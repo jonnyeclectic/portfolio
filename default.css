@@ -674,40 +674,40 @@ opacity:0;
 }
 
 figure:nth-child(12) {
-    animation: xfade 80s 0s infinite;
+    animation: xfade 120s 0s infinite;
 }
 figure:nth-child(11) {
-    animation: xfade 80s 10s infinite;
+    animation: xfade 120s 10s infinite;
 }
 figure:nth-child(10) {
-    animation: xfade 80s 32s infinite;
+    animation: xfade 120s 20s infinite;
 }
 figure:nth-child(9) {
-    animation: xfade 80s 71s infinite;
+    animation: xfade 120s 30s infinite;
 }
 figure:nth-child(8) {
-    animation: xfade 80s 97s infinite;
+    animation: xfade 120s 40s infinite;
 }
 figure:nth-child(7) {
-    animation: xfade 80s 50s infinite;
+    animation: xfade 120s 50s infinite;
 }
 figure:nth-child(6) {
-    animation: xfade 80s 60s infinite;
+    animation: xfade 120s 60s infinite;
 }
 figure:nth-child(5) {
-    animation: xfade 80s 70s infinite;
+    animation: xfade 120s 70s infinite;
 }
 figure:nth-child(4) {
-    animation: xfade 60s 40s infinite;
+    animation: xfade 120s 80s infinite;
 }
 figure:nth-child(3) {
-    animation: xfade 60s 45s infinite;
+    animation: xfade 120s 90s infinite;
 }
 figure:nth-child(2) {
-    animation: xfade 60s 50s infinite;
+    animation: xfade 120s 100s infinite;
 }
 figure:nth-child(1) {
-    animation: xfade 60s 55s infinite;
+    animation: xfade 120s 110s infinite;
 }
 @keyframes xfade{
     17% {
