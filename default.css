@@ -633,7 +633,7 @@ font-weight: 300;
 position: center;
 max-width: 495px;
 height: 550px;
-margin: 5em auto .5em auto;
+margin: 5em 5em .5em auto;
 }
 .css-slideshow figure{
 margin: 0;
@@ -651,7 +651,7 @@ top: 0;
 color: #fff;
 background: rgba(0,0,0, .3);
 font-size: .8em;
-padding: 8px 120px;
+padding: 8px 12px;
 opacity: 0;
 transition: opacity .5s;
 }
