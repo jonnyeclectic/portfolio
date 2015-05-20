@@ -677,16 +677,16 @@ figure:nth-child(12) {
     animation: xfade 80s 0s infinite;
 }
 figure:nth-child(11) {
-    animation: xfade 80s 10s infinite;
+    animation: xfade 80s 0s infinite;
 }
 figure:nth-child(10) {
-    animation: xfade 80s 20s infinite;
+    animation: xfade 80s 0s infinite;
 }
 figure:nth-child(9) {
-    animation: xfade 80s 30s infinite;
+    animation: xfade 80s 0s infinite;
 }
 figure:nth-child(8) {
-    animation: xfade 80s 40s infinite;
+    animation: xfade 80s 0s infinite;
 }
 figure:nth-child(7) {
     animation: xfade 80s 50s infinite;
