@@ -651,7 +651,7 @@ top: 0;
 color: #fff;
 background: rgba(0,0,0, .3);
 font-size: .8em;
-padding: 0px 12px;
+padding: 200px 12px;
 opacity: 0;
 transition: opacity .5s;
 }
