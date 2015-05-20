@@ -685,7 +685,7 @@ figure:nth-child(3) {
 figure:nth-child(4) {
     animation: xfade 80s 30s infinite;
 }
-figure:nth-child(6) {
+figure:nth-child(5) {
     animation: xfade 80s 40s infinite;
 }
 figure:nth-child(7) {
