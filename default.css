@@ -633,14 +633,14 @@ font-weight: 300;
 position: center;
 max-width: 495px;
 height: 500px;
-margin: 1em auto .5em auto;
+margin: 5em auto .5em auto;
 }
 .css-slideshow figure{
 margin: 0;
 max-width: 495px;
 height: 370px;
 background: #000;
-position: absolute;
+position: relative;
 }
 .css-slideshow img{
 box-shadow: 0 0 2px #666;
