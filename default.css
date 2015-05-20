@@ -631,13 +631,13 @@ font-weight: 300;
 }
 .css-slideshow{
 position: center;
-max-width: 495px;
+max-width: 49px;
 height: 550px;
 margin: 5em auto .5em auto;
 }
 .css-slideshow figure{
 margin: 0;
-max-width: 495px;
+max-width: 49px;
 height: 370px;
 background: #000;
 position: absolute;
