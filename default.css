@@ -640,7 +640,7 @@ margin: 0;
 max-width: 495px;
 height: 370px;
 background: #000;
-position: relative;
+position: center;
 }
 .css-slideshow img{
 box-shadow: 0 0 2px #666;
