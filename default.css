@@ -673,20 +673,20 @@ color: #666;
 opacity:0;
 }
 
-figure:nth-child(12) {
+figure:nth-child(1) {
     animation: xfade 80s 0s infinite;
 }
-figure:nth-child(11) {
-    animation: xfade 80s 0s infinite;
+figure:nth-child(2) {
+    animation: xfade 80s 10s infinite;
 }
-figure:nth-child(10) {
-    animation: xfade 80s 0s infinite;
+figure:nth-child(3) {
+    animation: xfade 80s 20s infinite;
 }
-figure:nth-child(9) {
-    animation: xfade 80s 0s infinite;
+figure:nth-child(4) {
+    animation: xfade 80s 30s infinite;
 }
-figure:nth-child(8) {
-    animation: xfade 80s 0s infinite;
+figure:nth-child(6) {
+    animation: xfade 80s 40s infinite;
 }
 figure:nth-child(7) {
     animation: xfade 80s 50s infinite;
