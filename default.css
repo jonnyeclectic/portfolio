@@ -893,10 +893,10 @@ li a:hover {
 .progress-bar {
     position: relative;
     top: -5px;
-    width: 680px;
+    width: 640px;
     height: 5px;
     background: #000;
-    animation: fullexpand 25s ease-out infinite;
+    animation: fullexpand 40s ease-out infinite;
 }
 
 /* ANIMATION BAR */
