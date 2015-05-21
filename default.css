@@ -858,23 +858,23 @@ figure:nth-child(1) {
 
 @keyframes cycle {
     0%  { top: 0px; } /* When you start the slide, the first image is already visible */
-    4%  { top: 0px; } /* Original Position */
-    16% { top: 0px; opacity:1; z-index:0; } /* From 4% to 16 % = for 3 seconds the image is visible */
-    20% { top: 325px; opacity: 0; z-index: 0; } /* From 16% to 20% = for 1 second exit image */
-    21% { top: -325px; opacity: 0; z-index: -1; } /* Return to Original Position */
-    92% { top: -325px; opacity: 0; z-index: 0; }
-    96% { top: -325px; opacity: 0; } /* From 96% to 100% = for 1 second enter image*/
+    2.5%  { top: 0px; } /* Original Position */
+    10% { top: 0px; opacity:1; z-index:0; } /* From 4% to 16 % = for 3 seconds the image is visible */
+    12.5% { top: 325px; opacity: 0; z-index: 0; } /* From 16% to 20% = for 1 second exit image */
+    15% { top: -325px; opacity: 0; z-index: -1; } /* Return to Original Position */
+    95% { top: -325px; opacity: 0; z-index: 0; }
+    97.5% { top: -325px; opacity: 0; } /* From 96% to 100% = for 1 second enter image*/
     100%{ top: 0px; opacity: 1; }
 }
 
 @keyframes cycletwo {
     0%  { top: -325px; opacity: 0; } /* Original Position */
-    16% { top: -325px; opacity: 0; }/* Starts moving after 16% to this position */
-    20% { top: 0px; opacity: 1; }
-    24% { top: 0px; opacity: 1; }  /* From 20% to 24% = for 1 second enter image*/
-    36% { top: 0px; opacity: 1; z-index: 0; }   /* From 24% to 36 % = for 3 seconds the image is visible */
-    40% { top: 325px; opacity: 0; z-index: 0; } /* From 36% to 40% = for 1 second exit image */
-    41% { top: -325px; opacity: 0; z-index: -1; }   /* Return to Original Position */
+    10% { top: -325px; opacity: 0; }/* Starts moving after 16% to this position */
+    12.5% { top: 0px; opacity: 1; }
+    15% { top: 0px; opacity: 1; }  /* From 20% to 24% = for 1 second enter image*/
+    22.5% { top: 0px; opacity: 1; z-index: 0; }   /* From 24% to 36 % = for 3 seconds the image is visible */
+    25% { top: 325px; opacity: 0; z-index: 0; } /* From 36% to 40% = for 1 second exit image */
+    26% { top: -325px; opacity: 0; z-index: -1; }   /* Return to Original Position */
     100%{ top: -325px; opacity: 0; z-index: -1; }
 }
 
