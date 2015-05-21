@@ -412,7 +412,15 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
 /* Header                                                                        */
 /*********************************************************************************/
 
-#header-wrapper
+#header-wrapper (max-width: 600px)
+{
+    position: relative;
+    padding: 4em 0em 7em 0em;
+    background: #111111 url(images/header-bg.jpg) no-repeat center;
+    background-size: cover;
+}
+
+#header-wrapper (min-width: 600px)
 {
     position: relative;
     padding: 4em 0em 7em 0em;
@@ -737,14 +745,6 @@ li a:hover {
     margin: 40px auto 0;
     overflow: visible;
     position: relative;
-}
-div.sidebar {
-    width: 300px;
-}
-
-@media all  {
-    width: 100%
-
 }
 
 /* HIDE ALL OUTSIDE OF THE SLIDER */
