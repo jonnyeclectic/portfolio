@@ -636,7 +636,7 @@ li a {
 li a:hover {
     color: #fff;
 }
-div {
+.mask {
     animation-name: move;
     animation-duration: 1s;
     animation-timing-function: ease-in-out;
