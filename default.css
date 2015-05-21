@@ -919,7 +919,7 @@ li a:hover {
     top: -5px;
     width: 640px;
     height: 5px;
-    background: #000;
+    background: #fff;
     animation: fullexpand 40s ease-out infinite;
 }
 
@@ -945,7 +945,7 @@ li a:hover {
 #slider .tooltip {
     background: rgba(0,0,0,0.7);
     width: 640px;
-    height: 60px;
+    height: 240px;
     position: relative;
     bottom: 75px;
     left: -645px
