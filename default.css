@@ -880,54 +880,54 @@ figure:nth-child(1) {
 
 @keyframes cyclethree {
     0%  { top: -325px; opacity: 0; }
-    36% { top: -325px; opacity: 0; }
-    40% { top: 0px; opacity: 1; }
-    44% { top: 0px; opacity: 1; }
-    56% { top: 0px; opacity: 1; }
-    60% { top: 325px; opacity: 0; z-index: 0; }
-    61% { top: -325px; opacity: 0; z-index: -1; }
+    22.5% { top: -325px; opacity: 0; }
+    25% { top: 0px; opacity: 1; }
+    27.5% { top: 0px; opacity: 1; }
+    35% { top: 0px; opacity: 1; }
+    37.5% { top: 325px; opacity: 0; z-index: 0; }
+    38.5% { top: -325px; opacity: 0; z-index: -1; }
     100%{ top: -325px; opacity: 0; z-index: -1; }
 }
 
 @keyframes cyclefour {
     0%  { top: -325px; opacity: 0; }
-    56% { top: -325px; opacity: 0; }
-    60% { top: 0px; opacity: 1; }
-    64% { top: 0px; opacity: 1; }
-    76% { top: 0px; opacity: 1; z-index: 0; }
-    80% { top: 325px; opacity: 0; z-index: 0; }
-    81% { top: -325px; opacity: 0; z-index: -1; }
+    35% { top: -325px; opacity: 0; }
+    37.5% { top: 0px; opacity: 1; }
+    40% { top: 0px; opacity: 1; }
+    47.5% { top: 0px; opacity: 1; z-index: 0; }
+    50% { top: 325px; opacity: 0; z-index: 0; }
+    51% { top: -325px; opacity: 0; z-index: -1; }
     100%{ top: -325px; opacity: 0; z-index: -1; }
 }
 @keyframes cyclefive {
     0%  { top: -325px; opacity: 0; }
-    76% { top: -325px; opacity: 0; }
-    80% { top: 0px; opacity: 1; }
-    84% { top: 0px; opacity: 1; }
-    96% { top: 0px; opacity: 1; z-index: 0; }
+    47.5% { top: -325px; opacity: 0; }
+    50% { top: 0px; opacity: 1; }
+    52.5% { top: 0px; opacity: 1; }
+    60% { top: 0px; opacity: 1; z-index: 0; }
     100%{ top: 325px; opacity: 0; z-index: 0; }
 }
 @keyframes cyclesix {
     0%  { top: -325px; opacity: 0; }
-    76% { top: -325px; opacity: 0; }
-    80% { top: 0px; opacity: 1; }
-    84% { top: 0px; opacity: 1; }
-    96% { top: 0px; opacity: 1; z-index: 0; }
+    60% { top: -325px; opacity: 0; }
+    62.5% { top: 0px; opacity: 1; }
+    65% { top: 0px; opacity: 1; }
+    72.5% { top: 0px; opacity: 1; z-index: 0; }
     100%{ top: 325px; opacity: 0; z-index: 0; }
 }
 @keyframes cycleseven {
     0%  { top: -325px; opacity: 0; }
-    76% { top: -325px; opacity: 0; }
-    80% { top: 0px; opacity: 1; }
-    84% { top: 0px; opacity: 1; }
-    96% { top: 0px; opacity: 1; z-index: 0; }
+    72.5% { top: -325px; opacity: 0; }
+    75% { top: 0px; opacity: 1; }
+    77.5% { top: 0px; opacity: 1; }
+    85% { top: 0px; opacity: 1; z-index: 0; }
     100%{ top: 325px; opacity: 0; z-index: 0; }
 }
 @keyframes cycleeight {
     0%  { top: -325px; opacity: 0; }
-    76% { top: -325px; opacity: 0; }
-    80% { top: 0px; opacity: 1; }
-    84% { top: 0px; opacity: 1; }
-    96% { top: 0px; opacity: 1; z-index: 0; }
+    85% { top: -325px; opacity: 0; }
+    87.5% { top: 0px; opacity: 1; }
+    90% { top: 0px; opacity: 1; }
+    97.5% { top: 0px; opacity: 1; z-index: 0; }
     100%{ top: 325px; opacity: 0; z-index: 0; }
 }
