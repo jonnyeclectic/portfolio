@@ -708,8 +708,8 @@ li a:hover {
     background: #000;
     border: 5px solid #eaeaea;
     box-shadow: 1px 1px 5px rgba(0,0,0,0.7);
-    height: 320px;
-    width: 680px;
+    height: 480px;
+    width: 640px;
     margin: 40px auto 0;
     overflow: visible;
     position: relative;
@@ -719,7 +719,7 @@ li a:hover {
 
 #mask {
     overflow: hidden;
-    height: 320px;
+    height: 480px;
 }
 
 /* IMAGE LIST */
@@ -734,7 +734,7 @@ li a:hover {
     width: 640px;  /* Width Image */
     height: 480px; /* Height Image */
     position: absolute;
-    top: -325px; /* Original Position - Outside of the Slider */
+    top: -485px; /* Original Position - Outside of the Slider */
     list-style: none;
 }
 
