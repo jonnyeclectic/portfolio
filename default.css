@@ -53,6 +53,7 @@ a {
     -moz-osx-font-smoothing: grayscale;
     position: relative;
     overflow: hidden;
+    color: darkgray;
 }
 a:before {
     content: "";
@@ -73,9 +74,6 @@ a:before {
 a:hover:before, .hvr-underline-from-right:focus:before, .hvr-underline-from-right:active:before {
     left: 0;
 }
-
-
-
 
 .container
 {
