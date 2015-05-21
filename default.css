@@ -924,6 +924,7 @@ li a:hover {
     height: 60px;
     position: relative;
     bottom: 75px;
+    left: -645px
 }
 
 #slider .tooltip h1 {
@@ -943,7 +944,10 @@ li a:hover {
 #slider li#second: hover .tooltip,
 #slider li#third: hover .tooltip,
 #slider li#fourth: hover .tooltip,
-#slider li#fifth: hover .tooltip {
+#slider li#fifth: hover .tooltip,
+#slider li#sixth: hover .tooltip,
+#slider li#seventh: hover .tooltip,
+#slider li#eighth: hover .tooltip{
     left: 0px;
 }
 
