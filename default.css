@@ -719,7 +719,7 @@ li a:hover {
 
 #mask {
     overflow: hidden;
-    height: 500px;
+    height: 480px;
 }
 
 /* IMAGE LIST */
@@ -734,7 +734,7 @@ li a:hover {
     width: 640px;  /* Width Image */
     height: 480px; /* Height Image */
     position: absolute;
-    top: -900px; /* Original Position - Outside of the Slider */
+    top: -485px; /* Original Position - Outside of the Slider */
     list-style: none;
 }
 
@@ -816,76 +816,76 @@ li a:hover {
     0%  { top: 0px; } /* When you start the slide, the first image is already visible */
     2.5%  { top: 0px; } /* Original Position */
     10% { top: 0px; opacity:1; z-index:0; } /* From 4% to 16 % = for 3 seconds the image is visible */
-    12.5% { top: 325px; opacity: 0; z-index: 0; } /* From 16% to 20% = for 1 second exit image */
-    15% { top: -325px; opacity: 0; z-index: -1; } /* Return to Original Position */
-    95% { top: -325px; opacity: 0; z-index: 0; }
-    97.5% { top: -325px; opacity: 0; } /* From 96% to 100% = for 1 second enter image*/
+    12.5% { top: 480px; opacity: 0; z-index: 0; } /* From 16% to 20% = for 1 second exit image */
+    15% { top: -480px; opacity: 0; z-index: -1; } /* Return to Original Position */
+    95% { top: -480px; opacity: 0; z-index: 0; }
+    97.5% { top: -480px; opacity: 0; } /* From 96% to 100% = for 1 second enter image*/
     100%{ top: 0px; opacity: 1; }
 }
 
 @keyframes cycletwo {
-    0%  { top: -325px; opacity: 0; } /* Original Position */
-    10% { top: -325px; opacity: 0; }/* Starts moving after 16% to this position */
+    0%  { top: -480px; opacity: 0; } /* Original Position */
+    10% { top: -480px; opacity: 0; }/* Starts moving after 16% to this position */
     12.5% { top: 0px; opacity: 1; }
     15% { top: 0px; opacity: 1; }  /* From 20% to 24% = for 1 second enter image*/
     22.5% { top: 0px; opacity: 1; z-index: 0; }   /* From 24% to 36 % = for 3 seconds the image is visible */
-    25% { top: 325px; opacity: 0; z-index: 0; } /* From 36% to 40% = for 1 second exit image */
-    26% { top: -325px; opacity: 0; z-index: -1; }   /* Return to Original Position */
-    100%{ top: -325px; opacity: 0; z-index: -1; }
+    25% { top: 480px; opacity: 0; z-index: 0; } /* From 36% to 40% = for 1 second exit image */
+    26% { top: -480px; opacity: 0; z-index: -1; }   /* Return to Original Position */
+    100%{ top: -480px; opacity: 0; z-index: -1; }
 }
 
 @keyframes cyclethree {
-    0%  { top: -325px; opacity: 0; }
-    22.5% { top: -325px; opacity: 0; }
+    0%  { top: -480px; opacity: 0; }
+    22.5% { top: -480px; opacity: 0; }
     25% { top: 0px; opacity: 1; }
     27.5% { top: 0px; opacity: 1; }
     35% { top: 0px; opacity: 1; }
-    37.5% { top: 325px; opacity: 0; z-index: 0; }
-    38.5% { top: -325px; opacity: 0; z-index: -1; }
-    100%{ top: -325px; opacity: 0; z-index: -1; }
+    37.5% { top: 480px; opacity: 0; z-index: 0; }
+    38.5% { top: -480px; opacity: 0; z-index: -1; }
+    100%{ top: -480px; opacity: 0; z-index: -1; }
 }
 
 @keyframes cyclefour {
-    0%  { top: -325px; opacity: 0; }
-    35% { top: -325px; opacity: 0; }
+    0%  { top: -480px; opacity: 0; }
+    35% { top: -480px; opacity: 0; }
     37.5% { top: 0px; opacity: 1; }
     40% { top: 0px; opacity: 1; }
     47.5% { top: 0px; opacity: 1; z-index: 0; }
-    50% { top: 325px; opacity: 0; z-index: 0; }
-    51% { top: -325px; opacity: 0; z-index: -1; }
-    100%{ top: -325px; opacity: 0; z-index: -1; }
+    50% { top: 480px; opacity: 0; z-index: 0; }
+    51% { top: -480px; opacity: 0; z-index: -1; }
+    100%{ top: -480px; opacity: 0; z-index: -1; }
 }
 @keyframes cyclefive {
-    0%  { top: -325px; opacity: 0; }
-    47.5% { top: -325px; opacity: 0; }
+    0%  { top: -480px; opacity: 0; }
+    47.5% { top: -480px; opacity: 0; }
     50% { top: 0px; opacity: 1; }
     52.5% { top: 0px; opacity: 1; }
     60% { top: 0px; opacity: 1; z-index: 0; }
-    100%{ top: 325px; opacity: 0; z-index: 0; }
+    100%{ top: 480px; opacity: 0; z-index: 0; }
 }
 @keyframes cyclesix {
-    0%  { top: -325px; opacity: 0; }
-    60% { top: -325px; opacity: 0; }
+    0%  { top: -480px; opacity: 0; }
+    60% { top: -480px; opacity: 0; }
     62.5% { top: 0px; opacity: 1; }
     65% { top: 0px; opacity: 1; }
     72.5% { top: 0px; opacity: 1; z-index: 0; }
-    100%{ top: 325px; opacity: 0; z-index: 0; }
+    100%{ top: 480px; opacity: 0; z-index: 0; }
 }
 @keyframes cycleseven {
-    0%  { top: -325px; opacity: 0; }
-    72.5% { top: -325px; opacity: 0; }
+    0%  { top: -480px; opacity: 0; }
+    72.5% { top: -480px; opacity: 0; }
     75% { top: 0px; opacity: 1; }
     77.5% { top: 0px; opacity: 1; }
     85% { top: 0px; opacity: 1; z-index: 0; }
-    100%{ top: 325px; opacity: 0; z-index: 0; }
+    100%{ top: 480px; opacity: 0; z-index: 0; }
 }
 @keyframes cycleeight {
-    0%  { top: -325px; opacity: 0; }
-    85% { top: -325px; opacity: 0; }
+    0%  { top: -480px; opacity: 0; }
+    85% { top: -480px; opacity: 0; }
     87.5% { top: 0px; opacity: 1; }
     90% { top: 0px; opacity: 1; }
     97.5% { top: 0px; opacity: 1; z-index: 0; }
-    100%{ top: 325px; opacity: 0; z-index: 0; }
+    100%{ top: 480px; opacity: 0; z-index: 0; }
 }
 
 /* PROGRESS BAR */
