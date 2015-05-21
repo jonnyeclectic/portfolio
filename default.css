@@ -924,7 +924,7 @@ li a:hover {
     height: 60px;
     position: relative;
     bottom: 75px;
-    left: -320px;
+    left: 320px;
 }
 
 #slider .tooltip h1 {
