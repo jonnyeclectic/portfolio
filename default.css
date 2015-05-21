@@ -625,7 +625,7 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
 
 /*//////////////////////////////////////////////////////////////////////////////*/
 
-a {
+li a {
     color: #000;
     transition-property: color;
     transition-duration: 0.7s;
@@ -633,7 +633,7 @@ a {
     transition-delay: 0.3s;
 }
 
-a:hover {
+li a:hover {
     color: #fff;
 }
 div {
