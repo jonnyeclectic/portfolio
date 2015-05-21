@@ -53,7 +53,7 @@ a {
     -moz-osx-font-smoothing: grayscale;
     position: relative;
     overflow: hidden;
-    color: darkgray;
+    color: black;
 }
 a:before {
     content: "";
