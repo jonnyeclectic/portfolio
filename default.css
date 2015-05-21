@@ -107,6 +107,7 @@ a:hover:before, .hvr-underline-from-right:focus:before, .hvr-underline-from-righ
 
 .feature-grid .feature .image {
     width: 30%;
+    max-width: 100%
 }
 
 .feature-grid .feature .image img {
@@ -134,6 +135,7 @@ a:hover:before, .hvr-underline-from-right:focus:before, .hvr-underline-from-righ
 .image
 {
     display: inline-block;
+    max-width: 100%
 }
 
 .image img
@@ -417,7 +419,7 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
     position: relative;
     padding: 4em 0em 7em 0em;
     background: #111111 url(images/header-bg.jpg) no-repeat center;
-    background-size: cover;
+    background-size: contain;
 }
 
 #header
@@ -600,7 +602,7 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
     position: relative;
     padding: 7em 0em 7em 0em;
     background: #111111 url(images/header-bg.png) no-repeat center;
-    background-size: cover;
+    background-size: contain;
     text-align: center;
 }
 
