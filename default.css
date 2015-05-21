@@ -730,7 +730,7 @@ li a:hover {
 
 #slider {
     background: #000;
-    border: 5px solid #eaeaea;
+    border: 2px solid #eaeaea;
     box-shadow: 1px 1px 5px rgba(0,0,0,0.7);
     height: 480px;
     width: 640px;
