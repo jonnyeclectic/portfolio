@@ -550,7 +550,7 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
 {
     overflow: hidden;
     padding: 5em 0em;
-    border-top: 1px solid rgba(0,0,0,1.08);
+    border-top: 1px solid rgba(0,0,0,0.8);
 }
 
 #copyright p
