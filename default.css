@@ -943,12 +943,12 @@ li a:hover {
 }
 
 #slider .tooltip {
-    background: rgba(0,0,0,0.7);
+    background: rgba(255,255,255,0.7);
     width: 640px;
-    height: 240px;
+    height: 100px;
     position: relative;
     bottom: 75px;
-    left: -645px
+    left: 100px
 }
 
 #slider .tooltip h1 {
