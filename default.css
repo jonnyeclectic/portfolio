@@ -739,23 +739,32 @@ li a:hover {
 }
 
 #slider li.firstanimation {
-    animation: cycle 25s linear infinite;
+    animation: cycle 40s linear infinite;
 }
 
 #slider li.secondanimation {
-    animation: cycletwo 25s linear infinite;
+    animation: cycletwo 40s linear infinite;
 }
 
 #slider li.thirdanimation {
-    animation: cyclethree 25s linear infinite;
+    animation: cyclethree 40s linear infinite;
 }
 
 #slider li.fourthanimation {
-    animation: cyclefour 25s linear infinite;
+    animation: cyclefour 40s linear infinite;
 }
 
 #slider li.fifthanimation {
-    animation: cyclefive 25s linear infinite;
+    animation: cyclefive 40s linear infinite;
+}
+#slider li.sixthanimation {
+    animation: cyclesix 40s linear infinite;
+}
+#slider li.seventhanimation {
+    animation: cycleseven 40s linear infinite;
+}
+#slider li.eighthanimation {
+    animation: cycleeight 40s linear infinite;
 }
 <!--
 figure:nth-child(11) {
@@ -891,6 +900,30 @@ figure:nth-child(1) {
     100%{ top: -325px; opacity: 0; z-index: -1; }
 }
 @keyframes cyclefive {
+    0%  { top: -325px; opacity: 0; }
+    76% { top: -325px; opacity: 0; }
+    80% { top: 0px; opacity: 1; }
+    84% { top: 0px; opacity: 1; }
+    96% { top: 0px; opacity: 1; z-index: 0; }
+    100%{ top: 325px; opacity: 0; z-index: 0; }
+}
+@keyframes cyclesix {
+    0%  { top: -325px; opacity: 0; }
+    76% { top: -325px; opacity: 0; }
+    80% { top: 0px; opacity: 1; }
+    84% { top: 0px; opacity: 1; }
+    96% { top: 0px; opacity: 1; z-index: 0; }
+    100%{ top: 325px; opacity: 0; z-index: 0; }
+}
+@keyframes cycleseven {
+    0%  { top: -325px; opacity: 0; }
+    76% { top: -325px; opacity: 0; }
+    80% { top: 0px; opacity: 1; }
+    84% { top: 0px; opacity: 1; }
+    96% { top: 0px; opacity: 1; z-index: 0; }
+    100%{ top: 325px; opacity: 0; z-index: 0; }
+}
+@keyframes cycleeight {
     0%  { top: -325px; opacity: 0; }
     76% { top: -325px; opacity: 0; }
     80% { top: 0px; opacity: 1; }
