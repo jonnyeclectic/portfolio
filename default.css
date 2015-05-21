@@ -766,51 +766,7 @@ li a:hover {
 #slider li.eighthanimation {
     animation: cycleeight 40s linear infinite;
 }
-<!--
-figure:nth-child(11) {
-    animation: xfade 120s 0s infinite;
-}
-figure:nth-child(10) {
-    animation: xfade 120s 20s infinite;
-}
-figure:nth-child(9) {
-    animation: xfade 120s 30s infinite;
-}
-figure:nth-child(8) {
-    animation: xfade 120s 40s infinite;
-}
-figure:nth-child(7) {
-    animation: xfade 120s 50s infinite;
-}
-figure:nth-child(6) {
-    animation: xfade 120s 60s infinite;
-}
-figure:nth-child(5) {
-    animation: xfade 120s 70s infinite;
-}
-figure:nth-child(4) {
-    animation: xfade 120s 80s infinite;
-}
-figure:nth-child(3) {
-    animation: xfade 120s 90s infinite;
-}
-figure:nth-child(2) {
-    animation: xfade 120s 100s infinite;
-}
-figure:nth-child(1) {
-    animation: xfade 120s 110s infinite;
-}
-@keyframes xfade{
-    17% {
-        opacity:1;
-    }
-    25% {
-        opacity:0;
-    }
-    92% {
-        opacity:0;
-    }
-}-->
+
 
 @keyframes move {
     from {
@@ -930,4 +886,69 @@ figure:nth-child(1) {
     90% { top: 0px; opacity: 1; }
     97.5% { top: 0px; opacity: 1; z-index: 0; }
     100%{ top: 325px; opacity: 0; z-index: 0; }
+}
+
+/* PROGRESS BAR */
+
+.progress-bar {
+    position: relative;
+    top: -5px;
+    width: 680px;
+    height: 5px;
+    background: #000;
+    animation: fullexpand 25s ease-out infinite;
+}
+
+/* ANIMATION BAR */
+
+@keyframes fullexpand {
+    /* In these keyframes, the progress-bar is stationary */
+    0%, 20%, 40%, 60%, 80%, 100% { width: 0%; opacity: 0; }
+
+    /* In these keyframes, the progress-bar starts to come alive */
+    4%, 24%, 44%, 64%, 84% { width: 0%; opacity: 0.3; }
+
+    /* In these keyframes, the progress-bar moves forward for 3 seconds */
+    16%, 36%, 56%, 76%, 96% { width: 100%; opacity: 0.7; }
+
+    /* In these keyframes, the progress-bar has finished his path */
+    17%, 37%, 57%, 77%, 97% { width: 100%; opacity: 0.3; }
+
+    /* In these keyframes, the progress-bar will disappear and then resume the cycle */
+    18%, 38%, 58%, 78%, 98% { width: 100%; opacity: 0; }
+}
+
+#slider .tooltip {
+    background: rgba(0,0,0,0.7);
+    width: 300px;
+    height: 60px;
+    position: relative;
+    bottom: 75px;
+    left: -320px;
+}
+
+#slider .tooltip h1 {
+    color: #fff;
+    font-size: 24px;
+    font-weight: 300;
+    line-height: 60px;
+    padding: 0 0 0 10px;
+}
+
+#slider .tooltip {
+    …
+    transition: all 0.3s ease-in-out;
+}
+
+#slider li#first: hover .tooltip,
+#slider li#second: hover .tooltip,
+#slider li#third: hover .tooltip,
+#slider li#fourth: hover .tooltip,
+#slider li#fifth: hover .tooltip {
+    left: 0px;
+}
+
+#slider: hover li,
+#slider: hover .progress-bar {
+    animation-play-state: paused;
 }
