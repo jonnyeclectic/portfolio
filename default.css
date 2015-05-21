@@ -742,10 +742,8 @@ div.sidebar {
     width: 300px;
 }
 
-@media all and (max-width: 400px) {
-    div.sidebar {
-        width: 100px;
-    }
+@media all  {
+    width: 100%
 
 }
 
