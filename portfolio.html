@@ -6,68 +6,70 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 -->
 <!doctype html>
 <html>
-<head>
-    <link href="css/style.css" type="text/css" rel="stylesheet" media="all">
-    <link href="css/bootstrap.css" type="text/css" rel="stylesheet" media="all">
-    <link rel="stylesheet" type="text/css" href="css/default.css" />
-    <link rel="stylesheet" type="text/css" href="css/component.css" />
-    <!--web-font-->
-    <link href='http://fonts.googleapis.com/css?family=Raleway:400,100,200,300,500,600,700,800,900' rel='stylesheet' type='text/css'>
-    <!--//web-font-->
-    <link href="https://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
-    <script src="https://vjs.zencdn.net/c/video.js"></script>
-    <!-- Custom Theme files -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="keywords" content="Wedo Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template,
-        Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
-    <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <!-- //Custom Theme files -->
-    <!-- js -->
-    <script src="js/jquery.min.js"></script>
-    <!-- //js -->
-    <!-- start-smoth-scrolling-->
-    <script type="text/javascript" src="js/move-top.js"></script>
-    <script type="text/javascript" src="js/easing.js"></script>
-    <script type="text/javascript" src="js/modernizr.custom.53451.js"></script>
-    <script type="text/javascript">
+    <head>
+        <link href="css/style.css" type="text/css" rel="stylesheet" media="all">
+        <link href="css/bootstrap.css" type="text/css" rel="stylesheet" media="all">
+        <link rel="stylesheet" type="text/css" href="css/default.css" />
+        <link rel="stylesheet" type="text/css" href="css/component.css" />
+        <!--web-font-->
+        <link href='http://fonts.googleapis.com/css?family=Raleway:400,100,200,300,500,600,700,800,900' rel='stylesheet' type='text/css'>
+        <!--//web-font-->
+        <link href="https://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
+        <script src="https://vjs.zencdn.net/c/video.js"></script>
+        <!-- Custom Theme files -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="keywords" content="Wedo Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template,
+                                       Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
+        <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <!-- //Custom Theme files -->
+        <!-- js -->
+        <script src="js/jquery.min.js"></script>
+        <!-- //js -->
+        <!-- start-smoth-scrolling-->
+        <script type="text/javascript" src="js/move-top.js"></script>
+        <script type="text/javascript" src="js/easing.js"></script>
+        <script type="text/javascript" src="js/modernizr.custom.53451.js"></script>
+        <script type="text/javascript">
             jQuery(document).ready(function($) {
                 $(".scroll").click(function(event){
                     event.preventDefault();
                     $('html,body').animate({scrollTop:$(this.hash).offset().top},1000);
                 });
             });
-    </script>
-    <!--//end-smoth-scrolling-->
-    <script src="js/easyResponsiveTabs.js" type="text/javascript"></script>
-            <script type="text/javascript">
-                $(document).ready(function () {
-                    $('#horizontalTab').easyResponsiveTabs({
-                        type: 'default', //Types: default, vertical, accordion
-                        width: 'auto', //auto or any width like 600px
-                        fit: true   // 100% fit in a container
-                    });
+        </script>
+        <!--//end-smoth-scrolling-->
+        <script src="js/easyResponsiveTabs.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('#horizontalTab').easyResponsiveTabs({
+                    type: 'default', //Types: default, vertical, accordion
+                    width: 'auto', //auto or any width like 600px
+                    fit: true   // 100% fit in a container
                 });
-    </script>
-</head>
-<body>
+            });
+        </script>
+    </head>
+    <body>
 
-    <div class="portfolio-filter">
-        <h3>Jonathan Reyes</h3>
-        <div class="container">
-            <div class="download">
-                <h3><a href="http://jonnyeclectic.github.io/portfolio/images/FinalResumeReyes.pdf">Résumé</a></h3>
+        <div class="portfolio-filter">
+            <h3>Jonathan Reyes</h3>
+            <div class="container">
+                <div class="services">
+                    <div class="download">
+                        <h3><a href="http://jonnyeclectic.github.io/portfolio/images/FinalResumeReyes.pdf">Résumé</a></h3>
+                    </div>
+                </div>
+
+
             </div>
 
 
-        </div>
-
-
-    <!--smooth-scrolling-of-move-up-->
-        <script type="text/javascript">
-                                    $(document).ready(function() {
-                                        /*
+            <!--smooth-scrolling-of-move-up-->
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    /*
                                         var defaults = {
                                               containerID: 'toTop', // fading element id
                                             containerHoverID: 'toTopHover', // fading element hover id
@@ -76,11 +78,11 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                          };
                                         */
 
-                                        $().UItoTop({ easingType: 'easeOutQuart' });
+                    $().UItoTop({ easingType: 'easeOutQuart' });
 
-                                    });
-                                </script>
-                    <a href="#" id="toTop" style="display: block;"> <span id="toTopHover" style="opacity: 1;"> </span></a>
-    <!--//smooth-scrolling-of-move-up-->
-</body>
-</html>
+                });
+            </script>
+            <a href="#" id="toTop" style="display: block;"> <span id="toTopHover" style="opacity: 1;"> </span></a>
+            <!--//smooth-scrolling-of-move-up-->
+            </body>
+        </html>
