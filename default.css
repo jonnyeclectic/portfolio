@@ -82,6 +82,11 @@ a:hover:before, .hvr-underline-from-right:focus:before, .hvr-underline-from-righ
     width: 1200px;
 }
 
+.download a
+{
+
+}
+
 /* Feature */
 
 .feature-grid {
