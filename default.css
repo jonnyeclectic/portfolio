@@ -596,10 +596,9 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
 
 #copyright a
 {
-
     text-align: center;
     font-size: 1em;
-    color: rgba(155,155,155,0.6);
+    color: rgba(155,155,155,0.3);
 }
 
 
