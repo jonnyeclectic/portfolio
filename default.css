@@ -75,12 +75,7 @@ a:hover:before, .hvr-underline-from-right:focus:before, .hvr-underline-from-righ
     left: 0;
 }
 
-.container
-{
-    overflow: hidden;
-    margin: 0em auto;
-    width: 1200px;
-}
+
 
 .download a
 {
@@ -600,7 +595,6 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
     text-align: center;
     font-size: 1em;
     color: rgba(155,155,155,0.3);
-
 
     text-decoration: none;
 }
