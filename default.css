@@ -630,9 +630,9 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
     color: rgba(55,55,55,1);
 }
 
-#welcome .container .title .byline
+#welcome .byline
 {
-    color: rgba(80,80,80,1);
+    color: rgba(80,0,80,1);
 }
 
 
