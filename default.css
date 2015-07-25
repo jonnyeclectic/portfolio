@@ -630,6 +630,11 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
     color: rgba(55,55,55,1);
 }
 
+#welcome span
+{
+    color: rgba(100,100,100,.8);
+}
+
 
 /*********************************************************************************/
 /* Extra                                                                         */
