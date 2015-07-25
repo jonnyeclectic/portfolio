@@ -622,12 +622,12 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
 {
     width: 1000px;
     padding: 0px 100px;
-    color: rgba(55,55,55,0.8);
+    color: rgba(90,90,90,0.8);
 }
 
 #welcome a
 {
-    color: rgba(55,55,55,1);
+    color: rgba(55,55,5,1);
 }
 
 #welcome .byline
