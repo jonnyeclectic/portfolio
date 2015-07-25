@@ -627,7 +627,12 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
 
 #welcome a
 {
-    color: rgba(55,55,5,1);
+    color: rgba(55,55,55,1);
+}
+
+#welcome .title
+{
+    color: rgba(85,85,85,1);
 }
 
 #welcome .byline
