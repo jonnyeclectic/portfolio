@@ -622,7 +622,7 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
 {
     width: 1000px;
     padding: 0px 100px;
-    color: rgba(100,100,100,0.8);
+    color: rgba(55,55,55,0.8);
 }
 
 #welcome a
@@ -630,9 +630,9 @@ ul.contact li a.icon-rss:before { background: #F2600B; }
     color: rgba(55,55,55,1);
 }
 
-#welcome .span
+#welcome .container .title .byline
 {
-    color: rgba(100,100,100,.8);
+    color: rgba(80,80,80,1);
 }
 
 
