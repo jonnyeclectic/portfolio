@@ -1,108 +1,605 @@
-<script type="text/javascript">
-    <!--
-        if (screen.width <= 800) {
-            window.location = "http://jonnyeclectic.github.io/portfolio/portfolio.html";
-        }
-    //-->
-</script>
-<script type="text/javascript" src="coolclock.js"></script>
-<script type="text/javascript" src="moreskins.js"></script>
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <meta name="viewport"  http-equiv="Content-Type" content="charset=utf-8, width=device-width, initial-scale=1">
-        <title></title>
-        <meta name="keywords" content="" />
-        <meta name="description" content="" />
-        <link href="https://fonts.googleapis.com/css?family=Helvetica+Neue" rel="stylesheet" />
-        <link href="default.css" rel="stylesheet" type="text/css" media="all" />
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    </head>
-    <body>
-        <div id="header-wrapper">
-            <div id="header" class="container">
-                <div id="logo">
-                    <h1><a href="experience.html">Jonathan Reyes</a></h1>
-                </div>
-                <div id="menu">
-                    <ul>
-                        <li class="active"><a href="index.html" accesskey="1" title="">Home</a></li>
-                        <li><a href="experience.html" accesskey="3" title="">Portfolio</a></li>
-                        <li><a href="resume.html" accesskey="2" title="">Résumé</a></li>
-                        <li><a href="contact.html" accesskey="4" title="">Contact</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div align="middle">
-                <canvas id="clockid" class="CoolClock:classic:200:0:+7"></canvas>
-                <body onload="CoolClock.findAndCreateClocks()"></body>
-            </div>
-            <div id="banner" class="container">
-                <div class="title">
-                    <h2>Software Development</h2>
-                    <span class="byline">Established experience in software development; passionate about 
-                        <p> technical writing, game design, and mathematics for computer applications and systems. </p>
-                    </span>
-                </div>
-                <ul class="actions">
-                    <li><a href="resume.html" class="button">Résumé</a></li>
-                </ul>
-            </div>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jonathan Reyes — Lead Software Engineer</title>
+<meta name="description" content="Jonathan Reyes — Lead Software Engineer at Capital One. 11 years building distributed systems, APIs, and developer platforms in regulated financial services. Java and Python on AWS.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0a10'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='bold' fill='%23fbbf24' text-anchor='middle'%3Ejr%3C/text%3E%3C/svg%3E">
+<script>document.documentElement.classList.add("js")</script>
+<style>
+  :root {
+    --bg: #0a0a10;
+    --panel: rgba(255,255,255,.035);
+    --panel-solid: #13131c;
+    --line: rgba(255,255,255,.09);
+    --line-soft: rgba(255,255,255,.05);
+    --text: #f0f0f5;
+    --text-2: #9d9dae;
+    --text-3: #8a8a9c;
+    --amber: #fbbf24;
+    --orange: #f59e0b;
+    --pink: #ec4899;
+    --violet: #a78bfa;
+    --blue: #60a5fa;
+    --sky: #7dd3fc;
+    --green: #4ade80;
+    --yellow: #facc15;
+    --term-bg: #1e1e38;
+    --term-bar: #2a2a4a;
+    --grad: linear-gradient(92deg, var(--orange) 0%, var(--pink) 55%, var(--violet) 100%);
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { transition: none !important; transform: none !important; opacity: 1 !important; }
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(1200px 800px at 30% 0%, #000 0%, rgba(0,0,0,.35) 60%, rgba(0,0,0,.15) 100%);
+            mask-image: radial-gradient(1200px 800px at 30% 0%, #000 0%, rgba(0,0,0,.35) 60%, rgba(0,0,0,.15) 100%);
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+  a { color: inherit; }
+  code { font-family: var(--mono); }
+  :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: 4px; }
+
+  /* ---------- nav ---------- */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,10,16,.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav { display: flex; align-items: center; gap: 24px; height: 64px; }
+  .logo { display: flex; align-items: baseline; gap: 10px; text-decoration: none; }
+  .logo b { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--amber); letter-spacing: -.02em; }
+  .logo span { font-size: 10.5px; letter-spacing: .24em; color: var(--text-2); text-transform: uppercase; }
+  .nav ul {
+    display: flex; gap: 4px; list-style: none; margin-left: auto;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .nav ul::-webkit-scrollbar { display: none; }
+  .nav ul a {
+    display: block; padding: 8px 12px; border-radius: 8px;
+    font-size: 14px; color: var(--text-2); text-decoration: none; white-space: nowrap;
+  }
+  .nav ul a:hover { color: var(--text); background: var(--panel); }
+  .nav ul a.cta { color: var(--text); font-weight: 600; }
+
+  /* ---------- shared section chrome ---------- */
+  section { padding: 110px 0 20px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    letter-spacing: .24em; text-transform: uppercase;
+    background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+    display: block; text-align: center; margin-bottom: 18px;
+  }
+  .sec-title {
+    font-size: clamp(30px, 4.5vw, 50px); font-weight: 800; letter-spacing: -.025em;
+    line-height: 1.1; text-align: center; text-wrap: balance;
+  }
+  .sec-sub {
+    max-width: 640px; margin: 18px auto 0; text-align: center;
+    color: var(--text-2); font-size: 17.5px; text-wrap: balance;
+  }
+  .sec-sub code {
+    color: var(--amber); background: rgba(251,191,36,.09);
+    padding: 1px 7px; border-radius: 6px; font-size: .88em;
+  }
+  .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+  .js .reveal.in { opacity: 1; transform: none; }
+  @media print {
+    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 96px 0 30px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 12.5px; color: #d8c9f5;
+    border: 1px solid rgba(167,139,250,.45); border-radius: 999px;
+    padding: 7px 16px; margin-bottom: 30px;
+    background: rgba(167,139,250,.07);
+  }
+  .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--grad); }
+  .hero h1 {
+    font-size: clamp(44px, 7.2vw, 86px); font-weight: 800;
+    letter-spacing: -.035em; line-height: 1.02; max-width: 900px; text-wrap: balance;
+  }
+  .hero h1 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.lede { max-width: 700px; margin-top: 30px; font-size: 19px; color: var(--text-2); }
+  .hero p.lede b { color: var(--text); font-weight: 650; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 38px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 15.5px; font-weight: 650; text-decoration: none;
+    padding: 14px 26px; border-radius: 12px; border: 1px solid transparent;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-grad {
+    color: #17110a;
+    background: linear-gradient(92deg, var(--orange), var(--pink));
+    box-shadow: 0 8px 30px rgba(236,72,153,.28);
+  }
+  .btn-grad:hover { box-shadow: 0 10px 36px rgba(236,72,153,.4); }
+  .btn-ghost { color: var(--text); border-color: var(--line); background: var(--panel); }
+  .btn-ghost:hover { border-color: rgba(255,255,255,.2); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 72px; }
+  .stat {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+    padding: 26px 22px; text-align: center;
+  }
+  .stat b {
+    display: block; font-size: clamp(28px, 3.4vw, 42px); font-weight: 800; letter-spacing: -.02em;
+    background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat span {
+    display: block; margin-top: 8px; font-size: 11px; font-weight: 650;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--text-2);
+  }
+
+  /* ---------- highlight cards ---------- */
+  .caps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 64px; }
+  .cap {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 30px 26px;
+    display: flex; flex-direction: column;
+  }
+  a.cap { text-decoration: none; transition: border-color .15s ease, transform .15s ease; }
+  a.cap:hover { border-color: rgba(255,255,255,.22); transform: translateY(-2px); }
+  .cap .ic {
+    width: 46px; height: 46px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 21px; margin-bottom: 20px;
+    background: var(--ic-bg, rgba(255,255,255,.06)); color: var(--ic-fg, var(--text));
+    border: 1px solid var(--line-soft);
+  }
+  .cap h3 { font-size: 19.5px; font-weight: 750; letter-spacing: -.01em; }
+  .cap p { font-size: 14.5px; color: var(--text-2); margin-top: 10px; }
+  .cap .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 18px; }
+  .cap .tags code {
+    font-size: 12px; color: #d5d5e2; background: rgba(255,255,255,.06);
+    border: 1px solid var(--line-soft); border-radius: 7px; padding: 3px 9px;
+  }
+  .cap .more { margin-top: auto; padding-top: 16px; font-size: 13.5px; font-weight: 650; color: var(--amber); }
+
+  /* ---------- experience timeline ---------- */
+  .xp { max-width: 880px; margin: 56px auto 0; }
+  .company { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 52px 0 14px; }
+  .company:first-child { margin-top: 0; }
+  .company h3 { font-size: 25px; font-weight: 800; letter-spacing: -.02em; }
+  .company .loc { font-size: 14px; color: var(--text-3); }
+  .company .span {
+    margin-left: auto; font-family: var(--mono); font-size: 12.5px; color: var(--text-2);
+    border: 1px solid var(--line); border-radius: 999px; padding: 5px 13px; white-space: nowrap;
+  }
+  .role {
+    position: relative; margin-left: 7px; padding: 6px 0 26px 32px;
+    border-left: 1px solid var(--line);
+  }
+  .role:last-of-type { padding-bottom: 8px; }
+  .role::before {
+    content: ""; position: absolute; left: -5.5px; top: 14px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--grad); box-shadow: 0 0 0 4px var(--bg);
+  }
+  .role h4 { font-size: 18px; font-weight: 750; letter-spacing: -.01em; }
+  .role .dates { display: block; font-family: var(--mono); font-size: 12.5px; color: var(--text-2); margin-top: 3px; }
+  .role p { font-size: 15px; color: var(--text-2); margin-top: 10px; max-width: 700px; }
+  .role p b { color: var(--text); font-weight: 650; }
+  .role .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+  .role .chips code {
+    font-size: 12px; color: #d5d5e2; background: rgba(255,255,255,.06);
+    border: 1px solid var(--line-soft); border-radius: 7px; padding: 3px 9px;
+  }
+  .xp-cta { text-align: center; margin-top: 44px; }
+
+  /* ---------- featured project ---------- */
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; margin-top: 64px; }
+  .feature-copy p { color: var(--text-2); margin-bottom: 22px; font-size: 17.5px; }
+  .feature-copy p b { color: var(--text); font-weight: 650; }
+  .feature-copy .chip-code {
+    font-family: var(--mono); font-size: .86em; color: var(--amber);
+    background: rgba(251,191,36,.09); padding: 1px 7px; border-radius: 6px;
+  }
+  .window {
+    background: var(--term-bg); border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
+    box-shadow: 0 24px 70px rgba(0,0,0,.5);
+    overflow: hidden;
+  }
+  .window .bar {
+    display: flex; align-items: center; height: 38px; padding: 0 14px;
+    background: var(--term-bar); border-bottom: 1px solid rgba(0,0,0,.25);
+  }
+  .window .dots { display: flex; gap: 7px; }
+  .window .dots i { width: 12px; height: 12px; border-radius: 50%; }
+  .window .dots i:nth-child(1) { background: #ff5f57; }
+  .window .dots i:nth-child(2) { background: #febc2e; }
+  .window .dots i:nth-child(3) { background: #28c840; }
+  .window .bar-title {
+    flex: 1; text-align: center; font-family: var(--mono); font-size: 12.5px; color: #b8b8d0;
+    margin-right: 47px;
+  }
+  .window pre {
+    padding: 22px 24px; overflow-x: auto;
+    font-family: var(--mono); font-size: 13.5px; line-height: 1.75; color: #dcdcf0;
+  }
+  .tp  { color: #8888aa; }
+  .tv  { color: #7ee787; font-weight: 700; }
+  .tc  { color: var(--yellow); font-weight: 700; }
+  .tok { color: var(--green); }
+  .tdim { color: #9d9dbd; }
+  .cm  { color: #9d9dbd; font-style: italic; }
+
+  /* ---------- education ---------- */
+  .edu {
+    max-width: 760px; margin: 56px auto 0;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    padding: 34px 34px 30px;
+  }
+  .edu h3 { font-size: 21px; font-weight: 750; letter-spacing: -.01em; }
+  .edu .dates { font-family: var(--mono); font-size: 12.5px; color: var(--text-2); margin-top: 4px; display: block; }
+  .edu p { font-size: 15px; color: var(--text-2); margin-top: 12px; }
+  .edu .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
+  .edu .tags code {
+    font-size: 12px; color: #d5d5e2; background: rgba(255,255,255,.06);
+    border: 1px solid var(--line-soft); border-radius: 7px; padding: 3px 9px;
+  }
+
+  /* ---------- contact strip ---------- */
+  .contact-strip { text-align: center; margin-top: 56px; }
+  .contact-strip .cta-row { justify-content: center; }
+
+  /* ---------- footer ---------- */
+  footer { margin-top: 130px; border-top: 1px solid var(--line-soft); padding: 44px 0 60px; text-align: center; }
+  footer .brand { font-size: 15px; color: var(--text-2); }
+  footer .brand b { font-family: var(--mono); color: var(--amber); }
+  footer .meta { margin-top: 10px; font-size: 13.5px; color: var(--text-3); }
+  footer .links { margin-top: 14px; font-size: 13.5px; color: var(--text-3); }
+  footer .links a { color: var(--text-2); text-decoration: none; }
+  footer .links a:hover { color: var(--text); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 960px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .caps { grid-template-columns: repeat(2, 1fr); }
+    .feature-grid { grid-template-columns: 1fr; gap: 40px; }
+  }
+  @media (max-width: 620px) {
+    section { padding: 84px 0 10px; }
+    .caps { grid-template-columns: 1fr; }
+    .stats { gap: 10px; }
+    .stat { padding: 18px 10px; }
+    .company .span { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#top"><b>jreyes</b><span>Software Engineer</span></a>
+    <ul>
+      <li><a href="#work">Highlights</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#skills">Technologies</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="experience.html">boost&nbsp;↗</a></li>
+      <li><a href="resume.html">Résumé</a></li>
+      <li><a class="cta" href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ================= HERO ================= -->
+  <div class="wrap hero">
+    <span class="badge">Lead Software Engineer · Capital One · Fort&nbsp;Worth,&nbsp;TX</span>
+    <h1>Distributed systems, APIs &amp; <span class="grad">developer platforms.</span></h1>
+    <p class="lede">
+      I'm <b>Jonathan Reyes</b> — a senior software engineer with 11 years building
+      in regulated financial services. At Capital One, I lead architecture for the
+      platform orchestrating <b>all dealership-partner communications</b>, and ran the
+      company-wide Artifactory platform ecosystem. Separately, on my own time, I build
+      <b>boost</b> — an open-source package manager for AI coding skills, shaped by what
+      running enterprise developer tooling teaches you. <b>Java and Python on AWS</b>,
+      with a record of setting standards that spread beyond team boundaries.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-grad" href="resume.html">View my résumé →</a>
+      <a class="btn btn-ghost" href="experience.html">Explore boost, my open-source AI tooling</a>
+    </div>
+    <div class="stats">
+      <div class="stat reveal"><b>11</b><span>Years of engineering</span></div>
+      <div class="stat reveal"><b>10K</b><span>Loan apps / hour orchestrated</span></div>
+      <div class="stat reveal"><b>8.4K</b><span>AI skills indexed by boost</span></div>
+      <div class="stat reveal"><b>AWS</b><span>Certified Solutions Architect</span></div>
+    </div>
+  </div>
+
+  <!-- ================= HIGHLIGHTS ================= -->
+  <section id="work">
+    <div class="wrap">
+      <span class="eyebrow">Highlights</span>
+      <h2 class="sec-title">What I've been building</h2>
+      <p class="sec-sub">Two platforms at Capital One — a high-throughput orchestration
+        backbone and a document-intelligence pipeline — plus boost, the open-source
+        developer tool I build outside of work.</p>
+
+      <div class="caps">
+        <div class="cap reveal" style="--ic-bg: rgba(96,165,250,.12); --ic-fg: #93c5fd;">
+          <div class="ic">⇄</div>
+          <h3>Dealer communications platform</h3>
+          <p>Lead architecture, technical direction, and delivery for the platform
+            orchestrating all communications between a major bank, its dealership
+            partners, and internal messaging systems — processing loan applications
+            at 10,000 per hour on AWS microservices.</p>
+          <div class="tags"><code>AWS</code><code>ECS</code><code>Docker</code><code>microservices</code><code>messaging</code></div>
         </div>
-        <div id="wrapper">
-            <div id="three-column" class="container">
-                <div class="title">
-                    <h2>Language. Database. Tools.</h2>
-                    <span class="byline">APIs, Full Stack Development, Micro-services, scripts, databases, and container logic.<span>
-                        </div>
-                        <div class="boxA">
-                            <span class="fa fa-code"></span>
-                            <p>Primary: PHP, Python, and Bash.</p>
-                            <p>Secondary: Javascript, HTML, C, and C++.</p>
-                        </div>
-                        <div class="boxB">
-                            <i class="fa fa-database"></i>
-                            <p>Design with complexity in mind.</p>
-                            <a href="experience.html" class="button button-alt">Portfolio</a>
-                        </div>
-                        <div class="boxC">
-                            <span class="fa fa-wrench"></span>
-                            <p> Zend, Laravel, Flask, PyTest, Docker, Kubernetes, and OpenShift.</p>
-                        </div>
-                        </div>
-                </div>
-                <div id="welcome">
-                    <div class="container">
-                        <div class="title">
-                            <h2>Jonathan Reyes</h2>
-                            <span class="byline">B.S. Computer Science | Minor in Mathematics | Cert. Technical Writing | Cert. Game Design</span>
-                        </div>
-                        <ul class="actions">
-                            <li><a href="contact.html" class="button">Contact</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div id="copyright" class="container">
-                    <p>&copy; Jonathan Michael Reyes. All rights reserved. |
+        <a class="cap reveal" href="experience.html" style="--ic-bg: rgba(236,72,153,.12); --ic-fg: #f9a8d4;">
+          <div class="ic">✦</div>
+          <h3>boost — open-source AI skills package manager</h3>
+          <p>An independent side project: a CLI that finds, installs, and governs the
+            skill files AI coding agents run on, then keeps them in sync across every
+            agent at once. Built on personal time; informed by years spent operating
+            enterprise developer platforms. I'm a daily practitioner of AI-assisted
+            engineering with Claude, Windsurf, and Gemini.</p>
+          <div class="tags"><code>CLI</code><code>open source</code><code>Python</code><code>AI tooling</code></div>
+          <span class="more">See the full visual guide →</span>
+        </a>
+        <div class="cap reveal" style="--ic-bg: rgba(74,222,128,.1); --ic-fg: #86efac;">
+          <div class="ic">◈</div>
+          <h3>Document intelligence pipeline</h3>
+          <p>Built a pipeline that ingests partner report PDFs and parses them with
+            AWS Textract, surfacing key findings that analysts use to set dealership
+            marketing targets.</p>
+          <div class="tags"><code>AWS Textract</code><code>Python</code><code>document AI</code></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-                        <a title="site stats"
-                           href="http://statcounter.com/free-web-stats/"
-                           target="_blank"><img
-                                                src="https://c.statcounter.com/10493417/0/a8fdde33/1/"
-                                                alt="site stats" style="border:none;"></a>
-                        <a
-                           href="http://statcounter.com/p10493417/?guest=1">Statistics </a></p>
-                    <p><a href="https://www.linkedin.com/in/reyesjon">
-                        <object data="images/linkedin.svg" type="image/svg+xml" height=34>
-                            <img src="images/linkedin.png" height=34 />
-                        </object>
-                        </a>
-                        <a href="https://github.com/jonnyeclectic">
-                            <object data="images/github.svg" type="image/svg+xml" height=34>
-                                <img src="images/github.png" height=34 />
-                            </object>
-                        </a>
+  <!-- ================= EXPERIENCE ================= -->
+  <section id="experience">
+    <div class="wrap">
+      <span class="eyebrow">Experience</span>
+      <h2 class="sec-title">Eleven years, two companies, six roles</h2>
+      <p class="sec-sub">From SoftLayer APIs to leading architecture for a major bank's
+        dealer-communications platform.</p>
 
-                    </p>
-                </div>
-                </body>
-            </html>
+      <div class="xp">
+        <div class="company reveal">
+          <h3>Capital One</h3><span class="loc">Plano, TX</span>
+          <span class="span">June 2019 – Present</span>
+        </div>
+        <div class="role reveal">
+          <h4>Lead Software Engineer</h4>
+          <span class="dates">Feb 2023 – Present</span>
+          <p>Lead architecture and delivery for the dealer-communications platform
+            (10,000 loan applications/hour) and a Textract document-intelligence
+            pipeline. Own production operations end to
+            end — on-call, incident triage, root-cause investigation, monitoring.
+            Serve as <b>Sales Testing Champion</b>, defining test strategy and quality
+            standards adopted across four engineering teams; mentor engineers and lead
+            cross-functional delivery from scoping through production.</p>
+          <div class="chips"><code>Java</code><code>Python</code><code>AWS ECS</code><code>Docker</code><code>Claude</code></div>
+        </div>
+        <div class="role reveal">
+          <h4>Principal Associate Software Engineer · Prequalified Applications</h4>
+          <span class="dates">June 2021 – Feb 2023</span>
+          <p>Architected and operated <b>external-facing services powering auto loan
+            prequalification</b> for public applicants — owning API contracts, data models,
+            AWS deployment, and production support end to end. Partnered with product and
+            risk stakeholders to translate regulated lending requirements into resilient,
+            scalable service architecture.</p>
+          <div class="chips"><code>API design</code><code>AWS</code><code>regulated lending</code></div>
+        </div>
+        <div class="role reveal">
+          <h4>Principal Associate Software Engineer · Artifactory Platform</h4>
+          <span class="dates">Jan 2020 – June 2021</span>
+          <p>Built and maintained the platform ecosystem around <b>JFrog Artifactory</b>,
+            the binary repository consumed by every technology organization at Capital One.
+            Automated artifact promotion within production deployment pipelines, removing a
+            manual step from every team's release process company-wide.</p>
+          <div class="chips"><code>JFrog Artifactory</code><code>CI/CD</code></div>
+        </div>
+        <div class="role reveal">
+          <h4>Principal Associate Software Engineer · Metrics</h4>
+          <span class="dates">June 2019 – Jan 2020</span>
+          <p>Delivered platform-agnostic performance analytics through clustered cloud
+            microservices; automated metrics aggregation feeding <b>machine learning models</b>
+            driving application performance and resilience.</p>
+          <div class="chips"><code>microservices</code><code>metrics-to-ML</code></div>
+        </div>
+
+        <div class="company reveal">
+          <h3>IBM</h3><span class="loc">Dallas, TX</span>
+          <span class="span">2015 – 2019</span>
+        </div>
+        <div class="role reveal">
+          <h4>Software Engineer II</h4>
+          <span class="dates">2017 – 2019</span>
+          <p>Built OpenShift deployments for microservices; migrated server provisioning to
+            <b>Netflix Conductor</b> workflow orchestration, converting sequential job
+            scheduling to parallel execution and cutting large-data processing
+            <b>from hours to minutes</b>.</p>
+          <div class="chips"><code>OpenShift</code><code>Netflix Conductor</code></div>
+        </div>
+        <div class="role reveal">
+          <h4>Software Engineer I · SoftLayer (acquired by IBM)</h4>
+          <span class="dates">2015 – 2017</span>
+          <p>Developed APIs for globally integrated services; built <b>Splunk dashboards</b>
+            for service metrics and health checks and contributed to the CI/CD functional
+            test framework.</p>
+          <div class="chips"><code>APIs</code><code>Splunk</code><code>CI/CD</code></div>
+        </div>
+      </div>
+
+      <div class="xp-cta reveal">
+        <a class="btn btn-ghost" href="resume.html">Read the full résumé →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FEATURED PROJECT ================= -->
+  <section id="project">
+    <div class="wrap">
+      <span class="eyebrow">Open Source</span>
+      <h2 class="sec-title">boost — a package manager for what your agent knows</h2>
+      <p class="sec-sub">An independent, open-source CLI that installs and governs AI
+        agent skills. Built and maintained on my own time.</p>
+
+      <div class="feature-grid">
+        <div class="feature-copy reveal">
+          <p>boost pulls AI coding skills out of Git-hosted registries and lands them
+            in Claude Code, Windsurf, and Cursor in one step — 72 commands spanning
+            install, discovery, AI-assisted authoring, governance, and team rollout.</p>
+          <p>Skills get handled like real dependencies instead of files you paste
+            around: a lock file pins exact state, <span class="chip-code">boost audit</span>
+            screens against safety blocklists, and Boostfile bundles hand an entire
+            setup to someone else intact.</p>
+          <a class="btn btn-grad" href="experience.html">Explore the visual guide →</a>
+        </div>
+        <div class="window reveal">
+          <div class="bar"><div class="dots"><i></i><i></i><i></i></div>
+            <div class="bar-title">zsh — boost</div></div>
+          <pre><span class="tp">$</span> <span class="tv">boost</span> <span class="tc">install</span> jira-integration
+  <span class="tok">✓</span> copied to ~/.agents/skills/jira-integration
+  <span class="tok">✓</span> linked → claude-code · windsurf · cursor
+  <span class="tok">✓</span> lock updated (.skill-lock.json)
+
+<span class="tp">$</span> <span class="tv">boost</span> <span class="tc">doctor</span>
+  <span class="tok">✓</span> 14 skills installed · 2 taps synced
+  <span class="tok">✓</span> lock file integrity OK
+
+<span class="cm"># open source · github.com/jonnyeclectic/boost</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TECHNOLOGIES ================= -->
+  <section id="skills">
+    <div class="wrap">
+      <span class="eyebrow">Technologies</span>
+      <h2 class="sec-title">The stack I work in</h2>
+      <p class="sec-sub">Deep in Java and Python on AWS, with the platform and
+        delivery tooling around them.</p>
+
+      <div class="caps">
+        <div class="cap reveal" style="--ic-bg: rgba(251,191,36,.12); --ic-fg: #fcd34d;">
+          <div class="ic">{ }</div>
+          <h3>Languages &amp; frameworks</h3>
+          <p>The core toolkit for services and automation.</p>
+          <div class="tags"><code>Java</code><code>Spring Boot</code><code>Python</code><code>SQL</code><code>Bash</code></div>
+        </div>
+        <div class="cap reveal" style="--ic-bg: rgba(96,165,250,.12); --ic-fg: #93c5fd;">
+          <div class="ic">☁</div>
+          <h3>Cloud &amp; infrastructure</h3>
+          <p>AWS Certified Solutions Architect; containers everywhere.</p>
+          <div class="tags"><code>AWS ECS</code><code>AWS Textract</code><code>Docker</code><code>Kubernetes</code><code>OpenShift</code><code>Linux</code></div>
+        </div>
+        <div class="cap reveal" style="--ic-bg: rgba(236,72,153,.12); --ic-fg: #f9a8d4;">
+          <div class="ic">✦</div>
+          <h3>AI &amp; automation</h3>
+          <p>Daily AI-assisted engineering, and building the tools for it.</p>
+          <div class="tags"><code>Claude</code><code>AI tooling</code><code>document intelligence</code><code>metrics-to-ML</code></div>
+        </div>
+        <div class="cap reveal" style="--ic-bg: rgba(167,139,250,.12); --ic-fg: #c4b5fd;">
+          <div class="ic">⛭</div>
+          <h3>Platform &amp; delivery</h3>
+          <p>The pipelines and platforms teams ship through.</p>
+          <div class="tags"><code>JFrog Artifactory</code><code>CI/CD</code><code>Netflix Conductor</code><code>Splunk</code></div>
+        </div>
+        <div class="cap reveal" style="--ic-bg: rgba(74,222,128,.1); --ic-fg: #86efac;">
+          <div class="ic">⇄</div>
+          <h3>APIs &amp; data</h3>
+          <p>External-facing contracts and the data behind them.</p>
+          <div class="tags"><code>API design &amp; versioning</code><code>microservices</code><code>messaging</code><code>Oracle</code><code>relational design</code></div>
+        </div>
+        <div class="cap reveal" style="--ic-bg: rgba(125,211,252,.12); --ic-fg: #bae6fd;">
+          <div class="ic">⛨</div>
+          <h3>Quality &amp; operations</h3>
+          <p>Test strategy champion; production ownership end to end.</p>
+          <div class="tags"><code>test strategy</code><code>on-call</code><code>incident response</code><code>monitoring &amp; alerting</code></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EDUCATION ================= -->
+  <section id="education">
+    <div class="wrap">
+      <span class="eyebrow">Education</span>
+      <h2 class="sec-title">University of North Texas</h2>
+
+      <div class="edu reveal">
+        <h3>BA, Computer Science</h3>
+        <span class="dates">2011 – 2015</span>
+        <p>Minor in Mathematics, with certificates in Technical Communication and
+          Game Programming.</p>
+        <div class="tags"><code>Minor: Mathematics</code><code>Cert: Technical Communication</code><code>Cert: Game Programming</code></div>
+      </div>
+
+      <div class="contact-strip reveal">
+        <p class="sec-sub">Want the details, or just want to talk shop?</p>
+        <div class="cta-row">
+          <a class="btn btn-grad" href="contact.html">Get in touch →</a>
+          <a class="btn btn-ghost" href="images/Jonathan_Reyes_Resume.pdf" download>Download résumé PDF</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <p class="brand"><b>jreyes</b> · Jonathan Reyes · Lead Software Engineer</p>
+      <p class="meta">Fort Worth, TX · © 2026 Jonathan Reyes. All rights reserved.</p>
+      <p class="links">
+        <a href="mailto:jreyes.me@protonmail.com">Email</a> ·
+        <a href="https://www.linkedin.com/in/reyesjon">LinkedIn</a> ·
+        <a href="https://github.com/jonnyeclectic">GitHub</a> ·
+        <a href="resume.html">Résumé</a> ·
+        <a href="experience.html">boost</a>
+      </p>
+    </div>
+  </footer>
+
+</main>
+
+<script>
+// ---------- scroll reveal ----------
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (!reduce && "IntersectionObserver" in window) {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+    });
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
+  document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+} else {
+  document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
+}
+</script>
+</body>
+</html>

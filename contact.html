@@ -1,88 +1,243 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<!--
-Design by TEMPLATED
-http://templated.co
-Released for free under the Creative Commons Attribution License
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact — Jonathan Reyes</title>
+<meta name="description" content="Get in touch with Jonathan Reyes — Lead Software Engineer in Fort Worth, TX.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0a10'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='bold' fill='%23fbbf24' text-anchor='middle'%3Ejr%3C/text%3E%3C/svg%3E">
+<script>document.documentElement.classList.add("js")</script>
+<style>
+  :root {
+    --bg: #0a0a10;
+    --panel: rgba(255,255,255,.035);
+    --panel-solid: #13131c;
+    --line: rgba(255,255,255,.09);
+    --line-soft: rgba(255,255,255,.05);
+    --text: #f0f0f5;
+    --text-2: #9d9dae;
+    --text-3: #8a8a9c;
+    --amber: #fbbf24;
+    --orange: #f59e0b;
+    --pink: #ec4899;
+    --violet: #a78bfa;
+    --grad: linear-gradient(92deg, var(--orange) 0%, var(--pink) 55%, var(--violet) 100%);
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { transition: none !important; transform: none !important; opacity: 1 !important; }
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(1200px 800px at 30% 0%, #000 0%, rgba(0,0,0,.35) 60%, rgba(0,0,0,.15) 100%);
+            mask-image: radial-gradient(1200px 800px at 30% 0%, #000 0%, rgba(0,0,0,.35) 60%, rgba(0,0,0,.15) 100%);
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+  a { color: inherit; }
+  code { font-family: var(--mono); }
+  :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: 4px; }
 
-Name       : StoneWork
-Description: A two-column, fixed-width design with dark color scheme.
-Version    : 1.0
-Released   : 20140228
+  /* ---------- nav ---------- */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,10,16,.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav { display: flex; align-items: center; gap: 24px; height: 64px; }
+  .logo { display: flex; align-items: baseline; gap: 10px; text-decoration: none; }
+  .logo b { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--amber); letter-spacing: -.02em; }
+  .logo span { font-size: 10.5px; letter-spacing: .24em; color: var(--text-2); text-transform: uppercase; }
+  .nav ul {
+    display: flex; gap: 4px; list-style: none; margin-left: auto;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .nav ul::-webkit-scrollbar { display: none; }
+  .nav ul a {
+    display: block; padding: 8px 12px; border-radius: 8px;
+    font-size: 14px; color: var(--text-2); text-decoration: none; white-space: nowrap;
+  }
+  .nav ul a:hover { color: var(--text); background: var(--panel); }
+  .nav ul a.cta { color: var(--text); font-weight: 600; }
 
--->
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title></title>
-        <meta name="keywords" content="" />
-        <meta name="description" content="" />
-        <link href="https://fonts.googleapis.com/css?family=Helvetica+Neue" rel="stylesheet" />
-        <link href="default.css" rel="stylesheet" type="text/css" media="all" />
+  /* ---------- hero ---------- */
+  .hero { padding: 96px 0 10px; text-align: center; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 12.5px; color: #d8c9f5;
+    border: 1px solid rgba(167,139,250,.45); border-radius: 999px;
+    padding: 7px 16px; margin-bottom: 30px;
+    background: rgba(167,139,250,.07);
+  }
+  .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--grad); }
+  .hero h1 {
+    font-size: clamp(40px, 6.5vw, 76px); font-weight: 800;
+    letter-spacing: -.035em; line-height: 1.05; text-wrap: balance;
+  }
+  .hero h1 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.lede { max-width: 620px; margin: 26px auto 0; font-size: 19px; color: var(--text-2); text-wrap: balance; }
+  .hero p.lede b { color: var(--text); font-weight: 650; }
+  .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+  .js .reveal.in { opacity: 1; transform: none; }
+  @media print {
+    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  }
 
-        <!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
+  /* ---------- contact cards ---------- */
+  .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 860px; margin: 64px auto 0; }
+  .card {
+    display: block; text-decoration: none;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    padding: 30px 28px; text-align: left;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  a.card:hover { border-color: rgba(255,255,255,.22); transform: translateY(-2px); }
+  .card .ic {
+    width: 46px; height: 46px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 21px; margin-bottom: 18px;
+    background: var(--ic-bg, rgba(255,255,255,.06)); color: var(--ic-fg, var(--text));
+    border: 1px solid var(--line-soft);
+  }
+  .card .tag {
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--text-2);
+  }
+  .card h3 { font-size: 19px; font-weight: 750; letter-spacing: -.01em; margin-top: 6px; overflow-wrap: anywhere; }
+  .card p { font-size: 14px; color: var(--text-2); margin-top: 8px; }
 
-    </head>
-    <body>
-        <div id="header-wrapper">
-            <div id="header" class="container">
-                <div id="logo">
-                    <h1><a href="index.html">Jonathan Reyes</a></h1>
-                </div>
-                <div id="menu">
-                    <ul>
-                        <li class="active"><a href="index.html" accesskey="1" title="">Home</a></li>
-                        <li><a href="experience.html" accesskey="3" title="">Portfolio</a></li>
-                        <li><a href="resume.html" accesskey="2" title="">Résumé</a></li>
+  /* ---------- cta ---------- */
+  .cta-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 56px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 15.5px; font-weight: 650; text-decoration: none;
+    padding: 14px 26px; border-radius: 12px; border: 1px solid transparent;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-grad {
+    color: #17110a;
+    background: linear-gradient(92deg, var(--orange), var(--pink));
+    box-shadow: 0 8px 30px rgba(236,72,153,.28);
+  }
+  .btn-grad:hover { box-shadow: 0 10px 36px rgba(236,72,153,.4); }
+  .btn-ghost { color: var(--text); border-color: var(--line); background: var(--panel); }
+  .btn-ghost:hover { border-color: rgba(255,255,255,.2); }
 
-                        <li><a href="contact.html" accesskey="4" title="">Contact</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div id="banner" class="container">
-                <div class="feature-grid">
-                    <div class="feature">
-                        <div class="image rounded">
-                            <img src="images/scotchsmile.jpg" alt="" />
-                        </div>
-                    </div>
-                    <div class="feature">
-                        <div align="right">
-                            <h1>jmreyes2013@gmail.com</h1>
-                        </div>
-                        <div align="right">
-                            <h1>469-350-8666</h1>
-                        </div>
-                        <div align="right">
-                            <h1><a href="https://www.linkedin.com/in/reyesjon">@reyesjon</a></h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="welcome">
-            <div class="container">
-                <div class="title">
-                    <h2>Jonathan Reyes</h2>
-                    <span class="byline">B.S. Computer Science | Minor in Mathematics | Cert. Technical Writing | Cert. Game Design</span>
-                </div>
-                <ul class="actions">
-                    <li><a href="contact.html" class="button">Contact</a></li>
-                </ul>
-            </div>
-        </div>
-        <div id="copyright" class="container">
-            <p>&copy; Jonathan Michael Reyes. All rights reserved.</p>
-            <p><a href="https://www.linkedin.com/in/reyesjon">
-                <object data="images/linkedin.svg" type="image/svg+xml" height=34>
-                    <img src="images/linkedin.png" height=34 />
-                </object>
-                </a>
-                <a href="https://github.com/jonnyeclectic">
-                    <object data="images/github.svg" type="image/svg+xml" height=34>
-                        <img src="images/github.png" height=34 />
-                    </object>
-                </a>
-            </p>
-        </div>
-    </body>
+  /* ---------- footer ---------- */
+  footer { margin-top: 130px; border-top: 1px solid var(--line-soft); padding: 44px 0 60px; text-align: center; }
+  footer .brand { font-size: 15px; color: var(--text-2); }
+  footer .brand b { font-family: var(--mono); color: var(--amber); }
+  footer .meta { margin-top: 10px; font-size: 13.5px; color: var(--text-3); }
+  footer .links { margin-top: 14px; font-size: 13.5px; color: var(--text-3); }
+  footer .links a { color: var(--text-2); text-decoration: none; }
+  footer .links a:hover { color: var(--text); }
+
+  @media (max-width: 620px) {
+    .cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="index.html"><b>jreyes</b><span>Software Engineer</span></a>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#experience">Experience</a></li>
+      <li><a href="experience.html">boost&nbsp;↗</a></li>
+      <li><a href="resume.html">Résumé</a></li>
+      <li><a class="cta" href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <span class="badge">Fort Worth, TX · Open to interesting problems</span>
+    <h1>Let's <span class="grad">talk.</span></h1>
+    <p class="lede">Whether it's distributed systems, developer platforms, or
+      AI-assisted engineering — the fastest way to reach me is
+      <b>email or LinkedIn</b>.</p>
+
+    <div class="cards">
+      <a class="card reveal" href="mailto:jreyes.me@protonmail.com" style="--ic-bg: rgba(251,191,36,.12); --ic-fg: #fcd34d;">
+        <div class="ic">✉</div>
+        <span class="tag">Email</span>
+        <h3>jreyes.me@protonmail.com</h3>
+        <p>Best for anything longer than a sentence.</p>
+      </a>
+      <a class="card reveal" href="https://www.linkedin.com/in/reyesjon" style="--ic-bg: rgba(96,165,250,.12); --ic-fg: #93c5fd;">
+        <div class="ic">in</div>
+        <span class="tag">LinkedIn</span>
+        <h3>linkedin.com/in/reyesjon</h3>
+        <p>Career history, recommendations, and DMs.</p>
+      </a>
+      <a class="card reveal" href="https://github.com/jonnyeclectic" style="--ic-bg: rgba(167,139,250,.12); --ic-fg: #c4b5fd;">
+        <div class="ic">&lt;/&gt;</div>
+        <span class="tag">GitHub</span>
+        <h3>github.com/jonnyeclectic</h3>
+        <p>Code, experiments, and this site.</p>
+      </a>
+      <a class="card reveal" href="tel:+14693508666" style="--ic-bg: rgba(74,222,128,.1); --ic-fg: #86efac;">
+        <div class="ic">☎</div>
+        <span class="tag">Phone</span>
+        <h3>469-350-8666</h3>
+        <p>Fort Worth, TX (Central Time).</p>
+      </a>
+    </div>
+
+    <div class="cta-row reveal">
+      <a class="btn btn-grad" href="images/Jonathan_Reyes_Resume.pdf" download>Download résumé PDF ↓</a>
+      <a class="btn btn-ghost" href="resume.html">Read the résumé online</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <p class="brand"><b>jreyes</b> · Jonathan Reyes · Lead Software Engineer</p>
+      <p class="meta">Fort Worth, TX · © 2026 Jonathan Reyes. All rights reserved.</p>
+      <p class="links">
+        <a href="index.html">Home</a> ·
+        <a href="resume.html">Résumé</a> ·
+        <a href="experience.html">boost</a>
+      </p>
+    </div>
+  </footer>
+</main>
+
+<script>
+// ---------- scroll reveal ----------
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (!reduce && "IntersectionObserver" in window) {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+    });
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
+  document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+} else {
+  document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
+}
+</script>
+</body>
 </html>
