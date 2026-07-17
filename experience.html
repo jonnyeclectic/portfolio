@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>boost — Homebrew for AI coding skills</title>
+<title>boost — a package manager for AI coding skills</title>
+<script>document.documentElement.classList.add("js")</script>
 <style>
   :root {
     --bg: #0a0a10;
@@ -13,7 +14,7 @@
     --line-soft: rgba(255,255,255,.05);
     --text: #f0f0f5;
     --text-2: #9d9dae;
-    --text-3: #6b6b7d;
+    --text-3: #8a8a9c;
     --amber: #fbbf24;
     --orange: #f59e0b;
     --pink: #ec4899;
@@ -101,8 +102,11 @@
     color: var(--amber); background: rgba(251,191,36,.09);
     padding: 1px 7px; border-radius: 6px; font-size: .88em;
   }
-  .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
-  .reveal.in { opacity: 1; transform: none; }
+  .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+  .js .reveal.in { opacity: 1; transform: none; }
+  @media print {
+    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  }
 
   /* ---------- hero ---------- */
   .hero { padding: 96px 0 30px; }
@@ -395,6 +399,7 @@
   <div class="wrap nav">
     <a class="logo" href="#top"><b>boost</b><span>Visual Guide</span></a>
     <ul>
+      <li><a href="index.html">← Home</a></li>
       <li><a href="#what">What it is</a></li>
       <li><a href="#how">How it works</a></li>
       <li><a href="#workflow">Workflow</a></li>
@@ -410,13 +415,13 @@
 
   <!-- ================= HERO ================= -->
   <div class="wrap hero">
-    <span class="badge">AI Skill Package Manager · v2.3.3</span>
-    <h1><span class="grad">Homebrew</span> for AI coding skills.</h1>
+    <span class="badge">Open Source · AI Skill Package Manager · v1.0.0</span>
+    <h1>A <span class="grad">package manager</span> for AI coding skills.</h1>
     <p class="lede">
-      Boost is a command-line package manager that <b>searches, installs, and
-      manages AI coding skills</b> from GitHub-hosted registries — then wires
-      them into <b>Claude Code, Windsurf, and Cursor</b> at once. One command
-      replaces the copy-paste-and-pray dance of setting up AI agent skills by hand.
+      boost is an independent open-source CLI that <b>finds, installs, and keeps
+      current the AI coding skills</b> published in Git-hosted registries — landing
+      them in <b>Claude Code, Windsurf, and Cursor</b> in a single step. One command
+      in place of the copy-paste-and-hope routine of wiring up agent skills by hand.
     </p>
     <div class="cta-row">
       <a class="btn btn-grad" href="#workflow">See how it works →</a>
@@ -435,8 +440,8 @@
     <div class="wrap">
       <span class="eyebrow">The Concept</span>
       <h2 class="sec-title">What is a “skill” — and why manage them?</h2>
-      <p class="sec-sub">AI coding agents get better when you give them reusable knowledge.
-        Boost makes that knowledge installable.</p>
+      <p class="sec-sub">AI coding agents get sharper when you hand them reusable knowledge.
+        boost turns that knowledge into something you can install.</p>
 
       <div class="concept-grid">
         <div class="concept-copy reveal">
@@ -445,10 +450,10 @@
             capability: a workflow, a set of coding rules, or domain knowledge.
             Agents like Claude Code load them automatically from
             <span class="chip-code">~/.claude/skills/</span>.</p>
-          <p>The problem: finding good skills, installing them into every agent,
-            keeping them updated, and sharing them with your team is all manual
-            copy-paste. <b>Boost is the package manager that automates it</b> — the
-            way Homebrew handles Mac apps or npm handles JavaScript. It also manages
+          <p>The friction: tracking down skills worth having, wiring them into each
+            agent, keeping them current, and getting them onto teammates' machines is
+            all hand-rolled copy-paste. <b>boost automates that loop</b> the way
+            Homebrew does for Mac apps or npm does for JavaScript — and it covers
             <b>rules, workflows, and configs</b> under the same roof.</p>
           <div class="analogy">
             <span><b>Homebrew</b> <i class="arr">→</i> Mac apps</span>
@@ -485,8 +490,8 @@ facilitate structured divergent thinking:
     <div class="wrap">
       <span class="eyebrow">Under the Hood</span>
       <h2 class="sec-title">From GitHub to every agent</h2>
-      <p class="sec-sub">Boost clones registries, builds a searchable cache, installs skills to one
-        canonical store, then symlinks them into each AI agent — all tracked by a lock file.</p>
+      <p class="sec-sub">boost clones registries, builds a searchable cache, installs skills into one
+        canonical store, then symlinks them out to each AI agent — with a lock file tracking all of it.</p>
 
       <div class="flow">
         <div class="flow-row one reveal">
@@ -611,8 +616,8 @@ facilitate structured divergent thinking:
     <div class="wrap">
       <span class="eyebrow">Beyond Install/Uninstall</span>
       <h2 class="sec-title">The capabilities that set it apart</h2>
-      <p class="sec-sub">Boost treats skills as first-class, governed, shareable artifacts —
-        not just files you copy.</p>
+      <p class="sec-sub">boost handles skills as first-class, governed, shareable artifacts —
+        not loose files you duplicate by hand.</p>
 
       <div class="caps">
         <div class="cap reveal" style="--ic-bg: rgba(236,72,153,.12); --ic-fg: #f9a8d4;">
@@ -672,9 +677,9 @@ facilitate structured divergent thinking:
     <div class="wrap">
       <span class="eyebrow">Where Skills Come From</span>
       <h2 class="sec-title">Pre-tapped registries + open discovery</h2>
-      <p class="sec-sub">Boost ships pre-tapped to curated public skills. Beyond that,
+      <p class="sec-sub">boost arrives pre-tapped to curated public skills. Past that,
         <code>boost discover</code> indexes 8,400+ skills across GitHub.
-        Tap your own team’s repo anytime.</p>
+        Point it at your own team’s repo whenever you want.</p>
 
       <div class="reg-wrap reveal">
         <div class="reg-scroll">
@@ -699,7 +704,7 @@ facilitate structured divergent thinking:
                 <td><span class="tapname">your-org/skills</span></td>
                 <td class="repo">any repo with SKILL.md files</td>
                 <td><span class="cnt">∞</span></td>
-                <td class="focus">Your team’s registry — <code style="color:var(--amber);font-size:.92em">boost tap your-org/skills</code> (private repos work over ssh)</td>
+                <td class="focus">Your own registry — <code style="color:var(--amber);font-size:.92em">boost tap your-org/skills</code> (private repos work over ssh)</td>
               </tr>
             </tbody>
           </table>
@@ -715,8 +720,8 @@ facilitate structured divergent thinking:
     <div class="wrap">
       <span class="eyebrow">Get Started</span>
       <h2 class="sec-title">One shim, zero setup</h2>
-      <p class="sec-sub">Copy a single bash shim onto your <code>PATH</code>. It finds Python 3.9+
-        and runs — no PyPI, no Artifactory, no manual setup.</p>
+      <p class="sec-sub">Drop a single bash shim onto your <code>PATH</code>. It locates Python 3.9+
+        and runs — no PyPI, no internal artifact store, no manual setup.</p>
 
       <div class="window install-box reveal">
         <div class="bar">
@@ -724,7 +729,7 @@ facilitate structured divergent thinking:
           <button class="copy-btn" id="copy-install" type="button">Copy</button>
         </div>
         <pre id="install-code"><span class="cm"># clone, link the shim onto your PATH, verify</span>
-git clone https://github.com/your-org/boost ~/.boost-src
+git clone https://github.com/jonnyeclectic/boost ~/.boost-src
 ln -s ~/.boost-src/boost ~/bin/boost
 <span class="tv">boost</span> --version
 
@@ -746,9 +751,9 @@ ln -s ~/.boost-src/boost ~/bin/boost
 
   <footer>
     <div class="wrap">
-      <p class="brand"><b>boost</b> · AI Skill Package Manager · v2.3.3</p>
+      <p class="brand"><b>boost</b> · Open-source AI Skill Package Manager · v1.0.0</p>
       <p class="meta">Requires Python 3.9+ and <code>git</code>. Supports Claude Code, Windsurf &amp; Cursor.</p>
-      <p class="links"><a href="#commands">CLI Reference</a> · <a href="#top">Home</a></p>
+      <p class="links"><a href="#commands">CLI Reference</a> · <a href="#top">Top</a> · <a href="index.html">Jonathan Reyes — Portfolio</a></p>
     </div>
   </footer>
 
