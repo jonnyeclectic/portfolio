@@ -5,23 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Résumé — Jonathan Reyes</title>
 <meta name="description" content="Résumé of Jonathan Reyes — Lead Software Engineer at Capital One. Distributed systems, APIs, and developer platforms in regulated financial services.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0a10'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='bold' fill='%23fbbf24' text-anchor='middle'%3Ejr%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3Ejr%3C/text%3E%3C/svg%3E">
 <script>document.documentElement.classList.add("js")</script>
 <style>
   :root {
-    --bg: #0a0a10;
+    /* ---- Aurora reskin: neon-tech living glass ---- */
+    --bg: #07080f;
     --panel: rgba(255,255,255,.035);
-    --panel-solid: #13131c;
+    --panel-solid: #0f1120;
     --line: rgba(255,255,255,.09);
     --line-soft: rgba(255,255,255,.05);
-    --text: #f0f0f5;
-    --text-2: #9d9dae;
-    --text-3: #8a8a9c;
-    --amber: #fbbf24;
-    --orange: #f59e0b;
-    --pink: #ec4899;
-    --violet: #a78bfa;
-    --grad: linear-gradient(92deg, var(--orange) 0%, var(--pink) 55%, var(--violet) 100%);
+    --line-hi: rgba(255,255,255,.22);
+    --text: #e9ebf5;
+    --text-2: #9298b0;
+    --text-3: #676d86;
+    --amber: #22d3ee;
+    --orange: #38bdf8;
+    --pink: #f472d0;
+    --violet: #a855f7;
+    --cyan: #22d3ee;
+    --grad: linear-gradient(96deg, #22d3ee 0%, #a855f7 52%, #f472d0 100%);
     --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
@@ -30,6 +33,7 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .reveal { transition: none !important; transform: none !important; opacity: 1 !important; }
+    body::before { animation: none !important; }
   }
   body {
     background: var(--bg);
@@ -39,15 +43,31 @@
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
+  /* ambient aurora drift — slow, low, "alive but not distracting" */
   body::before {
+    content: "";
+    position: fixed; inset: -25vmax; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(38vmax 38vmax at 12% 6%,  rgba(34,211,238,.20), transparent 60%),
+      radial-gradient(34vmax 34vmax at 90% 16%, rgba(168,85,247,.18), transparent 60%),
+      radial-gradient(30vmax 30vmax at 62% 104%, rgba(244,114,208,.14), transparent 62%);
+    filter: blur(34px) saturate(135%);
+    animation: aurora-drift 42s ease-in-out infinite;
+    will-change: transform;
+  }
+  body::after {
     content: "";
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
     background-image:
-      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-    background-size: 44px 44px;
-    -webkit-mask-image: radial-gradient(1200px 800px at 30% 0%, #000 0%, rgba(0,0,0,.35) 60%, rgba(0,0,0,.15) 100%);
-            mask-image: radial-gradient(1200px 800px at 30% 0%, #000 0%, rgba(0,0,0,.35) 60%, rgba(0,0,0,.15) 100%);
+      linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(1200px 800px at 30% 0%, #000 0%, rgba(0,0,0,.3) 60%, rgba(0,0,0,.1) 100%);
+            mask-image: radial-gradient(1200px 800px at 30% 0%, #000 0%, rgba(0,0,0,.3) 60%, rgba(0,0,0,.1) 100%);
+  }
+  @keyframes aurora-drift {
+    0%,100% { transform: translate3d(0,0,0) scale(1); }
+    50%     { transform: translate3d(2.5vmax,-2vmax,0) scale(1.08); }
   }
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
   a { color: inherit; }
@@ -57,7 +77,7 @@
   /* ---------- nav ---------- */
   header {
     position: sticky; top: 0; z-index: 50;
-    background: rgba(10,10,16,.82);
+    background: rgba(7,8,15,.82);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--line-soft);
@@ -95,11 +115,11 @@
   }
   .btn:hover { transform: translateY(-1px); }
   .btn-grad {
-    color: #17110a;
-    background: linear-gradient(92deg, var(--orange), var(--pink));
-    box-shadow: 0 8px 30px rgba(236,72,153,.28);
+    color: #05141a;
+    background: linear-gradient(96deg, var(--cyan), var(--violet));
+    box-shadow: 0 8px 30px rgba(34,211,238,.32);
   }
-  .btn-grad:hover { box-shadow: 0 10px 36px rgba(236,72,153,.4); }
+  .btn-grad:hover { box-shadow: 0 12px 40px rgba(168,85,247,.5); }
   .btn-ghost { color: var(--text); border-color: var(--line); background: var(--panel); }
   .btn-ghost:hover { border-color: rgba(255,255,255,.2); }
 
@@ -161,7 +181,7 @@
     font-size: 12.5px; color: #d5d5e2; background: rgba(255,255,255,.06);
     border: 1px solid var(--line-soft); border-radius: 7px; padding: 3px 10px;
   }
-  .tech .row .v code.hot { color: var(--amber); background: rgba(251,191,36,.09); border-color: rgba(251,191,36,.25); }
+  .tech .row .v code.hot { color: var(--amber); background: rgba(34,211,238,.09); border-color: rgba(34,211,238,.25); }
 
   /* ---------- education ---------- */
   .edu {
@@ -182,11 +202,37 @@
   footer .links a { color: var(--text-2); text-decoration: none; }
   footer .links a:hover { color: var(--text); }
 
+  /* ---------- Aurora living-glass cards: glass + cursor glow ---------- */
+  .role, .edu {
+    position: relative; overflow: hidden;
+    backdrop-filter: blur(14px) saturate(130%);
+    -webkit-backdrop-filter: blur(14px) saturate(130%);
+    transition: transform .3s cubic-bezier(.2,.7,.2,1), border-color .3s ease, box-shadow .35s ease;
+  }
+  .role > *, .edu > * { position: relative; z-index: 1; }
+  .role::before, .edu::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit;
+    pointer-events: none; opacity: 0; transition: opacity .35s ease;
+    background: radial-gradient(320px circle at var(--mx,50%) var(--my,50%),
+                rgba(34,211,238,.15), rgba(168,85,247,.10) 42%, transparent 70%);
+  }
+  .role:hover, .edu:hover {
+    transform: translateY(-4px);
+    border-color: var(--line-hi);
+    box-shadow: 0 22px 60px -22px rgba(168,85,247,.5), inset 0 0 0 1px rgba(34,211,238,.12);
+  }
+  .role:hover::before, .edu:hover::before { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .role, .edu { transition: border-color .3s ease, box-shadow .3s ease; }
+    .role:hover, .edu:hover { transform: none; }
+  }
+
   /* ---------- print ---------- */
   @media print {
     .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
     body { background: #fff; color: #111; }
-    body::before { display: none; }
+    body::before, body::after { display: none; }
+    .role, .edu, .window { box-shadow: none !important; backdrop-filter: none !important; }
     header, .head .cta-row, footer { display: none; }
     .eyebrow, .head h1 .grad {
       background: none; -webkit-background-clip: initial; background-clip: initial;
@@ -449,6 +495,15 @@ if (!reduce && "IntersectionObserver" in window) {
 } else {
   document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
 }
+
+// ---------- cursor-following glow on glass cards ----------
+document.querySelectorAll(".role, .edu").forEach((el) => {
+  el.addEventListener("pointermove", (e) => {
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--mx", (e.clientX - r.left) + "px");
+    el.style.setProperty("--my", (e.clientY - r.top) + "px");
+  });
+});
 </script>
 </body>
 </html>
