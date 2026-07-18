@@ -487,7 +487,7 @@
       <a class="btn btn-ghost" href="#commands">Explore all 72 commands</a>
     </div>
     <div class="stats">
-      <div class="stat reveal"><b>8,400+</b><span>Discoverable skills</span></div>
+      <div class="stat reveal"><b>10,000+</b><span>Discoverable skills</span></div>
       <div class="stat reveal"><b>72</b><span>Commands · 8 groups</span></div>
       <div class="stat reveal"><b>2</b><span>Pre-tapped registries</span></div>
       <div class="stat reveal"><b>3</b><span>AI agents supported</span></div>
@@ -557,7 +557,7 @@ facilitate structured divergent thinking:
           <div class="node src">
             <span class="tag">Source</span>
             <h4>GitHub registries</h4>
-            <p>Pre-tapped public registries + an 8,400-skill discovery index</p>
+            <p>Pre-tapped public registries + an 10,000-skill discovery index</p>
           </div>
         </div>
         <div class="flow-arrow reveal">
@@ -622,7 +622,7 @@ facilitate structured divergent thinking:
     <div class="wrap">
       <span class="eyebrow">The Everyday Loop</span>
       <h2 class="sec-title">Search → install → done</h2>
-      <p class="sec-sub">The thin bash shim finds your Python and runs with zero dependencies.
+      <p class="sec-sub">A single <code>pip install</code> drops boost onto your PATH.
         After that, the core loop is three commands.</p>
 
       <div class="window reveal" style="max-width: 860px; margin: 56px auto 0;">
@@ -737,7 +737,7 @@ facilitate structured divergent thinking:
       <span class="eyebrow">Where Skills Come From</span>
       <h2 class="sec-title">Pre-tapped registries + open discovery</h2>
       <p class="sec-sub">boost arrives pre-tapped to curated public skills. Past that,
-        <code>boost discover</code> indexes 8,400+ skills across GitHub.
+        <code>boost discover</code> indexes 10,000+ skills across GitHub.
         Point it at your own team’s repo whenever you want.</p>
 
       <div class="reg-wrap reveal">
@@ -784,21 +784,20 @@ facilitate structured divergent thinking:
   <section id="start">
     <div class="wrap">
       <span class="eyebrow">Get Started</span>
-      <h2 class="sec-title">One shim, zero setup</h2>
-      <p class="sec-sub">Drop a single bash shim onto your <code>PATH</code>. It locates Python 3.9+
-        and runs — no PyPI, no internal artifact store, no manual setup.</p>
+      <h2 class="sec-title">One install, zero setup</h2>
+      <p class="sec-sub">Install from PyPI with a single command. It runs on Python 3.9+
+        — no internal artifact store, no per-agent copy-paste, no manual setup.</p>
 
       <div class="window install-box reveal">
         <div class="bar">
-          <div class="label">install the shim</div>
+          <div class="label">install boost</div>
           <button class="copy-btn" id="copy-install" type="button">Copy</button>
         </div>
-        <pre id="install-code"><span class="cm"># clone, link the shim onto your PATH, verify</span>
-git clone https://github.com/jonnyeclectic/boost ~/.boost-src
-ln -s ~/.boost-src/boost ~/bin/boost
+        <pre id="install-code"><span class="cm"># install from PyPI, verify</span>
+pipx install boost-skill-cli   <span class="cm"># or: pip install boost-skill-cli</span>
 <span class="tv">boost</span> --version
 
-<span class="cm"># add the recommended registries and go</span>
+<span class="cm"># add the starter registries and go</span>
 <span class="tv">boost</span> <span class="tc">tap</span> --defaults
 <span class="tv">boost</span> <span class="tc">search</span> brainstorming</pre>
       </div>
@@ -808,7 +807,7 @@ ln -s ~/.boost-src/boost ~/bin/boost
         <a href="#commands"><span class="name"><span class="v">boost</span> install brainstorming</span><p>Install into every agent</p></a>
         <a href="#commands"><span class="name"><span class="v">boost</span> recommend</span><p>Suggestions for your stack</p></a>
         <a href="#commands"><span class="name"><span class="v">boost</span> browse</span><p>Interactive TUI explorer</p></a>
-        <a href="#commands"><span class="name"><span class="v">boost</span> discover</span><p>Browse 8,400+ skills</p></a>
+        <a href="#commands"><span class="name"><span class="v">boost</span> discover</span><p>Browse 10,000+ skills</p></a>
         <a href="#commands"><span class="name"><span class="v">boost</span> doctor</span><p>Health check &amp; repair hints</p></a>
       </div>
     </div>
