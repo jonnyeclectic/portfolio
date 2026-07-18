@@ -489,7 +489,7 @@
     <div class="stats">
       <div class="stat reveal"><b>10,000+</b><span>Discoverable skills</span></div>
       <div class="stat reveal"><b>72</b><span>Commands · 8 groups</span></div>
-      <div class="stat reveal"><b>2</b><span>Pre-tapped registries</span></div>
+      <div class="stat reveal"><b>5</b><span>Pre-tapped registries</span></div>
       <div class="stat reveal"><b>3</b><span>AI agents supported</span></div>
     </div>
   </div>
@@ -557,7 +557,7 @@ facilitate structured divergent thinking:
           <div class="node src">
             <span class="tag">Source</span>
             <h4>GitHub registries</h4>
-            <p>Pre-tapped public registries + an 10,000-skill discovery index</p>
+            <p>Pre-tapped public registries + a 10,000-skill discovery index</p>
           </div>
         </div>
         <div class="flow-arrow reveal">
@@ -760,6 +760,24 @@ facilitate structured divergent thinking:
                 <td class="focus">Community powerhouse — TDD, debugging, planning, subagent workflows</td>
               </tr>
               <tr>
+                <td><span class="tapname">trailofbits/skills</span></td>
+                <td class="repo">github.com/trailofbits/skills</td>
+                <td><span class="cnt" data-count="trailofbits">—</span></td>
+                <td class="focus">Security auditing from Trail of Bits — CodeQL, Semgrep, vulnerability hunting</td>
+              </tr>
+              <tr>
+                <td><span class="tapname">expo/skills</span></td>
+                <td class="repo">github.com/expo/skills</td>
+                <td><span class="cnt" data-count="expo">—</span></td>
+                <td class="focus">Official Expo team skills — EAS builds, app-store submissions, deployments</td>
+              </tr>
+              <tr>
+                <td><span class="tapname">K-Dense-AI/claude-scientific-skills</span></td>
+                <td class="repo">github.com/K-Dense-AI/claude-scientific-skills</td>
+                <td><span class="cnt" data-count="scientific">—</span></td>
+                <td class="focus">Scientific computing — research libraries, databases, and analysis toolkits</td>
+              </tr>
+              <tr>
                 <td><span class="tapname">--category rag</span></td>
                 <td class="repo">weaviate · pinecone · dspy · grace</td>
                 <td><span class="cnt">7</span></td>
@@ -919,7 +937,7 @@ const COMMANDS = [
 ];
 
 // live-measured registry skill counts (updated at build time)
-const REG_COUNTS = { anthropic: "18", superpowers: "14" };
+const REG_COUNTS = { anthropic: "18", superpowers: "14", trailofbits: "75", expo: "22", scientific: "149" };
 
 // ---------- render ----------
 const groupsEl = document.getElementById("cmd-groups");
