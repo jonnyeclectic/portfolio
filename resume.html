@@ -289,6 +289,7 @@
       <h1>Jonathan <span class="grad">Reyes</span></h1>
       <div class="contact-line">
         <span>Fort Worth, TX</span>
+        <span>Remote (US)</span>
         <a href="tel:+14693508666">469-350-8666</a>
         <a href="mailto:jreyes.me@protonmail.com">jreyes.me@protonmail.com</a>
         <a href="https://www.linkedin.com/in/reyesjon">linkedin.com/in/reyesjon</a>
@@ -319,17 +320,19 @@
         <div class="role reveal">
           <div class="role-head">
             <h4>Lead Software Engineer</h4>
-            <span class="dates">Feb 2023 – Present</span>
+            <span class="dates">Feb 2023 – Present · Remote</span>
           </div>
           <ul>
-            <li>Lead architecture, technical direction, and delivery for a <b>high-throughput platform orchestrating communications with external dealership partners</b>, built on AWS microservices (Docker, SQS, Kafka, Postgres, ECS).</li>
-            <li>Daily practitioner of <b>AI-assisted engineering</b> (Claude), integrating
-              agent tooling into development workflows and setting team conventions for
-              its use.</li>
+            <li>Lead architecture, technical direction, and delivery for a <b>high-throughput platform orchestrating communications with external dealership partners</b>, built on AWS microservices (ECS, API Gateway, SQS, Kafka, Docker, Postgres).</li>
+            <li>Led a <b>zero-loss migration of a highly stateful distributed system</b> between AWS accounts — coupled streams spanning Oracle, Postgres, SQS, and Kafka — using traffic splitting to shift live workloads under tight SLAs without dropping or duplicating a request.</li>
             <li>Built a <b>document-intelligence pipeline</b> using AWS Textract that extracts structured findings from unstructured partner documents, replacing manual review for analyst teams.</li>
+            <li>Re-architected the platform's LLM solution after a data-classification review surfaced highly confidential information — evolving it from Textract to <b>AWS Bedrock</b> and then to a self-hosted vLLM (Llama) deployment — tuning OCR schemas, prompts, and golden-set evaluations in production.</li>
+            <li>Designed <b>event-driven processing pipelines</b> in which EventBridge rules trigger Step Functions orchestrating AWS Batch jobs over S3 file drops, with companion state machines verifying downstream delivery and raising alarms.</li>
+            <li>Daily practitioner of <b>AI-assisted engineering</b> (Claude), using <b>MCP integrations</b> across Jira, Confluence, and GitHub; integrates agent tooling into development workflows and sets team conventions for its use.</li>
+            <li>Prototyped a <b>LangChain-based RAG developer-enablement tool</b> at an internal hackathon — retrieval over large JSON corpora — that drew adoption requests from engineering managers across teams.</li>
             <li>Own production operations end to end: on-call rotations, incident triage
-              and root-cause investigation, and continuous monitoring and alerting
-              improvements across the platform's services.</li>
+              and root-cause investigation, and continuous monitoring, alerting, and
+              observability improvements built on <b>OpenTelemetry and CloudWatch</b>.</li>
             <li>Serve as <b>Sales Testing Champion</b>, defining test strategy and quality
               standards adopted across four engineering teams; mentor engineers and lead
               cross-functional delivery from scoping through production.</li>
@@ -339,7 +342,7 @@
         <div class="role reveal">
           <div class="role-head">
             <h4>Principal Associate Software Engineer, Prequalified Applications</h4>
-            <span class="dates">June 2021 – Feb 2023</span>
+            <span class="dates">June 2021 – Feb 2023 · Remote</span>
           </div>
           <ul>
             <li>Architected and operated <b>external-facing services powering auto loan
@@ -357,7 +360,7 @@
           </div>
           <ul>
             <li>Built and maintained the platform ecosystem around <b>JFrog Artifactory</b>, the company-wide binary repository.</li>
-            <li>Automated artifact promotion within production deployment pipelines, <b>eliminating a manual release step</b> for engineering teams across the company.</li>
+            <li>Automated artifact promotion within production deployment pipelines using <b>AWS Lambda and DynamoDB</b> — promoting release artifacts to edge nodes once quality thresholds were met and <b>eliminating a manual release step</b> for engineering teams across the company.</li>
           </ul>
         </div>
 
@@ -414,12 +417,16 @@
             <span class="dates">Independent personal project · 2025 – Present</span>
           </div>
           <ul>
-            <li>Author and maintainer of an <b>open-source CLI</b> that searches, installs,
+            <li>Author and maintainer of an <b>open-source CLI with its own MCP server</b> that searches, installs,
               and governs AI coding skills across Claude Code, Windsurf, and Cursor —
               72 commands spanning install, discovery, authoring, governance, and rollout.</li>
             <li>Designed the lock-file and audit model that treats agent skills as
               versioned, verifiable dependencies rather than copied files; indexes
               10,000+ publicly available skills.</li>
+            <li>Built the project's <b>LLM evaluation harness</b>: golden-set retrieval
+              evals (recall@k, MRR, nDCG@k), ragas faithfulness scoring, and
+              statistical-significance testing between retrieval engines, enforced as
+              CI gates.</li>
             <li>Python 3.9+, one-line pip install (published on PyPI as <code>boost-skill-cli</code>).</li>
           </ul>
         </div>
@@ -435,15 +442,15 @@
           </div>
           <div class="row">
             <div class="k">Cloud &amp; Infrastructure</div>
-            <div class="v"><code class="hot">AWS (ECS, Textract)</code><code>Certified Solutions Architect</code><code>Docker</code><code>Kubernetes</code><code>OpenShift</code><code>Linux</code></div>
+            <div class="v"><code class="hot">AWS (ECS, Lambda, Step Functions, EventBridge, API Gateway, DynamoDB, Textract, Bedrock)</code><code>Certified Solutions Architect</code><code>IAM</code><code>Docker</code><code>Kubernetes</code><code>OpenShift</code><code>Linux</code></div>
           </div>
           <div class="row">
             <div class="k">AI &amp; Automation</div>
-            <div class="v"><code class="hot">AI-assisted engineering (Claude)</code><code>open-source AI tooling</code><code>document intelligence</code><code>metrics-to-ML pipelines</code></div>
+            <div class="v"><code class="hot">AI-assisted engineering (Claude)</code><code class="hot">MCP</code><code>prompt engineering</code><code>LLM evaluation (ragas, golden-set evals)</code><code>LangChain (RAG)</code><code>document intelligence</code><code>open-source AI tooling</code></div>
           </div>
           <div class="row">
             <div class="k">Platform &amp; Delivery</div>
-            <div class="v"><code class="hot">JFrog Artifactory</code><code>CI/CD pipelines</code><code>workflow orchestration (Netflix Conductor)</code><code>Splunk</code></div>
+            <div class="v"><code class="hot">JFrog Artifactory</code><code>CI/CD pipelines</code><code>workflow orchestration (Netflix Conductor)</code><code>OpenTelemetry</code><code>CloudWatch</code><code>Splunk</code></div>
           </div>
           <div class="row">
             <div class="k">APIs &amp; Data</div>
