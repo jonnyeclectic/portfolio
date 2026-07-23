@@ -214,7 +214,7 @@
     content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit;
     pointer-events: none; opacity: 0; transition: opacity .35s ease;
     background: radial-gradient(320px circle at var(--mx,50%) var(--my,50%),
-                rgba(34,211,238,.15), rgba(168,85,247,.10) 42%, transparent 70%);
+                rgba(34,211,238,.16), rgba(168,85,247,.10) 42%, transparent 70%);
   }
   .role:hover, .edu:hover {
     transform: translateY(-4px);
@@ -323,19 +323,24 @@
             <span class="dates">Feb 2023 – Present · Remote</span>
           </div>
           <ul>
-            <li>Lead architecture, technical direction, and delivery for a <b>high-throughput platform orchestrating communications with external dealership partners</b>, built on AWS microservices (ECS, API Gateway, SQS, Kafka, Docker, Postgres).</li>
-            <li>Led a <b>zero-loss migration of a highly stateful distributed system</b> between AWS accounts — coupled streams spanning Oracle, Postgres, SQS, and Kafka — using traffic splitting to shift live workloads under tight SLAs without dropping or duplicating a request.</li>
+            <li>Lead architecture, technical direction, and delivery for a <b>high-throughput platform orchestrating communications with external dealership partners</b>, built on AWS microservices (ECS, API Gateway, SQS, Kafka, Docker, PostgreSQL, Oracle).</li>
+            <li>Led a <b>zero-loss migration of a highly stateful distributed system</b> between AWS accounts — coupled Spring Boot streams spanning Oracle, PostgreSQL, SQS, and Kafka — traffic-splitting live workloads under tight SLAs without dropping or duplicating a request.</li>
             <li>Built a <b>document-intelligence pipeline</b> using AWS Textract that extracts structured findings from unstructured partner documents, replacing manual review for analyst teams.</li>
-            <li>Re-architected the platform's LLM solution after a data-classification review surfaced highly confidential information — evolving it from Textract to <b>AWS Bedrock</b> and then to a self-hosted vLLM (Llama) deployment — tuning OCR schemas, prompts, and golden-set evaluations in production.</li>
+            <li>Support <b>PCI, NPI, and model-risk reviews</b> — classifying sensitive data and remediating via tokenization and masking; re-architected the platform's LLM solution after data classification surfaced highly confidential information, evolving from Textract to <b>AWS Bedrock</b> and then to a self-hosted vLLM (Llama) deployment while tuning OCR schemas, prompts, and golden-set evaluations in production.</li>
             <li>Designed <b>event-driven processing pipelines</b> in which EventBridge rules trigger Step Functions orchestrating AWS Batch jobs over S3 file drops, with companion state machines verifying downstream delivery and raising alarms.</li>
-            <li>Daily practitioner of <b>AI-assisted engineering</b> (Claude), using <b>MCP integrations</b> across Jira, Confluence, and GitHub; integrates agent tooling into development workflows and sets team conventions for its use.</li>
+            <li>Practice <b>AI-assisted engineering</b> daily (Claude Code, Windsurf) with <b>MCP integrations</b> across Jira, Confluence, and GitHub; integrate agent tooling into development workflows and set team conventions for its use.</li>
             <li>Prototyped a <b>LangChain-based RAG developer-enablement tool</b> at an internal hackathon — retrieval over large JSON corpora — that drew adoption requests from engineering managers across teams.</li>
-            <li>Own production operations end to end: on-call rotations, incident triage
-              and root-cause investigation, and continuous monitoring, alerting, and
-              observability improvements built on <b>OpenTelemetry and CloudWatch</b>.</li>
-            <li>Serve as <b>Sales Testing Champion</b>, defining test strategy and quality
-              standards adopted across four engineering teams; mentor engineers and lead
-              cross-functional delivery from scoping through production.</li>
+            <li>Own production operations end to end: on-call rotations, incident triage,
+              root-cause investigation, and continuous monitoring, alerting, and
+              observability built on <b>OpenTelemetry, CloudWatch, New Relic, Splunk,
+              PagerDuty, and Prometheus</b>.</li>
+            <li>Serve as <b>Testing Champion for the Sales organization</b>, defining test
+              strategy and quality standards adopted across four engineering teams and
+              reporting posture to leadership.</li>
+            <li>Mentor engineers, serve as a <b>technical interviewer</b> for coding and
+              system design, and lead cross-functional delivery from scoping through
+              production; recognized with <b>two ACE Awards for Technical Engineering
+              Excellence</b> (2024, 2025) and the <b>Diamond Dealer Award</b> (2024).</li>
           </ul>
         </div>
 
@@ -346,8 +351,8 @@
           </div>
           <ul>
             <li>Architected and operated <b>external-facing services powering auto loan
-              prequalification</b> for public applicants, owning API contracts, data
-              models, AWS deployment, and production support end to end.</li>
+              prequalification</b> for public applicants, owning API contracts and
+              versioning, data models, AWS deployment, and production support end to end.</li>
             <li>Partnered with product and risk stakeholders to translate regulated
               lending requirements into resilient, scalable service architecture.</li>
           </ul>
@@ -355,24 +360,12 @@
 
         <div class="role reveal">
           <div class="role-head">
-            <h4>Principal Associate Software Engineer, Artifactory Platform</h4>
-            <span class="dates">Jan 2020 – June 2021</span>
+            <h4>Principal Associate Software Engineer, Artifactory Platform &amp; Metrics</h4>
+            <span class="dates">June 2019 – June 2021</span>
           </div>
           <ul>
-            <li>Built and maintained the platform ecosystem around <b>JFrog Artifactory</b>, the company-wide binary repository.</li>
-            <li>Automated artifact promotion within production deployment pipelines using <b>AWS Lambda and DynamoDB</b> — promoting release artifacts to edge nodes once quality thresholds were met and <b>eliminating a manual release step</b> for engineering teams across the company.</li>
-          </ul>
-        </div>
-
-        <div class="role reveal">
-          <div class="role-head">
-            <h4>Principal Associate Software Engineer, Metrics</h4>
-            <span class="dates">June 2019 – Jan 2020</span>
-          </div>
-          <ul>
-            <li>Delivered platform-agnostic performance analytics through clustered cloud
-              microservices; automated metrics aggregation feeding <b>machine learning
-              models driving application performance and resilience</b>.</li>
+            <li>Ran the platform ecosystem around <b>JFrog Artifactory</b>, the company-wide binary repository (services deployed via <b>Terraform</b>); automated artifact promotion in production pipelines with <b>AWS Lambda and DynamoDB</b>, <b>eliminating a manual release step</b> for engineering teams across the enterprise.</li>
+            <li>Delivered <b>performance-analytics microservices</b> and automated metrics pipelines feeding <b>machine learning models</b>.</li>
           </ul>
         </div>
 
@@ -387,7 +380,7 @@
             <span class="dates">2017 – 2019</span>
           </div>
           <ul>
-            <li>Built OpenShift deployments for microservices; migrated server
+            <li>Built OpenShift (Kubernetes) deployments for microservices; migrated server
               provisioning to <b>Netflix Conductor workflow orchestration</b>, converting
               sequential job scheduling to parallel execution and cutting large-data
               processing <b>from hours to minutes</b>.</li>
@@ -438,23 +431,23 @@
         <div class="tech">
           <div class="row">
             <div class="k">Languages &amp; Frameworks</div>
-            <div class="v"><code class="hot">Java</code><code class="hot">Spring Boot</code><code class="hot">Python</code><code>SQL</code><code>Bash</code></div>
+            <div class="v"><code class="hot">Java</code><code class="hot">Spring Boot</code><code class="hot">Python</code><code>Flask</code><code>SQL</code><code>Bash</code></div>
           </div>
           <div class="row">
             <div class="k">Cloud &amp; Infrastructure</div>
-            <div class="v"><code class="hot">AWS (ECS, Lambda, Step Functions, EventBridge, API Gateway, DynamoDB, Textract, Bedrock)</code><code>IAM</code><code>Docker</code><code>Kubernetes</code><code>OpenShift</code><code>Linux</code></div>
+            <div class="v"><code class="hot">AWS (ECS, Lambda, Step Functions, EventBridge, API Gateway, DynamoDB, Aurora, Textract, Bedrock)</code><code>IAM</code><code>Docker</code><code>Kubernetes</code><code>OpenShift</code><code>Terraform</code><code>Linux</code></div>
           </div>
           <div class="row">
             <div class="k">AI &amp; Automation</div>
-            <div class="v"><code class="hot">AI-assisted engineering (Claude)</code><code class="hot">MCP</code><code>prompt engineering</code><code>LLM evaluation (ragas, golden-set evals)</code><code>LangChain (RAG)</code><code>document intelligence</code><code>open-source AI tooling</code></div>
+            <div class="v"><code class="hot">AI-assisted engineering (Claude Code, Windsurf)</code><code class="hot">MCP integrations</code><code>prompt engineering</code><code>LLM evaluation (ragas, golden-set evals)</code><code>LangChain (RAG)</code><code>document intelligence</code></div>
           </div>
           <div class="row">
             <div class="k">Platform &amp; Delivery</div>
-            <div class="v"><code class="hot">JFrog Artifactory</code><code>CI/CD pipelines</code><code>workflow orchestration (Netflix Conductor)</code><code>OpenTelemetry</code><code>CloudWatch</code><code>Splunk</code></div>
+            <div class="v"><code class="hot">JFrog Artifactory</code><code>CI/CD pipelines</code><code>workflow orchestration (Netflix Conductor)</code><code>OpenTelemetry</code><code>CloudWatch</code><code>New Relic</code><code>Prometheus</code><code>Splunk</code><code>PagerDuty</code></div>
           </div>
           <div class="row">
             <div class="k">APIs &amp; Data</div>
-            <div class="v"><code class="hot">API design &amp; versioning</code><code>microservices</code><code>messaging systems</code><code>Oracle</code><code>relational design</code></div>
+            <div class="v"><code class="hot">REST API design &amp; versioning</code><code>microservices</code><code>messaging systems (Kafka, SQS)</code><code>PostgreSQL</code><code>Oracle</code><code>relational design</code></div>
           </div>
         </div>
       </div>

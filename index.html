@@ -318,7 +318,7 @@
   .cap::before, .stat::before, .edu::before {
     content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit;
     pointer-events: none; opacity: 0; transition: opacity .35s ease;
-    background: radial-gradient(340px circle at var(--mx,50%) var(--my,50%),
+    background: radial-gradient(320px circle at var(--mx,50%) var(--my,50%),
                 rgba(34,211,238,.16), rgba(168,85,247,.10) 42%, transparent 70%);
   }
   .cap:hover, .stat:hover, .edu:hover {
@@ -424,7 +424,7 @@
           <p>An independent side project: a CLI that finds, installs, and governs the
             skill files AI coding agents run on, then keeps them in sync across every
             agent at once. Grounded in daily, hands-on AI-assisted engineering with
-            Claude, Windsurf, and Gemini.</p>
+            Claude Code and Windsurf.</p>
           <div class="tags"><code>CLI</code><code>open source</code><code>Python</code><code>AI tooling</code></div>
           <span class="more">See the full visual guide →</span>
         </a>
@@ -442,7 +442,7 @@
   <section id="experience">
     <div class="wrap">
       <span class="eyebrow">Experience</span>
-      <h2 class="sec-title">Eleven years, two companies, six roles</h2>
+      <h2 class="sec-title">Eleven years, two companies, five roles</h2>
       <p class="sec-sub">From SoftLayer APIs to leading architecture for a major bank's
         dealer-communications platform.</p>
 
@@ -456,12 +456,15 @@
           <span class="dates">Feb 2023 – Present · Remote</span>
           <p>Lead architecture and delivery for a high-throughput
             dealer-communications platform and a Textract document-intelligence
-            pipeline. Own production operations end to
-            end — on-call, incident triage, root-cause investigation, monitoring.
-            Serve as <b>Sales Testing Champion</b>, defining test strategy and quality
-            standards adopted across four engineering teams; mentor engineers and lead
-            cross-functional delivery from scoping through production.</p>
-          <div class="chips"><code>Java</code><code>Python</code><code>AWS ECS</code><code>Docker</code><code>Claude</code></div>
+            pipeline; re-architected its LLM solution from Textract to <b>AWS Bedrock</b>
+            and a self-hosted vLLM (Llama) deployment after a data-classification review.
+            Own production operations end to end — on-call, incident triage, root-cause
+            investigation, monitoring. Serve as <b>Sales Testing Champion</b>, defining
+            test strategy and quality standards adopted across four engineering teams;
+            mentor engineers and lead cross-functional delivery from scoping through
+            production. Recognized with <b>two ACE Awards for Technical Engineering
+            Excellence</b> (2024, 2025) and the <b>Diamond Dealer Award</b> (2024).</p>
+          <div class="chips"><code>Java</code><code>Python</code><code>AWS ECS</code><code>AWS Bedrock</code><code>Docker</code><code>Claude Code</code></div>
         </div>
         <div class="role reveal">
           <h4>Principal Associate Software Engineer · Prequalified Applications</h4>
@@ -474,21 +477,15 @@
           <div class="chips"><code>API design</code><code>AWS</code><code>regulated lending</code></div>
         </div>
         <div class="role reveal">
-          <h4>Principal Associate Software Engineer · Artifactory Platform</h4>
-          <span class="dates">Jan 2020 – June 2021</span>
-          <p>Built and maintained the platform ecosystem around <b>JFrog Artifactory</b>,
-            the company-wide binary repository consumed by teams across the organization.
-            Automated artifact promotion within production deployment pipelines,
-            eliminating a manual release step for engineering teams across the company.</p>
-          <div class="chips"><code>JFrog Artifactory</code><code>CI/CD</code></div>
-        </div>
-        <div class="role reveal">
-          <h4>Principal Associate Software Engineer · Metrics</h4>
-          <span class="dates">June 2019 – Jan 2020</span>
-          <p>Delivered platform-agnostic performance analytics through clustered cloud
-            microservices; automated metrics aggregation feeding <b>machine learning models</b>
-            driving application performance and resilience.</p>
-          <div class="chips"><code>microservices</code><code>metrics-to-ML</code></div>
+          <h4>Principal Associate Software Engineer · Artifactory Platform &amp; Metrics</h4>
+          <span class="dates">June 2019 – June 2021</span>
+          <p>Ran the platform ecosystem around <b>JFrog Artifactory</b>, the company-wide
+            binary repository (services deployed via Terraform). Automated artifact
+            promotion in production pipelines with <b>AWS Lambda and DynamoDB</b>,
+            eliminating a manual release step for engineering teams across the enterprise;
+            delivered performance-analytics microservices and metrics pipelines feeding
+            <b>machine learning models</b>.</p>
+          <div class="chips"><code>JFrog Artifactory</code><code>AWS Lambda</code><code>DynamoDB</code><code>Terraform</code></div>
         </div>
 
         <div class="company reveal">
@@ -498,7 +495,7 @@
         <div class="role reveal">
           <h4>Software Engineer II</h4>
           <span class="dates">2017 – 2019</span>
-          <p>Built OpenShift deployments for microservices; migrated server provisioning to
+          <p>Built OpenShift (Kubernetes) deployments for microservices; migrated server provisioning to
             <b>Netflix Conductor</b> workflow orchestration, converting sequential job
             scheduling to parallel execution and cutting large-data processing
             <b>from hours to minutes</b>.</p>
@@ -576,25 +573,25 @@
           <div class="ic">☁</div>
           <h3>Cloud &amp; infrastructure</h3>
           <p>Production AWS services, with containers everywhere.</p>
-          <div class="tags"><code>AWS ECS</code><code>AWS Textract</code><code>Aurora</code><code>SQS</code><code>Docker</code><code>Linux</code></div>
+          <div class="tags"><code>AWS ECS</code><code>Bedrock</code><code>Textract</code><code>Aurora</code><code>SQS</code><code>Docker</code><code>Terraform</code><code>Linux</code></div>
         </div>
         <div class="cap reveal" style="--ic-bg: rgba(236,72,153,.12); --ic-fg: #f9a8d4;">
           <div class="ic">✦</div>
           <h3>AI &amp; automation</h3>
           <p>Daily AI-assisted engineering, and building the tools for it.</p>
-          <div class="tags"><code>Claude</code><code>AI tooling</code><code>document intelligence</code><code>metrics-to-ML</code></div>
+          <div class="tags"><code>Claude Code</code><code>Windsurf</code><code>MCP</code><code>document intelligence</code><code>metrics-to-ML</code></div>
         </div>
         <div class="cap reveal" style="--ic-bg: rgba(167,139,250,.12); --ic-fg: #c4b5fd;">
           <div class="ic">⛭</div>
           <h3>Platform &amp; delivery</h3>
           <p>The pipelines and platforms teams ship through.</p>
-          <div class="tags"><code>JFrog Artifactory</code><code>CI/CD</code><code>Netflix Conductor</code><code>Splunk</code></div>
+          <div class="tags"><code>JFrog Artifactory</code><code>CI/CD</code><code>Netflix Conductor</code><code>OpenTelemetry</code><code>Splunk</code></div>
         </div>
         <div class="cap reveal" style="--ic-bg: rgba(74,222,128,.1); --ic-fg: #86efac;">
           <div class="ic">⇄</div>
           <h3>APIs &amp; data</h3>
           <p>External-facing contracts and the data behind them.</p>
-          <div class="tags"><code>API design &amp; versioning</code><code>microservices</code><code>messaging</code><code>Oracle</code><code>relational design</code></div>
+          <div class="tags"><code>REST API design &amp; versioning</code><code>microservices</code><code>messaging (Kafka, SQS)</code><code>PostgreSQL</code><code>Oracle</code><code>relational design</code></div>
         </div>
         <div class="cap reveal" style="--ic-bg: rgba(125,211,252,.12); --ic-fg: #bae6fd;">
           <div class="ic">⛨</div>
