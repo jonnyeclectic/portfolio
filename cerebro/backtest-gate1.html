@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backtest (Gate 1) — Cerebro Architecture</title>
+<meta name="description" content="Gate 1 of Cerebro: assembling a Nautilus backtest, the next-bar execution model that prevents look-ahead, honest net-liquidation measurement, and the in-sample gate criteria a strategy must clear.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='71' font-size='60' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="stylesheet" href="assets/cerebro-docs.css">
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script defer src="assets/cerebro-docs.js"></script>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="logo" href="index.html"><b>cerebro</b><span>architecture</span></a>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="data-and-universe.html">Data</a></li>
+        <li><a href="backtest-gate1.html">Backtest</a></li>
+        <li><a href="risk-layer.html">Risk</a></li>
+        <li><a href="validation-gate2.html">Validation</a></li>
+        <li><a href="paper-gate3.html">Paper</a></li>
+        <li><a href="live-gate4.html">Live</a></li>
+        <li><a class="cta" href="../index.html">↗&nbsp;Portfolio</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="page-head reveal">
+    <span class="pill gate">Gate 1</span>
+    <h1 class="page-title">Backtest <span class="grad-text">(in-sample)</span></h1>
+    <p class="page-sub">Run the strategy over history under a deliberately pessimistic execution model,
+      measure it from a reconstructed equity curve — not the engine's cash analyzer — and hold it to a
+      hard set of criteria. A halted run is not a result.</p>
+  </div>
+
+  <div class="explain reveal">
+    <div class="col plain">
+      <h4>In plain terms</h4>
+      <p>Play the strategy against the past, but pretend you're a realistic, slightly unlucky trader:
+        your orders fill on the <em>next</em> bar, always a tick worse, and you pay fees every time.</p>
+      <p>Then grade the result on real portfolio value — cash plus what your holdings are worth — and
+        only pass strategies that clear every bar of the report card.</p>
+    </div>
+    <div class="col tech">
+      <h4>Technically</h4>
+      <p><code>backtest.py</code> builds a <code>BacktestEngine</code> on an <code>XNAS</code> venue
+        (<code>CASH</code> account, <code>NETTING</code> OMS, $1M start). A <code>LatencyModel</code> defers
+        fills one bar; a <code>FillModel</code> charges one adverse tick. Performance comes from
+        <code>reconstruct_equity_curve()</code> (NLV), never <code>analyzer.returns()</code>.</p>
+    </div>
+  </div>
+
+  <h2 class="sec" id="assembly">Assembling the backtest</h2>
+  <p class="lead">A strategy entry in the <code>STRATEGIES</code> registry resolves to bar types + a config.
+    Both the high-level (<code>build_run_config</code>) and low-level (<code>run_engine_backtest</code>)
+    paths wire the same venue, data, and cost models via shared constants.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+flowchart TD
+  CFG["strategy config&lt;br/&gt;(STRATEGIES registry)"] --&gt; RB["build_run_config&lt;br/&gt;or run_engine_backtest"]
+  RB --&gt; VEN["BacktestVenueConfig&lt;br/&gt;XNAS / CASH / NETTING / $1M"]
+  RB --&gt; DAT["BacktestDataConfig&lt;br/&gt;ParquetDataCatalog bars"]
+  RB --&gt; FM["FillModel + LatencyModel&lt;br/&gt;(shared constants)"]
+  VEN --&gt; ENG["BacktestEngine"]
+  DAT --&gt; ENG
+  FM --&gt; ENG
+  ENG --&gt; RUN["run()"]
+  RUN --&gt; REC["reconstruct_equity_curve&lt;br/&gt;NLV = cash + sum(qty x close)"]
+  REC --&gt; REP["EquityReport to stats"]
+    </div>
+    <figcaption>Backtest assembly. The registry drives which instruments load from the catalog; the venue is
+      a CASH/NETTING account; the fill and latency models are shared so both backtest paths, and live, price
+      execution identically.</figcaption>
+  </figure>
+
+  <h2 class="sec" id="execution">The execution model (no look-ahead)</h2>
+  <p class="lead">A decision made on bar <em>t</em>'s close cannot know its own fill price — because the
+    order fills on bar <em>t+1</em>'s close, one adverse tick worse. This is what makes the backtest
+    honest and keeps backtest and live identical.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+sequenceDiagram
+  autonumber
+  participant S as Strategy
+  participant L as LatencyModel
+  participant F as FillModel
+  participant V as Venue
+  Note over S: decision uses close[t]
+  S-&gt;&gt;V: submit MARKET order (bar t close)
+  V-&gt;&gt;L: apply latency (EXEC_LATENCY_NANOS = 1h)
+  L--&gt;&gt;V: eligible at bar t+1
+  V-&gt;&gt;F: fill at bar t+1 close
+  F--&gt;&gt;V: + one adverse tick (prob_slippage = 1.0)
+  V--&gt;&gt;S: OrderFilled at close[t+1] + slippage
+  Note over S: fill price unknown at decision time
+    </div>
+    <figcaption>The sub-bar latency model pushes every fill to the next bar; the fill model applies a
+      deterministic one-tick adverse move on top of the taker fee. Together they are the slippage model.</figcaption>
+  </figure>
+
+  <div class="window reveal">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="bar-title">src/runners/backtest.py — execution-model constants</span></div>
+<pre><span class="tc">EXEC_LATENCY_NANOS</span> = <span class="tn">3_600_000_000_000</span>   <span class="cm"># 1 hour -&gt; fill defers to next bar close</span>
+<span class="tc">FILL_PROB_SLIPPAGE</span> = <span class="tn">1.0</span>              <span class="cm"># one adverse price-increment per fill</span>
+<span class="tc">FILL_RANDOM_SEED</span>   = <span class="tn">42</span>               <span class="cm"># deterministic backtests</span>
+<span class="cm"># Venue: XNAS · AccountType.CASH · OmsType.NETTING · starting_balances=["1_000_000 USD"]</span></pre>
+  </div>
+
+  <h2 class="sec" id="measurement">Honest measurement (NLV)</h2>
+  <div class="callout danger reveal">
+    <span class="k">Why not the built-in analyzer?</span>
+    <p>On a CASH account, <code>analyzer.returns()</code> is the percent change of the <em>cash</em> balance —
+      buying the book reads as a −54% day, liquidating as +115%. And <code>positions_closed()</code>
+      undercounts round trips ~80× under NETTING. Both silently fabricated results before 2026-07-23.</p>
+  </div>
+  <p>Instead, <code>reconstruct_equity_curve()</code> rebuilds net liquidation value from the account and
+    fill streams, and every statistic — Sharpe, Sortino, drawdown, trade count — is computed from it.</p>
+
+  <div class="window reveal">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="bar-title">src/runners/equity_curve.py — the source of truth</span></div>
+<pre><span class="cm"># Net liquidation value at each day:</span>
+<span class="tv">NLV</span>(t) = cash(t) + <span class="tc">sum</span>( qty_i(t) * close_i(t) )
+<span class="cm"># Sharpe / Sortino / max_drawdown / trade counts all derive from this series.</span></pre>
+  </div>
+
+  <h2 class="sec" id="gate1">Gate 1 criteria</h2>
+  <p class="lead">A strategy must satisfy <strong>all</strong> of these to advance. The "run valid" check is
+    evaluated <em>first</em>: if the drawdown kill-switch latched mid-window, the run halted and its tidy
+    stats are meaningless.</p>
+
+  <div class="tbl-scroll reveal">
+    <table class="data">
+      <thead><tr><th>Criterion</th><th>Threshold</th><th>Guards against</th></tr></thead>
+      <tbody>
+        <tr><td>Run valid (kill-switch not latched)</td><td>required, checked first</td><td>scoring a halted run</td></tr>
+        <tr><td>Sharpe ratio</td><td class="num">≥ 1.0</td><td>weak risk-adjusted return</td></tr>
+        <tr><td>Sortino ratio</td><td class="num">≥ 1.2</td><td>downside volatility</td></tr>
+        <tr><td>Max drawdown</td><td class="num">≤ 20%</td><td>unacceptable peak-to-trough loss</td></tr>
+        <tr><td>Trade count</td><td class="num">≥ 100</td><td>statistically thin samples</td></tr>
+        <tr><td>Fees + slippage modeled</td><td>required</td><td>costless fantasy fills</td></tr>
+        <tr><td>No look-ahead in signals</td><td>required</td><td>peeking at the future</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn reveal">
+    <span class="k">The tripwire sits above the standard</span>
+    <p>The kill-switch fires at <code>0.25</code> drawdown — above the 20% Gate 1 limit, below anything
+      catastrophic. Set below the standard it would just be the drawdown gate applied twice, killing
+      strategies that were still performing acceptably.</p>
+  </div>
+
+  <div class="window reveal">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="bar-title">zsh — run Gate 1</span></div>
+<pre><span class="tp">$</span> <span class="tv">python</span> -m src.runners.backtest <span class="tc">--strategy</span> cross_sectional_momentum_etf
+<span class="tp">$</span> <span class="tv">python</span> -m src.runners.promote_check <span class="tc">--strategy</span> cross_sectional_momentum_etf</pre>
+  </div>
+
+  <h2 class="sec" id="refs">References</h2>
+  <ul class="refs">
+    <li><a>src/runners/backtest.py</a> — <span class="what"><code>STRATEGIES</code>, <code>build_run_config</code>, <code>run_engine_backtest</code>, execution-model constants.</span></li>
+    <li><a>src/runners/equity_curve.py</a> — <span class="what"><code>reconstruct_equity_curve</code>, <code>sharpe_ratio</code>, <code>max_drawdown</code>, <code>match_round_trips</code>, <code>EquityReport</code>.</span></li>
+    <li><a>src/runners/promote_check.py</a> — <span class="what"><code>check_gate1</code>, <code>check_auto_rejections</code>, <code>run_promote_check</code>.</span></li>
+    <li><a>docs/gates.md</a> — <span class="what">the full Gate 1 checklist and the "a halted run is not a result" rule.</span></li>
+  </ul>
+
+  <nav class="pager">
+    <a class="prev" href="data-and-universe.html">
+      <span class="dir">← Prev</span>
+      <span class="ttl">Stage 0 · Data &amp; Universe</span>
+    </a>
+    <a class="next" href="risk-layer.html">
+      <span class="dir">Next →</span>
+      <span class="ttl">Cross-cutting · Risk Layer</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <p class="brand"><b>cerebro</b> · paper-first multi-asset trading research on Nautilus Trader</p>
+    <p class="links">
+      <a href="index.html">Architecture home</a> ·
+      <a href="../index.html">Portfolio</a> ·
+      <a href="https://jonnyeclectic.github.io/boost/">boost</a> ·
+      <a href="https://github.com/jonnyeclectic">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

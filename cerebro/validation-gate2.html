@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Validation (Gate 2) — Cerebro Architecture</title>
+<meta name="description" content="Gate 2 of Cerebro: rolling walk-forward validation, parameter-perturbation robustness, and the deflated Sharpe ratio that discounts a result by the number of configurations tried.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='71' font-size='60' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="stylesheet" href="assets/cerebro-docs.css">
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script defer src="assets/cerebro-docs.js"></script>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="logo" href="index.html"><b>cerebro</b><span>architecture</span></a>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="data-and-universe.html">Data</a></li>
+        <li><a href="backtest-gate1.html">Backtest</a></li>
+        <li><a href="risk-layer.html">Risk</a></li>
+        <li><a href="validation-gate2.html">Validation</a></li>
+        <li><a href="paper-gate3.html">Paper</a></li>
+        <li><a href="live-gate4.html">Live</a></li>
+        <li><a class="cta" href="../index.html">↗&nbsp;Portfolio</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="page-head reveal">
+    <span class="pill gate">Gate 2</span>
+    <h1 class="page-title">Walk-forward <span class="grad-text">validation</span></h1>
+    <p class="page-sub">A strategy that only shines in-sample has not passed. Gate 2 attacks overfitting from
+      three angles: out-of-sample consistency across rolling windows, resistance to parameter perturbation,
+      and a Sharpe deflated by how many configurations were tried.</p>
+  </div>
+
+  <div class="explain reveal">
+    <div class="col plain">
+      <h4>In plain terms</h4>
+      <p>It's easy to find a strategy that fit the past perfectly — and is worthless. So Cerebro repeatedly
+        tunes on an early slice and tests on the <em>next</em>, unseen slice, walking forward through history.</p>
+      <p>It also nudges the settings ±20% (a real edge shouldn't collapse) and penalizes results for every
+        variation that was tried, because trying enough things guarantees a lucky winner.</p>
+    </div>
+    <div class="col tech">
+      <h4>Technically</h4>
+      <p><code>walk_forward.py</code> generates rolling train/test windows (504/126, step 126) and runs each
+        via a subprocess. <code>param_sensitivity.py</code> perturbs key params ±20% and writes a trial
+        sidecar; <code>dsr.py</code> computes the Bailey &amp; López de Prado deflated Sharpe from N trials.</p>
+    </div>
+  </div>
+
+  <h2 class="sec" id="walk-forward">Rolling walk-forward</h2>
+  <p class="lead">Each window trains on 504 bars and tests on the next 126, then the whole frame steps
+    forward 126 bars. Out-of-sample performance is judged on the test segments only.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+gantt
+  dateFormat X
+  axisFormat %s
+  title Rolling walk-forward — train 504, test 126, step 126 (bars)
+  section Window 1
+  train :0, 504
+  test  :504, 126
+  section Window 2
+  train :126, 504
+  test  :630, 126
+  section Window 3
+  train :252, 504
+  test  :756, 126
+    </div>
+    <figcaption>Overlapping train/test frames stepping through history. OOS metrics are the median across
+      countable windows; a window that correctly sat in cash (0 trades, risk-off) is excluded, not penalized.</figcaption>
+  </figure>
+
+  <div class="tbl-scroll reveal">
+    <table class="data">
+      <thead><tr><th>Gate 2 criterion</th><th>Threshold</th></tr></thead>
+      <tbody>
+        <tr><td>OOS Sharpe vs in-sample (median)</td><td class="num">within 30%</td></tr>
+        <tr><td>Catastrophic drawdown in any OOS window</td><td class="num">≤ 30%</td></tr>
+        <tr><td>Parameter perturbation ±20%</td><td>no &gt;50% Sharpe drop</td></tr>
+        <tr><td>Window stability (coefficient of variation)</td><td class="num">≤ 1.5</td></tr>
+        <tr><td>Countable windows (≥ 8 trades/yr, scaled)</td><td class="num">≥ 5</td></tr>
+        <tr><td>Deflated Sharpe ratio</td><td class="num">≥ 0.95</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="sec" id="robustness">Robustness &amp; deflation</h2>
+  <p class="lead">The evaluation hub, <code>promote_check.py</code>, runs in-sample and out-of-sample
+    backtests in a subprocess (Nautilus initializes its logger once per process), then folds together the
+    gate checks, auto-rejections, the deflated Sharpe, and regime-coverage warnings.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+flowchart TD
+  IN["backtest IS + OOS&lt;br/&gt;(run in subprocess)"] --&gt; G1["check_gate1&lt;br/&gt;Sharpe / Sortino / DD / trades / valid"]
+  IN --&gt; AR["check_auto_rejections&lt;br/&gt;IS-only? Sharpe collapse? too few trades?"]
+  TRIALS["param_trials sidecar&lt;br/&gt;(n_trials, sharpes)"] --&gt; DSR["check_dsr&lt;br/&gt;deflated Sharpe at least 0.95"]
+  REG["regime coverage&lt;br/&gt;GFC 2008 / COVID 2020 / 2022"] --&gt; WARN["warnings"]
+  G1 --&gt; REP["PromotionReport&lt;br/&gt;overall_passed"]
+  AR --&gt; REP
+  DSR --&gt; REP
+  WARN --&gt; REP
+    </div>
+    <figcaption>Evaluation flow. The param-sensitivity run writes the trial count that the deflated-Sharpe
+      check reads back — so "we tried 40 variants" is priced into the significance of the winner.</figcaption>
+  </figure>
+
+  <div class="explain reveal">
+    <div class="col plain">
+      <h4>What "deflated Sharpe" means</h4>
+      <p>If you try 100 random strategies, the best one looks great by luck alone. The deflated Sharpe asks:
+        "given how many we tried, is this one <em>really</em> better than noise?" — and demands 95% confidence.</p>
+    </div>
+    <div class="col tech">
+      <h4>How it's computed</h4>
+      <p><code>dsr.deflated_sharpe_ratio(sharpe, t_obs, n_trials, trial_sharpes)</code> estimates the expected
+        maximum Sharpe of <code>n_trials</code> noise strategies and returns the probability the observed
+        Sharpe exceeds it. Threshold <code>0.95</code>, capped at <code>MAX_EFFECTIVE_TRIALS = 100</code>.</p>
+    </div>
+  </div>
+
+  <div class="window reveal">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="bar-title">zsh — run Gate 2</span></div>
+<pre><span class="tp">$</span> <span class="tv">python</span> -m src.runners.walk_forward      <span class="tc">--strategy</span> cross_sectional_momentum_etf
+<span class="tp">$</span> <span class="tv">python</span> -m src.runners.param_sensitivity <span class="tc">--strategy</span> cross_sectional_momentum_etf
+<span class="cm"># param_sensitivity writes data/sessions/param_trials_&lt;strategy&gt;.json for the DSR check</span></pre>
+  </div>
+
+  <div class="callout danger reveal">
+    <span class="k">Automatic rejection</span>
+    <p>In-sample-only results are rejected outright. So is a Sharpe that collapses &gt;50% from in-sample to
+      out-of-sample, or a strategy with too few countable windows. Out-of-sample validation is mandatory —
+      an in-sample number has not passed.</p>
+  </div>
+
+  <h2 class="sec" id="refs">References</h2>
+  <ul class="refs">
+    <li><a>src/runners/walk_forward.py</a> — <span class="what"><code>generate_windows</code>, <code>run_gate2_checks</code>, sharpe-consistency / stability / drawdown checks.</span></li>
+    <li><a>src/runners/param_sensitivity.py</a> — <span class="what"><code>generate_perturbation_grid</code>, <code>check_param_sensitivity</code>, <code>write_trial_sidecar</code>.</span></li>
+    <li><a>src/runners/dsr.py</a> — <span class="what"><code>deflated_sharpe_ratio</code>, <code>expected_max_sharpe</code> (Bailey &amp; López de Prado).</span></li>
+    <li><a>src/runners/promote_check.py</a> — <span class="what"><code>run_backtest_and_extract</code>, <code>check_dsr</code>, <code>check_regime_coverage</code>.</span></li>
+  </ul>
+
+  <nav class="pager">
+    <a class="prev" href="risk-layer.html">
+      <span class="dir">← Prev</span>
+      <span class="ttl">Cross-cutting · Risk Layer</span>
+    </a>
+    <a class="next" href="paper-gate3.html">
+      <span class="dir">Next →</span>
+      <span class="ttl">Gate 3 · IBKR Paper</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <p class="brand"><b>cerebro</b> · paper-first multi-asset trading research on Nautilus Trader</p>
+    <p class="links">
+      <a href="index.html">Architecture home</a> ·
+      <a href="../index.html">Portfolio</a> ·
+      <a href="https://jonnyeclectic.github.io/boost/">boost</a> ·
+      <a href="https://github.com/jonnyeclectic">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

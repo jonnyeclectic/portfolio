@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IBKR Paper (Gate 3) — Cerebro Architecture</title>
+<meta name="description" content="Gate 3 of Cerebro: the live TradingNode with IBKR execution and IBKR-or-Databento data, the paper-mode safety guard, the monitoring actor, and the operational runbook for at least two weeks of paper trading.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='71' font-size='60' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="stylesheet" href="assets/cerebro-docs.css">
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script defer src="assets/cerebro-docs.js"></script>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="logo" href="index.html"><b>cerebro</b><span>architecture</span></a>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="data-and-universe.html">Data</a></li>
+        <li><a href="backtest-gate1.html">Backtest</a></li>
+        <li><a href="risk-layer.html">Risk</a></li>
+        <li><a href="validation-gate2.html">Validation</a></li>
+        <li><a href="paper-gate3.html">Paper</a></li>
+        <li><a href="live-gate4.html">Live</a></li>
+        <li><a class="cta" href="../index.html">↗&nbsp;Portfolio</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="page-head reveal">
+    <span class="pill gate">Gate 3</span>
+    <h1 class="page-title">IBKR <span class="grad-text">paper</span></h1>
+    <p class="page-sub">The same strategy code now runs against a live market feed and a paper brokerage
+      account for at least two weeks — the first time model meets reality. Getting here requires clearing a
+      hard safety guard that refuses to start against a live account.</p>
+  </div>
+
+  <div class="explain reveal">
+    <div class="col plain">
+      <h4>In plain terms</h4>
+      <p>Now the robot trades a <em>pretend</em> account with real, live prices. This is where you find out
+        whether the fills, timing, and connections behave like the backtest assumed — before any real money.</p>
+      <p>A safety officer refuses to even start if anything about the setup points at a real-money account.</p>
+    </div>
+    <div class="col tech">
+      <h4>Technically</h4>
+      <p><code>live.py</code> assembles a <code>TradingNode</code>: execution is <em>always</em> IBKR; data is
+        IBKR or Databento. <code>validate_paper_mode()</code> cross-checks both the self-declared
+        <code>TRADING_MODE</code> and the actual gateway port before the node builds. A
+        <code>MonitorActor</code> logs status every five minutes.</p>
+    </div>
+  </div>
+
+  <h2 class="sec" id="assembly">Assembling the live node</h2>
+  <p class="lead">Configuration is read from the environment, gated by the paper-mode check, then wired into a
+    node with a data client, an IBKR execution client, and the monitoring actor.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+flowchart TD
+  ENV["env: IBKR_HOST / PORT / TRADING_MODE"] --&gt; CFG["get_ibkr_config"]
+  CFG --&gt; GUARD{"validate_paper_mode&lt;br/&gt;paper AND port not live?"}
+  GUARD --&gt;|fail| STOP["RuntimeError: SAFETY CHECK FAILED"]
+  GUARD --&gt;|ok| BUILD["build_live_node_config"]
+  BUILD --&gt; DATA{"data_source?"}
+  DATA --&gt;|ibkr| IBD["IB data client"]
+  DATA --&gt;|databento| DBD["Databento data client"]
+  BUILD --&gt; EXEC["IBKR exec client (always)"]
+  BUILD --&gt; MON["MonitorActor&lt;br/&gt;status every 300s"]
+  IBD --&gt; NODE["TradingNode.run()"]
+  DBD --&gt; NODE
+  EXEC --&gt; NODE
+  MON --&gt; NODE
+  NODE --&gt; GW["IB Gateway (Docker, port 4002)"]
+    </div>
+    <figcaption>Live assembly. Execution is IBKR-only (Databento is data-only). The kill-switch state path is
+      injected here so the switch persists across restarts — a safety concern unique to live.</figcaption>
+  </figure>
+
+  <div class="callout danger reveal">
+    <span class="k">The paper-mode guard (Hard Rule 2)</span>
+    <p>The mode string is self-declared, but the <em>port</em> is what actually routes orders. So
+      <code>validate_paper_mode</code> refuses to start unless <code>TRADING_MODE == "paper"</code> <strong>and</strong>
+      the port is not one of the live gateway/TWS ports (<code>IB_LIVE_PORTS = {4001, 7496}</code>). A
+      paper-labelled session on a live port would route real orders.</p>
+  </div>
+
+  <div class="window reveal">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="bar-title">src/config/node.py — validate_paper_mode()</span></div>
+<pre><span class="tc">if</span> trading_mode.lower() != <span class="ts">"paper"</span>:
+    <span class="tc">raise</span> <span class="tv">RuntimeError</span>(<span class="ts">"LIVE mode requires explicit authorization"</span>)
+<span class="tc">if</span> port <span class="tc">in</span> IB_LIVE_PORTS:   <span class="cm"># {4001, 7496}</span>
+    <span class="tc">raise</span> <span class="tv">RuntimeError</span>(<span class="ts">"paper mode but port is a LIVE gateway port"</span>)</pre>
+  </div>
+
+  <h2 class="sec" id="loop">The live loop &amp; monitoring</h2>
+  <p class="lead">Live bars run the identical per-bar path as the backtest — size, risk-check, submit — but
+    now orders route through the IBKR adapter to the Gateway, and the execution engine reconciles fills. A
+    monitor actor watches the book.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+sequenceDiagram
+  autonumber
+  participant F as Data feed (IBKR/Databento)
+  participant S as Strategy
+  participant R as Risk layer
+  participant O as OMS
+  participant A as IBKR adapter
+  participant M as MonitorActor
+  F-&gt;&gt;S: Bar (live close)
+  S-&gt;&gt;R: size + check_order
+  R--&gt;&gt;S: allowed
+  S-&gt;&gt;O: submit_order
+  O-&gt;&gt;A: route order
+  A-&gt;&gt;A: IB Gateway to exchange
+  A--&gt;&gt;O: OrderFilled / reconcile
+  M--&gt;&gt;M: every 300s log equity, exposure, drawdown, slippage
+    </div>
+    <figcaption>Live trading loop. Reconciliation is enabled on the execution engine so restarts recover open
+      orders and positions. The monitor writes a paper-session record on stop for the Gate 4 review.</figcaption>
+  </figure>
+
+  <div class="tbl-scroll reveal">
+    <table class="data">
+      <thead><tr><th>Metric</th><th>Healthy</th><th>Warning</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td>Gross exposure</td><td class="num">&lt; 80%</td><td class="num">60–80%</td><td>gatekeeper caps at 80%</td></tr>
+        <tr><td>Net exposure</td><td class="num">&lt; 60%</td><td class="num">40–60%</td><td>gatekeeper caps at 60%</td></tr>
+        <tr><td>Drawdown</td><td class="num">&lt; 5%</td><td class="num">5–8%</td><td>monitor; kill-switch region beyond</td></tr>
+        <tr><td>Fill count</td><td>&gt; 0 / week</td><td>0 for 3+ days</td><td>check feed &amp; signal thresholds</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="sec" id="ops">Operating it</h2>
+  <div class="window reveal">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="bar-title">zsh — start / verify / stop (paper)</span></div>
+<pre><span class="tp">$</span> <span class="tv">docker</span> compose up -d ibgateway          <span class="cm"># start IB Gateway (port 4002)</span>
+<span class="tp">$</span> <span class="tv">python</span> -m src.runners.live <span class="tc">--dry-run</span>     <span class="cm"># validate config, no connection</span>
+<span class="tp">$</span> <span class="tv">python</span> -m src.runners.live <span class="tc">--strategy</span> cross_sectional_momentum <span class="tc">--data-source</span> databento
+<span class="tp">$</span> <span class="tv">python</span> -m src.dashboard               <span class="cm"># read-only overview at :8787</span></pre>
+  </div>
+
+  <div class="callout warn reveal">
+    <span class="k">Ctrl+C liquidates the book by default</span>
+    <p>On stop, each strategy cancels working orders and — because <code>flatten_on_stop</code> defaults to
+      <code>True</code> — market-closes every position. To stop while keeping positions open, set
+      <code>flatten_on_stop=False</code> before starting. Control actions stay on the CLI; the dashboard is
+      deliberately read-only so no web button can liquidate a live book.</p>
+  </div>
+
+  <h2 class="sec" id="gate3">Gate 3 criteria</h2>
+  <div class="tbl-scroll reveal">
+    <table class="data">
+      <thead><tr><th>Criterion</th><th>Requirement</th></tr></thead>
+      <tbody>
+        <tr><td>Duration on live market data</td><td class="num">≥ 2 weeks</td></tr>
+        <tr><td>Fill rates &amp; slippage vs backtest</td><td>match assumptions</td></tr>
+        <tr><td>Disconnects / missed signals</td><td>none unexpected</td></tr>
+        <tr><td>P&amp;L trajectory vs backtest</td><td>consistent</td></tr>
+        <tr><td>Kill-switch</td><td>tested &amp; functional</td></tr>
+        <tr><td>Runbook</td><td>reviewed &amp; up to date</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="sec" id="refs">References</h2>
+  <ul class="refs">
+    <li><a>src/runners/live.py</a> — <span class="what"><code>build_live_node_config</code>, IBKR exec + IBKR/Databento data, <code>MonitorActor</code> wiring, <code>--dry-run</code>.</span></li>
+    <li><a>src/config/node.py</a> — <span class="what"><code>get_ibkr_config</code>, <code>validate_paper_mode</code>, <code>IB_LIVE_PORTS</code>, adapter config builders.</span></li>
+    <li><a>src/monitoring/monitor.py</a> — <span class="what"><code>MonitorActor</code>: 5-minute status, drawdown warning, paper-session record.</span></li>
+    <li><a>docs/runbook.md</a> — <span class="what">pre-flight checklist, start/stop, monitoring table, troubleshooting.</span></li>
+  </ul>
+
+  <nav class="pager">
+    <a class="prev" href="validation-gate2.html">
+      <span class="dir">← Prev</span>
+      <span class="ttl">Gate 2 · Validation</span>
+    </a>
+    <a class="next" href="live-gate4.html">
+      <span class="dir">Next →</span>
+      <span class="ttl">Gate 4 · Review &amp; Live</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <p class="brand"><b>cerebro</b> · paper-first multi-asset trading research on Nautilus Trader</p>
+    <p class="links">
+      <a href="index.html">Architecture home</a> ·
+      <a href="../index.html">Portfolio</a> ·
+      <a href="https://jonnyeclectic.github.io/boost/">boost</a> ·
+      <a href="https://github.com/jonnyeclectic">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
