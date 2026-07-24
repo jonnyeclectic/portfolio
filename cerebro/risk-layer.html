@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Risk Layer — Cerebro Architecture</title>
+<meta name="description" content="Cerebro's risk layer: fixed-fractional position sizing, volatility targeting, hard exposure and concentration caps, and a latching drawdown kill-switch — composed inside every strategy and consulted on every bar.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='71' font-size='60' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="stylesheet" href="assets/cerebro-docs.css">
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script defer src="assets/cerebro-docs.js"></script>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="logo" href="index.html"><b>cerebro</b><span>architecture</span></a>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="data-and-universe.html">Data</a></li>
+        <li><a href="backtest-gate1.html">Backtest</a></li>
+        <li><a href="risk-layer.html">Risk</a></li>
+        <li><a href="validation-gate2.html">Validation</a></li>
+        <li><a href="paper-gate3.html">Paper</a></li>
+        <li><a href="live-gate4.html">Live</a></li>
+        <li><a class="cta" href="../index.html">↗&nbsp;Portfolio</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="page-head reveal">
+    <span class="pill">Cross-cutting</span>
+    <h1 class="page-title">The <span class="grad-text">Risk Layer</span></h1>
+    <p class="page-sub">Four small, pure components — a sizer, a vol-targeter, an exposure gatekeeper, and a
+      kill-switch — composed inside every strategy and consulted on every bar. Signal never reaches the
+      broker without passing through them.</p>
+  </div>
+
+  <div class="explain reveal">
+    <div class="col plain">
+      <h4>In plain terms</h4>
+      <p>Even a good idea can blow up if you bet too big or too often. The risk layer decides <em>how much</em>
+        to trade, refuses trades that would over-concentrate the book, and pulls a master switch that flattens
+        everything if losses get too deep.</p>
+    </div>
+    <div class="col tech">
+      <h4>Technically</h4>
+      <p>Each <code>Strategy</code> owns one <code>PositionSizer</code>, <code>RiskGatekeeper</code>, and
+        <code>KillSwitch</code> (momentum also a <code>vol_target</code>). They are plain Python, unit-tested
+        in isolation — there is no separate Nautilus "risk actor"; the layer is <em>composed</em> into the
+        strategy so backtest and live behave identically.</p>
+    </div>
+  </div>
+
+  <h2 class="sec" id="components">Four guards</h2>
+  <div class="tbl-scroll reveal">
+    <table class="data">
+      <thead><tr><th>Component</th><th>Role</th><th>Key call</th><th>Default limits</th></tr></thead>
+      <tbody>
+        <tr><td><code>PositionSizer</code></td><td>fixed-fractional size from the stop distance</td><td><code>calculate(equity, entry, stop)</code></td><td class="num">risk 1% / trade</td></tr>
+        <tr><td><code>vol_target</code></td><td>scale size toward a target volatility</td><td><code>vol_scale(realized, target)</code></td><td class="num">0.25×–2.0×</td></tr>
+        <tr><td><code>RiskGatekeeper</code></td><td>hard exposure / concentration / loss caps</td><td><code>check_order(...)</code></td><td class="num">gross 80% · net 60% · conc 25%</td></tr>
+        <tr><td><code>KillSwitch</code></td><td>portfolio drawdown halt (latches)</td><td><code>update_equity(equity)</code></td><td class="num">25% drawdown</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="sec" id="order-path">The order path</h2>
+  <p class="lead">When a strategy decides to enter, sizing and risk run in a fixed order: size from the stop,
+    scale by volatility, cap by concentration and budget, then submit to the gatekeeper. Only an
+    <em>allowed</em> check reaches the OMS.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+sequenceDiagram
+  autonumber
+  participant S as _enter_long
+  participant P as PositionSizer
+  participant V as VolTarget
+  participant G as RiskGatekeeper
+  participant O as OMS
+  S-&gt;&gt;S: entry = close, stop = max(entry*(1-stop_pct), 0.01)
+  S-&gt;&gt;P: calculate(equity, entry, stop)
+  P--&gt;&gt;S: qty (fixed-fractional)
+  S-&gt;&gt;V: vol_scale(realized_vol, target_vol)
+  V--&gt;&gt;S: scale in [min, max]
+  S-&gt;&gt;S: cap by concentration and net-exposure budget
+  S-&gt;&gt;G: check_order(equity, notional, gross, net, instr_exp, trade_risk)
+  alt allowed
+    G--&gt;&gt;S: RiskCheck(allowed=true)
+    S-&gt;&gt;O: submit_order(MARKET BUY, qty)
+  else blocked
+    G--&gt;&gt;S: RiskCheck(allowed=false, reason)
+    S-&gt;&gt;S: log and skip
+  end
+    </div>
+    <figcaption>The <code>_enter_long</code> order path. The gatekeeper is a hard backstop wider than the
+      sizer's own budget — belt and suspenders. A blocked check is logged and the order is skipped, never forced.</figcaption>
+  </figure>
+
+  <div class="window reveal">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="bar-title">src/risk/position_sizer.py &amp; gatekeeper.py</span></div>
+<pre><span class="cm"># Fixed-fractional: risk a fixed % of equity on the distance to the stop</span>
+qty = <span class="tc">int</span>( equity * risk_per_trade / (entry - stop) )
+
+<span class="cm"># Gatekeeper caps checked in order (all must pass):</span>
+<span class="cm">#   trade_risk / equity  &lt;=  max_loss_per_trade   (2%)</span>
+<span class="cm">#   |gross|              &lt;=  max_gross_exposure   (80%)</span>
+<span class="cm">#   |net|                &lt;=  max_net_exposure     (60%)</span>
+<span class="cm">#   instrument           &lt;=  max_concentration    (25%)</span></pre>
+  </div>
+
+  <h2 class="sec" id="kill-switch">The kill-switch</h2>
+  <p class="lead">Every bar updates the high-water mark and current drawdown. Cross the threshold and the
+    switch <strong>latches</strong> — it flattens the book and stays triggered until a human resets it.
+    In live trading its state is persisted atomically across restarts.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+stateDiagram-v2
+  [*] --&gt; Normal
+  Normal --&gt; Normal: update_equity (dd under max)
+  Normal --&gt; Triggered: drawdown &gt;= max_drawdown
+  Triggered --&gt; Triggered: latched (no auto-resume)
+  Triggered --&gt; Normal: reset() by human
+  note right of Triggered
+    flatten_all: cancel + close
+    state persisted atomically (live)
+  end note
+    </div>
+    <figcaption>Kill-switch lifecycle. It fails <em>closed</em>: if the persisted state file is unreadable at
+      startup it assumes triggered. Backtests leave the state path <code>None</code> (clean, in-memory per run).</figcaption>
+  </figure>
+
+  <div class="callout safe reveal">
+    <span class="k">Every strategy defines a non-null stop</span>
+    <p>Hard Rule 5: a strategy may not enter without a defined stop, and the risk layer is obeyed before any
+      signal. The per-bar ordering is always kill-switch → manage open position (hard stop first) → then
+      evaluate a new entry.</p>
+  </div>
+
+  <h2 class="sec" id="refs">References</h2>
+  <ul class="refs">
+    <li><a>src/risk/position_sizer.py</a> — <span class="what"><code>PositionSizer.calculate</code> (fixed-fractional, notional ceiling).</span></li>
+    <li><a>src/risk/vol_target.py</a> — <span class="what"><code>vol_scale</code>, <code>annualized_vol</code>, <code>returns_from_equity</code> (fails neutral at 1.0×).</span></li>
+    <li><a>src/risk/gatekeeper.py</a> — <span class="what"><code>RiskGatekeeper.check_order</code>, <code>RiskCheck</code>, exposure/concentration/loss caps.</span></li>
+    <li><a>src/risk/kill_switch.py</a> — <span class="what"><code>KillSwitch.update_equity</code>, <code>is_triggered</code>, <code>reset</code>, atomic state persistence.</span></li>
+    <li><a>src/strategies/cross_sectional_momentum.py</a> — <span class="what"><code>on_bar</code> ordering and the <code>_enter_long</code> order path.</span></li>
+  </ul>
+
+  <nav class="pager">
+    <a class="prev" href="backtest-gate1.html">
+      <span class="dir">← Prev</span>
+      <span class="ttl">Gate 1 · Backtest</span>
+    </a>
+    <a class="next" href="validation-gate2.html">
+      <span class="dir">Next →</span>
+      <span class="ttl">Gate 2 · Validation</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <p class="brand"><b>cerebro</b> · paper-first multi-asset trading research on Nautilus Trader</p>
+    <p class="links">
+      <a href="index.html">Architecture home</a> ·
+      <a href="../index.html">Portfolio</a> ·
+      <a href="https://jonnyeclectic.github.io/boost/">boost</a> ·
+      <a href="https://github.com/jonnyeclectic">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

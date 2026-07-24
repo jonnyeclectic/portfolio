@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review &amp; Live (Gate 4) — Cerebro Architecture</title>
+<meta name="description" content="Gate 4 of Cerebro: automated divergence analysis of paper results versus the backtest baseline, a mandatory human sign-off, the emergency flatten command, and going live at minimum size.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='71' font-size='60' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="stylesheet" href="assets/cerebro-docs.css">
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script defer src="assets/cerebro-docs.js"></script>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="logo" href="index.html"><b>cerebro</b><span>architecture</span></a>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="data-and-universe.html">Data</a></li>
+        <li><a href="backtest-gate1.html">Backtest</a></li>
+        <li><a href="risk-layer.html">Risk</a></li>
+        <li><a href="validation-gate2.html">Validation</a></li>
+        <li><a href="paper-gate3.html">Paper</a></li>
+        <li><a href="live-gate4.html">Live</a></li>
+        <li><a class="cta" href="../index.html">↗&nbsp;Portfolio</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="page-head reveal">
+    <span class="pill gate">Gate 4</span>
+    <h1 class="page-title">Review &amp; <span class="grad-text">go live</span></h1>
+    <p class="page-sub">Code never promotes itself to live. It produces the evidence — a divergence analysis
+      of paper versus backtest — and a checklist. A human reads it, signs off, and only then does the
+      strategy trade real capital, at the smallest viable size.</p>
+  </div>
+
+  <div class="explain reveal">
+    <div class="col plain">
+      <h4>In plain terms</h4>
+      <p>Before risking real money, Cerebro compares the paper results to what the backtest promised. If they
+        diverge in an important way, it flags it. A person must review and approve — the software cannot flip
+        the switch itself.</p>
+    </div>
+    <div class="col tech">
+      <h4>Technically</h4>
+      <p><code>gate_review.py</code> loads a paper-session record, runs a backtest baseline, and
+        <code>compute_divergence()</code> compares Sharpe, drawdown, win-rate, slippage, and fill-rate. It
+        writes a git-tracked, unchecked review doc to <code>docs/reviews/</code>. No code path approves live.</p>
+    </div>
+  </div>
+
+  <h2 class="sec" id="review">The Gate 4 review</h2>
+  <p class="lead">Paper meets backtest one last time. Material divergence on any comparable metric is flagged
+    for investigation; the output is a review document with an unchecked six-item checklist and a blank
+    sign-off block for a human.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+flowchart TD
+  PS["paper session record&lt;br/&gt;data/sessions/*.json"] --&gt; DIV["compute_divergence&lt;br/&gt;paper vs backtest baseline"]
+  BT["backtest baseline&lt;br/&gt;run_backtest_and_extract"] --&gt; DIV
+  DIV --&gt; MAT{"material divergence?&lt;br/&gt;Sharpe / DD / slippage / fill-rate"}
+  MAT --&gt;|yes| FLAG["flag for investigation"]
+  MAT --&gt;|no| OK["within tolerance"]
+  FLAG --&gt; DOC["generate_review_markdown&lt;br/&gt;docs/reviews/*.md (unchecked)"]
+  OK --&gt; DOC
+  DOC --&gt; HUMAN["human sign-off&lt;br/&gt;6-item GATE4_CHECKLIST"]
+  HUMAN --&gt; LIVE(["Live · minimum size"])
+    </div>
+    <figcaption>Divergence is judged per metric: Sharpe collapse &gt;50%, drawdown beyond a 20% floor, realized
+      slippage &gt;2× the modeled 3&nbsp;bps, or fill rate &lt;90%. The document is generated unchecked — a person
+      must tick every box.</figcaption>
+  </figure>
+
+  <div class="tbl-scroll reveal">
+    <table class="data">
+      <thead><tr><th>Gate 4 checklist (human)</th></tr></thead>
+      <tbody>
+        <tr><td>Paper results reviewed by a human</td></tr>
+        <tr><td>Material divergence from backtest investigated &amp; explained</td></tr>
+        <tr><td>Position sizing set to minimum viable (1× or fractional)</td></tr>
+        <tr><td>Emergency flatten command tested</td></tr>
+        <tr><td>IP-restricted API keys configured</td></tr>
+        <tr><td>Separate state store from the paper environment</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="sec" id="flatten">Emergency flatten</h2>
+  <p class="lead">At any stage, one command cancels every order and closes every position, on a separate
+    client ID so it can run alongside — or instead of — the main node. It confirms the book is actually flat,
+    or fails loudly.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+sequenceDiagram
+  autonumber
+  participant U as Operator
+  participant FS as FlattenStrategy
+  participant O as OMS
+  participant A as IBKR (client_id 2)
+  U-&gt;&gt;FS: python -m src.runners.flatten
+  FS-&gt;&gt;O: cancel all open orders
+  FS-&gt;&gt;O: close all positions (market)
+  O-&gt;&gt;A: route cancels + closes
+  loop every 5s until flat or 60s deadline
+    FS-&gt;&gt;FS: _check_flat
+  end
+  FS--&gt;&gt;U: confirmed flat (exit 0) or timed_out (non-zero)
+    </div>
+    <figcaption>The flatten runner validates paper mode, uses <code>client_id = 2</code>, and exits non-zero if
+      it can't confirm a flat book within the 60-second deadline — so an operator (or a script) knows the true outcome.</figcaption>
+  </figure>
+
+  <div class="window reveal">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="bar-title">zsh — review &amp; emergency stop</span></div>
+<pre><span class="tp">$</span> <span class="tv">python</span> -m src.runners.gate_review <span class="tc">--strategy</span> cross_sectional_momentum <span class="tc">--sample</span>
+<span class="tdim">wrote docs/reviews/gate4_review_cross_sectional_momentum_2026-01-01.md</span>
+<span class="tp">$</span> <span class="tv">python</span> -m src.runners.flatten            <span class="cm"># cancel all orders + close all positions</span></pre>
+  </div>
+
+  <div class="callout danger reveal">
+    <span class="k">Going live is deliberate and reversible</span>
+    <p>Live starts at minimum size, with IP-restricted keys and a state store separate from paper. Position
+      sizing, the kill-switch, and the flatten command all carry over unchanged — the safety layer that ran in
+      every backtest is the same one now standing between the strategy and real capital.</p>
+  </div>
+
+  <h2 class="sec" id="refs">References</h2>
+  <ul class="refs">
+    <li><a>src/runners/gate_review.py</a> — <span class="what"><code>compute_divergence</code>, <code>check_gate4_divergence</code>, <code>generate_review_markdown</code>, <code>GATE4_CHECKLIST</code>.</span></li>
+    <li><a>src/runners/flatten.py</a> — <span class="what"><code>FlattenStrategy</code>, <code>DEADLINE_SECONDS</code>, client-id-2 isolation, paper-mode guard.</span></li>
+    <li><a>docs/gates.md</a> — <span class="what">Gate 4 checklist and the automatic-rejection rules.</span></li>
+    <li><a>docs/runbook.md</a> — <span class="what">emergency flatten, graceful shutdown, weekly review.</span></li>
+  </ul>
+
+  <nav class="pager">
+    <a class="prev" href="paper-gate3.html">
+      <span class="dir">← Prev</span>
+      <span class="ttl">Gate 3 · IBKR Paper</span>
+    </a>
+    <a class="next" href="index.html">
+      <span class="dir">Back to start ↑</span>
+      <span class="ttl">Overview &amp; Architecture</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <p class="brand"><b>cerebro</b> · paper-first multi-asset trading research on Nautilus Trader</p>
+    <p class="links">
+      <a href="index.html">Architecture home</a> ·
+      <a href="../index.html">Portfolio</a> ·
+      <a href="https://jonnyeclectic.github.io/boost/">boost</a> ·
+      <a href="https://github.com/jonnyeclectic">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

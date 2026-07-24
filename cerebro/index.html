@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cerebro — Architecture & Workflow</title>
+<meta name="description" content="Visual architecture and workflow documentation for Cerebro, a paper-first multi-asset quant trading bot on Nautilus Trader: data, backtest, risk, validation, paper, and live stages explained simply and technically.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='71' font-size='60' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="stylesheet" href="assets/cerebro-docs.css">
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script defer src="assets/cerebro-docs.js"></script>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="logo" href="index.html"><b>cerebro</b><span>architecture</span></a>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="data-and-universe.html">Data</a></li>
+        <li><a href="backtest-gate1.html">Backtest</a></li>
+        <li><a href="risk-layer.html">Risk</a></li>
+        <li><a href="validation-gate2.html">Validation</a></li>
+        <li><a href="paper-gate3.html">Paper</a></li>
+        <li><a href="live-gate4.html">Live</a></li>
+        <li><a class="cta" href="../index.html">↗&nbsp;Portfolio</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="page-head reveal">
+    <span class="eyebrow">Cerebro · system documentation</span>
+    <h1 class="page-title">Architecture &amp; <span class="grad-text">Workflow</span></h1>
+    <p class="page-sub">How a market idea travels from raw price data to a live order — through a
+      backtest, out-of-sample validation, weeks of paper trading, and a human sign-off — with a
+      risk layer standing guard at every bar. Read each idea twice: once in plain terms, once precisely.</p>
+    <p style="margin-top:18px"><span class="badge"><span class="dot"></span> paper-first · Nautilus Trader · IBKR</span></p>
+  </div>
+
+  <div class="explain reveal">
+    <div class="col plain">
+      <h4>In plain terms</h4>
+      <p>Cerebro is a robot that tests trading ideas honestly and only lets the survivors touch real money.</p>
+      <p>It gathers price history, tries a strategy on the past, then re-tests it on data it never
+        "saw" while being tuned. If it still works, it trades a pretend account for a few weeks. Only
+        after a person reviews the results can it go live — and even then, at the smallest size.</p>
+      <p>Every step has a safety officer that can halt trading if losses get too deep.</p>
+    </div>
+    <div class="col tech">
+      <h4>Technically</h4>
+      <p>Python strategies run on the Rust-core <code>nautilus_trader</code> engine (CASH account,
+        NETTING OMS). Bars flow from a <code>ParquetDataCatalog</code> into a <code>Strategy</code>,
+        through a composed risk layer, to the engine's OMS and out via the IBKR adapter.</p>
+      <p>Promotion is gated: <code>backtest</code> (in-sample) → <code>walk_forward</code> (OOS) +
+        <code>param_sensitivity</code> + <code>dsr</code> → IBKR paper → <code>gate_review</code> → live.
+        Metrics come from a reconstructed net-liquidation curve, never the engine's cash analyzer.</p>
+    </div>
+  </div>
+
+  <h2 class="sec" id="big-picture">The big picture</h2>
+  <p class="lead">Data on the left, market on the right. The strategy never talks to the broker directly —
+    it goes through the risk layer and the engine's order-management system, and the same code path
+    runs in both backtest and live.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+flowchart LR
+  subgraph SRC["Data sources"]
+    IB[(IBKR)]
+    DB[(Databento)]
+    YF[(yfinance)]
+  end
+  CAT[["Parquet catalog&lt;br/&gt;data/catalog"]]
+  UNI["Point-in-time universe&lt;br/&gt;data/universe.py"]
+  SRC --&gt;|ingest.py| CAT
+  UNI -. membership .-&gt; CAT
+
+  subgraph ENGINE["Nautilus engine"]
+    STRAT["Strategy (Python)&lt;br/&gt;strategies/*"]
+    RISK["Risk layer&lt;br/&gt;sizer / gatekeeper / kill-switch"]
+    OMS["Engine / OMS&lt;br/&gt;NETTING / CASH"]
+    BUS{{"message bus"}}
+    STRAT --&gt; RISK --&gt; OMS
+    STRAT &lt;--&gt; BUS
+    OMS &lt;--&gt; BUS
+  end
+  CAT --&gt; STRAT
+  OMS --&gt;|orders| ADP["IBKR adapter"]
+  ADP --&gt; GW["IB Gateway (Docker)"]
+  GW --&gt;|paper / live| MKT((Market))
+    </div>
+    <figcaption>High-level architecture. Ingestion writes a Parquet catalog; strategies read bars from it,
+      pass every order through the risk layer and OMS, and reach the market only via the IBKR adapter and
+      a Dockerized IB Gateway. The message bus links strategy, engine, and actors.</figcaption>
+  </figure>
+
+  <div class="legend reveal">
+    <div class="item"><span class="sw" style="background:#22d3ee"></span> data &amp; catalog</div>
+    <div class="item"><span class="sw" style="background:#a855f7"></span> strategy / engine</div>
+    <div class="item"><span class="sw" style="background:#f472d0"></span> execution / market</div>
+  </div>
+
+  <h2 class="sec" id="bar-lifecycle">How a strategy actually runs</h2>
+  <p class="lead">Everything happens on <strong>each bar</strong>. The order is deliberate: check the
+    kill-switch first, then manage risk, then (maybe) trade. Safety precedes signal.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+sequenceDiagram
+  autonumber
+  participant E as Engine
+  participant S as Strategy.on_bar
+  participant K as KillSwitch
+  participant P as PositionSizer
+  participant V as VolTarget
+  participant G as RiskGatekeeper
+  participant O as OMS / Venue
+  E-&gt;&gt;S: Bar (close)
+  S-&gt;&gt;S: append close, compute equity (NLV)
+  S-&gt;&gt;K: update_equity(equity)
+  alt drawdown &gt;= max
+    K--&gt;&gt;S: is_triggered = true
+    S-&gt;&gt;O: flatten_all (cancel + close)
+  else within limits
+    S-&gt;&gt;S: rebalance? (monthly / signal)
+    S-&gt;&gt;P: calculate(equity, entry, stop)
+    P--&gt;&gt;S: qty
+    S-&gt;&gt;V: vol_scale(realized, target)
+    V--&gt;&gt;S: scale
+    S-&gt;&gt;G: check_order(exposure, trade_risk)
+    alt allowed
+      G--&gt;&gt;S: RiskCheck(allowed=true)
+      S-&gt;&gt;O: submit_order(MARKET BUY)
+      O--&gt;&gt;S: OrderFilled (next bar close)
+    else blocked
+      G--&gt;&gt;S: RiskCheck(allowed=false)
+    end
+  end
+    </div>
+    <figcaption>The per-bar control flow shared by every strategy. The kill-switch is consulted before any
+      trading logic; sizing, vol-targeting, and the exposure gatekeeper all run before an order is submitted;
+      fills land on the <em>next</em> bar's close (no look-ahead). Detailed on the
+      <a href="risk-layer.html">Risk Layer</a> page.</figcaption>
+  </figure>
+
+  <h2 class="sec" id="pipeline">The promotion pipeline</h2>
+  <p class="lead">A strategy may not advance until it passes every criterion at its current stage
+    (<code>docs/gates.md</code>). A failure sends it back to research — it does not get waved through.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+flowchart LR
+  I["Stage 0&lt;br/&gt;Data &amp; Universe"]
+  G1["Gate 1&lt;br/&gt;Backtest (in-sample)"]
+  G2["Gate 2&lt;br/&gt;Walk-forward (OOS)"]
+  G3["Gate 3&lt;br/&gt;IBKR paper (2+ weeks)"]
+  G4["Gate 4&lt;br/&gt;Human review"]
+  L(["Live&lt;br/&gt;minimum size"])
+  X["Reject / iterate"]
+  I --&gt; G1 --&gt; G2 --&gt; G3 --&gt; G4 --&gt; L
+  G1 -. fail .-&gt; X
+  G2 -. fail .-&gt; X
+  G3 -. fail .-&gt; X
+  X -. revise .-&gt; I
+    </div>
+    <figcaption>Promotion order. Runners by stage: <code>ingest</code>/<code>catalog_check</code> →
+      <code>backtest</code>/<code>promote_check</code> → <code>walk_forward</code>/<code>param_sensitivity</code>/<code>dsr</code>
+      → <code>live</code>/<code>monitor</code> → <code>gate_review</code>.</figcaption>
+  </figure>
+
+  <div class="explain reveal">
+    <div class="col plain">
+      <h4>Why so many gates?</h4>
+      <p>Most backtest numbers are lies — a strategy tuned on the past can look brilliant and still be
+        worthless. Each gate is a different way of asking "is this real, or did we fool ourselves?"</p>
+    </div>
+    <div class="col tech">
+      <h4>What each gate defends against</h4>
+      <p><strong>Gate 1</strong>: baseline quality + look-ahead. <strong>Gate 2</strong>: overfitting
+        (OOS consistency, ±20% param perturbation, deflated Sharpe for N trials).
+        <strong>Gate 3</strong>: model-vs-reality (fills, slippage, disconnects).
+        <strong>Gate 4</strong>: the human veto before capital is at risk.</p>
+    </div>
+  </div>
+
+  <h2 class="sec" id="module-map">Module map</h2>
+  <p class="lead">How the code fits together. Runners orchestrate; strategies decide; the risk package and
+    the equity-curve reconstructor are shared machinery.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+flowchart TD
+  live["runners/live.py"]
+  bt["runners/backtest.py"]
+  node["config/node.py"]
+  mon["monitoring/monitor.py"]
+  strat["strategies/*"]
+  risk["risk/*"]
+  eq["runners/equity_curve.py"]
+  pc["runners/promote_check.py"]
+  wf["runners/walk_forward.py"]
+  ps["runners/param_sensitivity.py"]
+  dsr["runners/dsr.py"]
+  gr["runners/gate_review.py"]
+  ing["runners/ingest.py"]
+  uni["data/universe.py"]
+  con["data/constituents.py"]
+  cc["data/catalog_check.py"]
+  live --&gt; node
+  live --&gt; bt
+  live --&gt; mon
+  bt --&gt; ing
+  bt --&gt; eq
+  bt --&gt; strat
+  strat --&gt; risk
+  pc --&gt; dsr
+  pc --&gt; bt
+  pc --&gt; eq
+  wf --&gt; pc
+  ps --&gt; pc
+  gr --&gt; pc
+  mon --&gt; pc
+  ing --&gt; con
+  con --&gt; uni
+  cc --&gt; bt
+    </div>
+    <figcaption>Static dependency map. <code>backtest.py</code> holds the strategy registry and the
+      execution model; <code>promote_check.py</code> is the evaluation hub the validation runners share;
+      every strategy composes the same <code>risk/*</code> components.</figcaption>
+  </figure>
+
+  <h2 class="sec" id="stages">Explore each stage</h2>
+  <div class="stage-grid">
+    <a class="cap stage-card reveal" href="data-and-universe.html" style="--ic-bg:rgba(34,211,238,.12);--ic-fg:#22d3ee">
+      <div class="step">Stage 0</div>
+      <div class="ic">DB</div>
+      <h3>Data &amp; Universe</h3>
+      <p>Ingesting survivorship-free price history and point-in-time membership into the Parquet catalog.</p>
+    </a>
+    <a class="cap stage-card reveal" href="backtest-gate1.html" style="--ic-bg:rgba(56,189,248,.12);--ic-fg:#38bdf8">
+      <div class="step">Gate 1</div>
+      <div class="ic">BT</div>
+      <h3>Backtest</h3>
+      <p>Assembling a backtest, the no-look-ahead execution model, and honest NLV measurement.</p>
+    </a>
+    <a class="cap stage-card reveal" href="risk-layer.html" style="--ic-bg:rgba(168,85,247,.14);--ic-fg:#c9a9f7">
+      <div class="step">Cross-cutting</div>
+      <div class="ic">RX</div>
+      <h3>Risk Layer</h3>
+      <p>Position sizing, vol-targeting, exposure caps, and the drawdown kill-switch.</p>
+    </a>
+    <a class="cap stage-card reveal" href="validation-gate2.html" style="--ic-bg:rgba(168,85,247,.14);--ic-fg:#c9a9f7">
+      <div class="step">Gate 2</div>
+      <div class="ic">WF</div>
+      <h3>Validation</h3>
+      <p>Walk-forward windows, parameter perturbation, and the deflated Sharpe ratio.</p>
+    </a>
+    <a class="cap stage-card reveal" href="paper-gate3.html" style="--ic-bg:rgba(74,222,128,.12);--ic-fg:#4ade80">
+      <div class="step">Gate 3</div>
+      <div class="ic">PP</div>
+      <h3>IBKR Paper</h3>
+      <p>The live TradingNode, IBKR/Databento wiring, monitoring, and operational safety.</p>
+    </a>
+    <a class="cap stage-card reveal" href="live-gate4.html" style="--ic-bg:rgba(244,114,208,.14);--ic-fg:#f472d0">
+      <div class="step">Gate 4</div>
+      <div class="ic">LV</div>
+      <h3>Review &amp; Live</h3>
+      <p>Divergence analysis, the human sign-off, emergency flatten, and going live at minimum size.</p>
+    </a>
+  </div>
+
+  <h2 class="sec" id="refs">References</h2>
+  <p class="section-note">Primary sources in the Cerebro repository (paths relative to the repo root).</p>
+  <ul class="refs">
+    <li><a>CLAUDE.md</a> — <span class="what">project rules: paper-default, Python-only trading path, mandatory stop &amp; risk layer.</span></li>
+    <li><a>README.md</a> — <span class="what">project intent and the "honest measurement" first principle.</span></li>
+    <li><a>docs/gates.md</a> — <span class="what">the full Gate 1–4 promotion criteria and automatic rejections.</span></li>
+    <li><a>docs/runbook.md</a> — <span class="what">operational runbook: start/stop, monitoring, emergency flatten.</span></li>
+    <li><a>src/</a> — <span class="what">source root: <code>strategies/</code>, <code>risk/</code>, <code>runners/</code>, <code>data/</code>, <code>config/</code>.</span></li>
+  </ul>
+
+  <nav class="pager">
+    <span></span>
+    <a class="next" href="data-and-universe.html">
+      <span class="dir">Next →</span>
+      <span class="ttl">Stage 0 · Data &amp; Universe</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <p class="brand"><b>cerebro</b> · paper-first multi-asset trading research on Nautilus Trader</p>
+    <p class="links">
+      <a href="index.html">Architecture home</a> ·
+      <a href="../index.html">Portfolio</a> ·
+      <a href="https://jonnyeclectic.github.io/boost/">boost</a> ·
+      <a href="https://github.com/jonnyeclectic">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
