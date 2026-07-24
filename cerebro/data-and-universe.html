@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data &amp; Universe — Cerebro Architecture</title>
+<meta name="description" content="Stage 0 of Cerebro: ingesting survivorship-free daily price history and point-in-time index membership into a Parquet catalog, then verifying its integrity before any backtest trusts it.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='71' font-size='60' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="stylesheet" href="assets/cerebro-docs.css">
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script defer src="assets/cerebro-docs.js"></script>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="logo" href="index.html"><b>cerebro</b><span>architecture</span></a>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="data-and-universe.html">Data</a></li>
+        <li><a href="backtest-gate1.html">Backtest</a></li>
+        <li><a href="risk-layer.html">Risk</a></li>
+        <li><a href="validation-gate2.html">Validation</a></li>
+        <li><a href="paper-gate3.html">Paper</a></li>
+        <li><a href="live-gate4.html">Live</a></li>
+        <li><a class="cta" href="../index.html">↗&nbsp;Portfolio</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="page-head reveal">
+    <span class="pill stage">Stage 0</span>
+    <h1 class="page-title">Data &amp; <span class="grad-text">Universe</span></h1>
+    <p class="page-sub">Nothing downstream can be more honest than its data. This stage builds the price
+      catalog and the point-in-time membership that make a survivorship-free backtest possible — and
+      refuses to persist anything that looks truncated or corrupt.</p>
+  </div>
+
+  <div class="explain reveal">
+    <div class="col plain">
+      <h4>In plain terms</h4>
+      <p>Before testing any idea, Cerebro collects clean price history — including companies that were
+        later delisted or acquired, so the test isn't rigged toward today's winners.</p>
+      <p>It also records <em>who was in the index on each date</em>, so a backtest only ever "sees" the
+        stocks that actually existed then. Then it double-checks the data for gaps and errors.</p>
+    </div>
+    <div class="col tech">
+      <h4>Technically</h4>
+      <p><code>ingest.py</code> fetches daily bars (yfinance or Databento <code>DBEQ.BASIC</code>), writes
+        an <code>Equity</code> + bar series per symbol into a <code>ParquetDataCatalog</code> at
+        <code>data/catalog</code>. <code>PointInTimeUniverse</code> models membership as half-open
+        intervals; <code>catalog_check.py</code> is a pure-detector integrity gate.</p>
+      <p>Survivorship exposure is <em>measured</em>: <code>symbols_to_ingest()</code> returns every name
+        that was a member over a window (delisted included), and the ingest's "Written X/Y" line is the gap.</p>
+    </div>
+  </div>
+
+  <h2 class="sec" id="ingest">Ingesting price bars</h2>
+  <p class="lead">One command fetches a universe, retries transient vendor hiccups, and writes each symbol
+    as a full replacement — but only after validating the new bars in a throwaway catalog first, so a
+    truncated download can never destroy good history.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+flowchart TD
+  A["CLI: ingest.py"] --&gt; B{source?}
+  B --&gt; Y["fetch_yfinance_bars"]
+  B --&gt; D["fetch_databento_bars&lt;br/&gt;DBEQ.BASIC ohlcv-1d"]
+  Y --&gt; R["_with_backoff&lt;br/&gt;retry transient (429 / timeout)"]
+  D --&gt; C2["_consolidate_databento_daily&lt;br/&gt;one bar/day across venues"]
+  R --&gt; W["_write_symbol"]
+  C2 --&gt; W
+  W --&gt; V{"new bars under&lt;br/&gt;50% of existing?"}
+  V --&gt;|yes| SK["SKIP-WRITE&lt;br/&gt;(truncation guard)"]
+  V --&gt;|no| T["validate in temp catalog&lt;br/&gt;then delete + write (full replace)"]
+  T --&gt; CAT[["Parquet catalog&lt;br/&gt;data/catalog"]]
+    </div>
+    <figcaption>Ingestion path. Vendor calls are wrapped in capped exponential backoff; a &gt;50% shrink is
+      treated as a truncated fetch and refused; the real write is preceded by a temp-catalog validation and
+      followed by best-effort rollback, because delete + write is not transactional.</figcaption>
+  </figure>
+
+  <div class="callout reveal">
+    <span class="k">Costs are modeled at the instrument</span>
+    <p>Fees and slippage are not an afterthought — every <code>Equity</code> carries a realistic taker fee,
+      and under bar execution that fee <em>is</em> the one-way slippage model (Hard Rule 6: backtest and
+      live use identical strategy code and costs).</p>
+  </div>
+
+  <div class="window reveal">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="bar-title">src/runners/ingest.py — make_equity()</span></div>
+<pre><span class="cm"># Realistic all-in cost model for liquid US large-caps at retail size:</span>
+<span class="cm"># ~1.5bps commission + ~1.5bps half-spread/impact = 3bps one-way (taker).</span>
+maker_fee=Decimal(<span class="ts">"0.00015"</span>),
+taker_fee=Decimal(<span class="ts">"0.0003"</span>),   <span class="cm"># the taker fee IS the slippage model under bar_execution</span></pre>
+  </div>
+
+  <div class="window reveal">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="bar-title">zsh — ingest a survivorship-free universe</span></div>
+<pre><span class="tp">$</span> <span class="tv">python</span> -m src.runners.ingest \
+    <span class="tc">--universe-file</span> data/universe/sp500.csv \
+    <span class="tc">--source</span> databento <span class="tc">--start</span> 2023-03-28 <span class="tc">--end</span> 2026-01-01
+<span class="cm"># ... the "Written X/Y" line below IS the survivorship gap for this source</span>
+<span class="tdim">Written 498/503 instruments to data/catalog</span></pre>
+  </div>
+
+  <h2 class="sec" id="universe">Point-in-time universe</h2>
+  <p class="lead">Membership is stored as half-open date intervals, so "who was in the S&amp;P on date D?"
+    has a single, non-forward-looking answer. Delisted names are preserved, not silently dropped.</p>
+
+  <figure class="diagram reveal">
+    <div class="mermaid">
+flowchart TD
+  S["S&amp;P history CSV&lt;br/&gt;(fja05680 snapshots)"] --&gt; P["parse_snapshots&lt;br/&gt;date to roster set"]
+  P --&gt; U["PointInTimeUniverse&lt;br/&gt;from_snapshots"]
+  U --&gt; M["members_over(start, end)&lt;br/&gt;includes delisted names"]
+  M --&gt; SI["symbols_to_ingest"]
+  SI --&gt; ING["ingest_real(...)"]
+  ING --&gt; GAP["'Written X / Y'&lt;br/&gt;= survivorship gap"]
+  U --&gt; AO["as_of(date)&lt;br/&gt;point-in-time membership"]
+  CAT[["catalog"]] --&gt; CK["catalog_check&lt;br/&gt;bad_ohlc / gaps / dupes"]
+    </div>
+    <figcaption>From dated roster snapshots to an ingest list. <code>from_snapshots()</code> derives
+      intervals that never look forward; <code>_verify_complete()</code> rejects a roster with fewer than
+      <code>MIN_EXPECTED_SNAPSHOTS</code> so a truncated download can't persist a quietly survivor-biased universe.</figcaption>
+  </figure>
+
+  <div class="explain reveal">
+    <div class="col plain">
+      <h4>Why this matters so much</h4>
+      <p>If you only test on companies that still exist, your results look great for a stupid reason: you
+        accidentally excluded every company that failed. That flattering illusion is <em>survivorship bias</em>.</p>
+    </div>
+    <div class="col tech">
+      <h4>How it's neutralized</h4>
+      <p><code>Interval.contains()</code> is half-open <code>[start, end)</code>; <code>as_of(d)</code>
+        returns exactly the live members. The gap between <code>members_over()</code> and the names actually
+        priced is reported, not hidden — a large gap flags a still-biased evaluation.</p>
+    </div>
+  </div>
+
+  <h2 class="sec" id="integrity">Catalog integrity gate</h2>
+  <p class="lead">Before a backtest trusts the catalog, pure detectors re-verify every symbol's bars:
+    bad OHLC ordering, zero-volume rows, non-monotonic or duplicate timestamps, and stale gaps.</p>
+
+  <div class="window reveal">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="bar-title">zsh — verify the catalog</span></div>
+<pre><span class="tp">$</span> <span class="tv">python</span> -m src.data.catalog_check
+<span class="tdim">checking 503 symbols in data/catalog ...</span>
+<span class="tv">CLEAN</span> <span class="tdim">— 0 issues (exits non-zero if dirty)</span></pre>
+  </div>
+
+  <h2 class="sec" id="refs">References &amp; snippets</h2>
+  <ul class="refs">
+    <li><a>src/runners/ingest.py</a> — <span class="what"><code>fetch_bars</code>, <code>_with_backoff</code>, <code>make_equity</code>, <code>_write_symbol</code>, CLI flags.</span></li>
+    <li><a>src/data/universe.py</a> — <span class="what"><code>PointInTimeUniverse</code>, <code>Interval</code>, <code>from_snapshots</code>, <code>as_of</code>, <code>members_over</code>.</span></li>
+    <li><a>src/data/constituents.py</a> — <span class="what"><code>parse_snapshots</code>, <code>symbols_to_ingest</code>, <code>_verify_complete</code>, <code>build_sp500_universe</code>.</span></li>
+    <li><a>src/data/catalog_check.py</a> — <span class="what"><code>bad_ohlc</code>, <code>zero_volume</code>, <code>non_monotonic</code>, <code>duplicate_timestamps</code>, <code>stale_gaps</code>, <code>check_catalog</code>.</span></li>
+  </ul>
+
+  <nav class="pager">
+    <a class="prev" href="index.html">
+      <span class="dir">← Prev</span>
+      <span class="ttl">Overview &amp; Architecture</span>
+    </a>
+    <a class="next" href="backtest-gate1.html">
+      <span class="dir">Next →</span>
+      <span class="ttl">Gate 1 · Backtest</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <p class="brand"><b>cerebro</b> · paper-first multi-asset trading research on Nautilus Trader</p>
+    <p class="links">
+      <a href="index.html">Architecture home</a> ·
+      <a href="../index.html">Portfolio</a> ·
+      <a href="https://jonnyeclectic.github.io/boost/">boost</a> ·
+      <a href="https://github.com/jonnyeclectic">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
