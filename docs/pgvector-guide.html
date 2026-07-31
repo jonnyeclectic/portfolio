@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pgvector, explained twice — a working reference | Jonathan Reyes</title>
+<meta name="description" content="What pgvector is and how to run it: embeddings as a schema contract, HNSW versus IVFFlat, hybrid over-fetch-and-fuse ranking, and the golden-set gates that keep an approximate index honest. A working reference guide.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3Ejr%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #07080f;
+    --panel: rgba(255,255,255,.035);
+    --panel-solid: #0f1120;
+    --line: rgba(255,255,255,.09);
+    --line-soft: rgba(255,255,255,.05);
+    --line-hi: rgba(255,255,255,.22);
+    --text: #e9ebf5;
+    --text-2: #9298b0;
+    --text-3: #676d86;
+    --amber: #22d3ee;
+    --orange: #38bdf8;
+    --pink: #f472d0;
+    --violet: #a855f7;
+    --blue: #38bdf8;
+    --sky: #7dd3fc;
+    --green: #4ade80;
+    --yellow: #facc15;
+    --term-bg: #0d1024;
+    --term-bar: #171a33;
+    --cyan: #22d3ee;
+    --grad: linear-gradient(96deg, #22d3ee 0%, #a855f7 52%, #f472d0 100%);
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: var(--sans); line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(700px 420px at 12% -6%, rgba(34,211,238,.10), transparent 60%),
+      radial-gradient(620px 420px at 92% 4%, rgba(168,85,247,.10), transparent 62%),
+      radial-gradient(800px 500px at 50% 108%, rgba(244,114,208,.06), transparent 60%);
+  }
+  a { color: var(--cyan); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ---------- nav ---------- */
+  header.top {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(7,8,15,.78); backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .top-in {
+    max-width: 1240px; margin: 0 auto; padding: 13px 24px;
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  }
+  .brand { font-family: var(--mono); font-weight: 700; letter-spacing: .04em; color: var(--text); }
+  .brand span { color: var(--cyan); }
+  .top nav { margin-left: auto; display: flex; gap: 18px; flex-wrap: wrap; }
+  .top nav a { color: var(--text-2); font-size: 13.5px; }
+  .top nav a:hover { color: var(--text); text-decoration: none; }
+
+  /* ---------- layout ---------- */
+  main { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 0 24px 100px; }
+  section { padding-top: 62px; }
+  h1, h2, h3 { line-height: 1.2; margin: 0 0 12px; }
+  h1 { font-size: clamp(30px, 5vw, 46px); letter-spacing: -.02em; }
+  h2 { font-size: clamp(22px, 3.2vw, 30px); letter-spacing: -.015em; }
+  h3 { font-size: 17px; letter-spacing: -.01em; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--cyan); margin-bottom: 10px;
+  }
+  .lede { color: var(--text-2); font-size: 17px; max-width: 74ch; }
+  .grad {
+    background: var(--grad); -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 66px 0 8px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
+  .chip {
+    font-family: var(--mono); font-size: 11.5px; color: var(--text-2);
+    border: 1px solid var(--line); background: var(--panel);
+    padding: 5px 11px; border-radius: 999px;
+  }
+
+  /* ---------- side-by-side ---------- */
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 22px; }
+  .card {
+    border: 1px solid var(--line); background: var(--panel);
+    border-radius: 16px; padding: 20px 22px; position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+  }
+  .card.simple::before { background: linear-gradient(180deg, var(--cyan), rgba(34,211,238,0)); }
+  .card.tech::before   { background: linear-gradient(180deg, var(--violet), rgba(168,85,247,0)); }
+  .card h3 { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+  .badge {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em;
+    text-transform: uppercase; padding: 3px 9px; border-radius: 999px;
+  }
+  .simple .badge { color: #062b31; background: var(--cyan); }
+  .tech .badge   { color: #1b0733; background: var(--violet); }
+  .card p { margin: 0 0 10px; color: var(--text-2); font-size: 15px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card strong { color: var(--text); font-weight: 600; }
+  .card ul { margin: 0; padding-left: 18px; color: var(--text-2); font-size: 15px; }
+  .card li { margin-bottom: 6px; }
+  .card li:last-child { margin-bottom: 0; }
+  code.i {
+    font-family: var(--mono); font-size: .88em; color: var(--sky);
+    background: rgba(56,189,248,.09); border: 1px solid rgba(56,189,248,.16);
+    padding: 1px 5px; border-radius: 5px;
+  }
+
+  /* ---------- code blocks ---------- */
+  .code {
+    margin-top: 18px; border: 1px solid var(--line); border-radius: 14px;
+    background: var(--term-bg); overflow: hidden;
+  }
+  .code-bar {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--term-bar); border-bottom: 1px solid var(--line-soft);
+    padding: 8px 14px; font-family: var(--mono); font-size: 11.5px; color: var(--text-3);
+  }
+  .code-bar .dot { width: 9px; height: 9px; border-radius: 50%; background: #2c3157; }
+  .code-bar .name { margin-left: 6px; color: var(--text-2); }
+  .code-bar .lang { margin-left: auto; color: var(--cyan); letter-spacing: .1em; text-transform: uppercase; font-size: 10px; }
+  pre {
+    margin: 0; padding: 16px 18px; overflow-x: auto;
+    font-family: var(--mono); font-size: 13px; line-height: 1.72; color: #cfd4ea;
+  }
+  .k { color: var(--violet); }     /* keyword */
+  .s { color: var(--green); }      /* string */
+  .c { color: var(--text-3); font-style: italic; }  /* comment */
+  .n { color: var(--yellow); }     /* number / literal */
+  .f { color: var(--sky); }        /* function / type */
+  .o { color: var(--pink); }       /* operator */
+
+  /* ---------- figures ---------- */
+  figure { margin: 26px 0 0; }
+  .diagram {
+    border: 1px solid var(--line); background: var(--panel-solid);
+    border-radius: 16px; padding: 18px; overflow-x: auto;
+  }
+  .diagram svg { display: block; width: 100%; height: auto; min-width: 560px; }
+  figcaption {
+    color: var(--text-3); font-size: 13px; margin-top: 10px;
+    font-family: var(--mono);
+  }
+  .svg-label { font-family: var(--mono); font-size: 11px; fill: var(--text-2); }
+  .svg-title { font-family: var(--mono); font-size: 12.5px; fill: var(--text); font-weight: 600; }
+  .svg-mut { font-family: var(--mono); font-size: 10px; fill: var(--text-3); }
+  .svg-box { fill: rgba(255,255,255,.035); stroke: var(--line-hi); stroke-width: 1; }
+  .svg-flow { stroke: var(--line-hi); stroke-width: 1.4; fill: none; }
+
+  /* ---------- tables ---------- */
+  .tablewrap { overflow-x: auto; margin-top: 20px; border: 1px solid var(--line); border-radius: 14px; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+  th, td { text-align: left; padding: 11px 15px; border-bottom: 1px solid var(--line-soft); }
+  th { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); background: rgba(255,255,255,.025); }
+  td { color: var(--text-2); }
+  td:first-child { color: var(--text); font-family: var(--mono); font-size: 12.5px; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ---------- callouts ---------- */
+  .note {
+    margin-top: 20px; border-left: 2px solid var(--yellow);
+    background: rgba(250,204,21,.05); border-radius: 0 12px 12px 0;
+    padding: 14px 18px; color: var(--text-2); font-size: 14.5px;
+  }
+  .note b { color: var(--yellow); font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: 5px; }
+  .note.ok { border-color: var(--green); background: rgba(74,222,128,.05); }
+  .note.ok b { color: var(--green); }
+
+  /* ---------- misc ---------- */
+  .rule { height: 1px; background: var(--line-soft); margin-top: 56px; }
+  footer {
+    border-top: 1px solid var(--line-soft); margin-top: 70px; padding: 28px 24px 44px;
+    color: var(--text-3); font-size: 13.5px; text-align: center; position: relative; z-index: 1;
+  }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 22px; }
+
+  @media (max-width: 860px) {
+    .duo, .grid3 { grid-template-columns: 1fr; }
+    main { padding: 0 16px 70px; }
+    .top-in { padding: 12px 16px; }
+  }
+</style>
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "xts74nlqbp");
+</script>
+<script data-goatcounter="https://jonnyeclectic.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="../index.html">j<span>reyes</span></a>
+    <nav>
+      <a href="#what">What it is</a>
+      <a href="#embeddings">Embeddings</a>
+      <a href="#schema">Schema</a>
+      <a href="#index">Indexes</a>
+      <a href="#boost">Design: skill search</a>
+      <a href="#rag">Example: RAG</a>
+      <a href="#eval">Evaluation</a>
+      <a href="#ops">Operating it</a>
+      <a href="index.html">← Library</a>
+      <a href="../index.html">Portfolio</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero" id="top">
+    <div class="eyebrow">Postgres extension · vector search</div>
+    <h1>pgvector, <span class="grad">explained twice</span></h1>
+    <p class="lede">
+      Every section below is written two ways: the plain-English version on the left, the
+      engineering version on the right. The two worked examples are <strong>reference
+      designs</strong> — how I would build each pattern on pgvector — not accounts of
+      systems I have deployed. <a href="https://jonnyeclectic.github.io/boost/">boost</a>,
+      my open-source CLI, is a real system, but its shipped retrieval core is BM25 with an
+      optional local sqlite-vec backend. I have not deployed pgvector, or any vector
+      database, in production. The evaluation practice in <a href="#eval">§07</a> is the
+      part drawn directly from work I have shipped.
+    </p>
+    <div class="chips">
+      <span class="chip">PostgreSQL</span>
+      <span class="chip">pgvector</span>
+      <span class="chip">HNSW</span>
+      <span class="chip">embeddings</span>
+      <span class="chip">RAG</span>
+      <span class="chip">Python</span>
+      <span class="chip">Java / Spring Boot</span>
+    </div>
+  </section>
+
+  <!-- ================= WHAT ================= -->
+  <section id="what">
+    <div class="eyebrow">01 — the idea</div>
+    <h2>What is pgvector?</h2>
+
+    <div class="duo">
+      <div class="card simple">
+        <h3><span class="badge">Simple</span> The plain version</h3>
+        <p>
+          Normal database search matches <strong>letters</strong>. If you search for
+          "service contract" and the document says "maintenance agreement," you get nothing back — not a
+          single character lines up.
+        </p>
+        <p>
+          pgvector is an add-on for PostgreSQL that lets the database match on
+          <strong>meaning</strong> instead. Each piece of text gets turned into a long list of
+          numbers that acts like a coordinate — a position on a map of ideas. Things that mean
+          similar things land near each other on that map.
+        </p>
+        <p>
+          So the question stops being <em>"which rows contain this word?"</em> and becomes
+          <em>"which rows are closest to this point?"</em> Same Postgres, same SQL, same
+          backups, same permissions — one new column type and a new kind of <code class="i">ORDER BY</code>.
+        </p>
+      </div>
+
+      <div class="card tech">
+        <h3><span class="badge">Technical</span> The engineering version</h3>
+        <p>
+          pgvector is a Postgres extension adding a <code class="i">vector(n)</code> type
+          (plus <code class="i">halfvec</code>, <code class="i">bit</code>, and
+          <code class="i">sparsevec</code>), distance operators, and two ANN index access
+          methods — <strong>HNSW</strong> and <strong>IVFFlat</strong>.
+        </p>
+        <ul>
+          <li>Storage: a dense <code class="i">float4[]</code>-backed type with a fixed
+              dimensionality declared per column.</li>
+          <li>Operators: <code class="i">&lt;=&gt;</code> cosine,
+              <code class="i">&lt;-&gt;</code> L2, <code class="i">&lt;#&gt;</code> negative
+              inner product, <code class="i">&lt;+&gt;</code> L1.</li>
+          <li>Query shape: <code class="i">ORDER BY embedding &lt;=&gt; $1 LIMIT k</code> —
+              the planner uses the ANN index only when the ordering expression matches the
+              indexed operator class.</li>
+          <li>It's still Postgres: joins, <code class="i">WHERE</code> filters, transactions,
+              RLS, PITR, and read replicas all apply. That's the whole reason to pick it over
+              a bolt-on vector store — one system of record instead of two that drift.</li>
+        </ul>
+        <p>
+          Available as a managed extension on RDS and Aurora PostgreSQL, so adopting it is a
+          <code class="i">CREATE EXTENSION</code> and a migration, not a new piece of
+          infrastructure to staff and on-call.
+        </p>
+      </div>
+    </div>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 900 250" role="img" aria-label="Keyword search fails on synonyms while vector search matches on meaning">
+          <!-- left: keyword -->
+          <text class="svg-title" x="20" y="26">Keyword search (LIKE / tsvector)</text>
+          <rect class="svg-box" x="20" y="44" width="180" height="34" rx="8"/>
+          <text class="svg-label" x="34" y="66">query: "service contract"</text>
+          <path class="svg-flow" d="M210 61 H262" marker-end="url(#arrow)"/>
+          <rect class="svg-box" x="272" y="44" width="150" height="34" rx="8"/>
+          <text class="svg-label" x="286" y="66">token overlap</text>
+          <path class="svg-flow" d="M432 61 H484" marker-end="url(#arrow)"/>
+          <rect x="494" y="40" width="330" height="42" rx="8" fill="rgba(244,114,208,.07)" stroke="rgba(244,114,208,.35)"/>
+          <text class="svg-label" x="508" y="58" fill="#f472d0">"maintenance agreement" → 0 rows</text>
+          <text class="svg-mut" x="508" y="73">no shared token, no match</text>
+
+          <line x1="20" y1="112" x2="880" y2="112" stroke="rgba(255,255,255,.06)"/>
+
+          <!-- right: vector -->
+          <text class="svg-title" x="20" y="146">Vector search (pgvector)</text>
+          <rect class="svg-box" x="20" y="164" width="180" height="34" rx="8"/>
+          <text class="svg-label" x="34" y="186">query: "service contract"</text>
+          <path class="svg-flow" d="M210 181 H262" marker-end="url(#arrow)"/>
+          <rect class="svg-box" x="272" y="164" width="150" height="34" rx="8"/>
+          <text class="svg-label" x="286" y="186">embed → [0.02…]</text>
+          <path class="svg-flow" d="M432 181 H484" marker-end="url(#arrow)"/>
+          <rect x="494" y="160" width="330" height="42" rx="8" fill="rgba(74,222,128,.07)" stroke="rgba(74,222,128,.35)"/>
+          <text class="svg-label" x="508" y="178" fill="#4ade80">"maintenance agreement" → dist 0.11</text>
+          <text class="svg-mut" x="508" y="193">nearest neighbour by cosine distance</text>
+
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 z" fill="rgba(255,255,255,.35)"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      <figcaption>Fig 1 — the failure mode pgvector exists to fix: synonymy.</figcaption>
+    </figure>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ================= EMBEDDINGS ================= -->
+  <section id="embeddings">
+    <div class="eyebrow">02 — the numbers</div>
+    <h2>Where the vectors come from</h2>
+
+    <div class="duo">
+      <div class="card simple">
+        <h3><span class="badge">Simple</span> A map of meaning</h3>
+        <p>
+          A separate model — not the database — reads a piece of text and hands back a list of
+          numbers. Think of it as pinning that text to a spot on an enormous map.
+        </p>
+        <p>
+          On this map, "service contract paperwork" and "maintenance agreement documents" end up
+          practically on top of each other. "Kubernetes deployment" is way over on the other
+          side of the map.
+        </p>
+        <p>
+          pgvector's job is narrow and important: <strong>store those pins and find the ones
+          nearest a given point, fast.</strong> It doesn't create them and doesn't understand
+          them.
+        </p>
+      </div>
+
+      <div class="card tech">
+        <h3><span class="badge">Technical</span> Model output, not DB output</h3>
+        <p>
+          Embeddings come from an external model — Bedrock Titan, a self-hosted
+          sentence-transformer, an OpenAI endpoint. The dimensionality is a property of that
+          model and is baked into your DDL.
+        </p>
+        <ul>
+          <li><code class="i">all-MiniLM-L6-v2</code> → 384 dims (cheap, CPU-friendly)</li>
+          <li><code class="i">amazon.titan-embed-text-v2</code> → 1024 dims (configurable)</li>
+          <li><code class="i">text-embedding-3-large</code> → 3072 dims</li>
+        </ul>
+        <p>
+          Two hard consequences. <strong>One:</strong> the model is now part of your schema
+          contract — changing it means a full re-embed and backfill, so version the model name
+          on the row. <strong>Two:</strong> query text must be embedded by the <em>same</em>
+          model, or you're measuring distance between two unrelated coordinate systems and the
+          results will be confidently wrong.
+        </p>
+        <p>
+          Normalize to unit length at write time and cosine distance reduces to inner product —
+          cheaper, and it makes <code class="i">1 - distance</code> a clean similarity score.
+        </p>
+      </div>
+    </div>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" role="img" aria-label="Two-dimensional projection of an embedding space with clusters">
+          <rect x="30" y="24" width="500" height="250" rx="12" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.09)"/>
+          <text class="svg-mut" x="42" y="44">embedding space (2-D projection of 1024-D)</text>
+
+          <!-- cluster A: contract docs -->
+          <circle cx="150" cy="110" r="62" fill="rgba(34,211,238,.07)" stroke="rgba(34,211,238,.3)" stroke-dasharray="3 3"/>
+          <circle cx="128" cy="96"  r="4.5" fill="#22d3ee"/>
+          <circle cx="163" cy="105" r="4.5" fill="#22d3ee"/>
+          <circle cx="142" cy="132" r="4.5" fill="#22d3ee"/>
+          <circle cx="176" cy="128" r="4.5" fill="#22d3ee"/>
+          <text class="svg-label" x="104" y="192" fill="#22d3ee">contract documents</text>
+
+          <!-- cluster B: infra -->
+          <circle cx="400" cy="180" r="58" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.3)" stroke-dasharray="3 3"/>
+          <circle cx="382" cy="166" r="4.5" fill="#a855f7"/>
+          <circle cx="416" cy="174" r="4.5" fill="#a855f7"/>
+          <circle cx="396" cy="200" r="4.5" fill="#a855f7"/>
+          <circle cx="428" cy="196" r="4.5" fill="#a855f7"/>
+          <text class="svg-label" x="352" y="256" fill="#a855f7">infra / deployment</text>
+
+          <!-- query point -->
+          <path d="M112 76 l10 -10 M122 76 l-10 -10" stroke="#facc15" stroke-width="2"/>
+          <text class="svg-label" x="60" y="62" fill="#facc15">query ✦</text>
+          <line x1="118" y1="72" x2="128" y2="94" stroke="#facc15" stroke-width="1.2" stroke-dasharray="2 2"/>
+
+          <!-- right: explanation -->
+          <text class="svg-title" x="570" y="46">"maintenance agreement"</text>
+          <rect class="svg-box" x="570" y="58" width="300" height="30" rx="8"/>
+          <text class="svg-mut" x="582" y="78">↓ embedding model (external)</text>
+          <rect x="570" y="98" width="300" height="34" rx="8" fill="rgba(34,211,238,.06)" stroke="rgba(34,211,238,.28)"/>
+          <text class="svg-label" x="582" y="119">[ 0.021, -0.114, 0.307, … ]  ← 1024 floats</text>
+          <text class="svg-mut" x="570" y="158">stored as: vector(1024)</text>
+          <text class="svg-mut" x="570" y="178">on disk: ~4 bytes × 1024 ≈ 4 KB / row</text>
+          <text class="svg-mut" x="570" y="198">halfvec(1024) → ~2 KB / row</text>
+          <text class="svg-mut" x="570" y="228">near ⇒ similar meaning</text>
+          <text class="svg-mut" x="570" y="248">far  ⇒ unrelated topic</text>
+        </svg>
+      </div>
+      <figcaption>Fig 2 — text in, coordinates out. Clustering is what makes nearest-neighbour search useful.</figcaption>
+    </figure>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ================= SCHEMA ================= -->
+  <section id="schema">
+    <div class="eyebrow">03 — the schema</div>
+    <h2>Setting it up</h2>
+
+    <div class="duo">
+      <div class="card simple">
+        <h3><span class="badge">Simple</span> One column, one operator</h3>
+        <p>
+          Turn the extension on, add a column that holds the list of numbers, and search with
+          <code class="i">ORDER BY</code> using a special "distance" symbol instead of the usual
+          <code class="i">=</code>.
+        </p>
+        <p>
+          The rest of the table is ordinary: titles, tags, timestamps, foreign keys. That's the
+          selling point — your meaning-search results can be filtered and joined with everything
+          else you already store, in one query.
+        </p>
+      </div>
+
+      <div class="card tech">
+        <h3><span class="badge">Technical</span> DDL &amp; query contract</h3>
+        <p>
+          Dimensionality is fixed at column definition and enforced on insert. Keep the model
+          identifier on the row so a re-embed can be rolled forward incrementally rather than as
+          a stop-the-world migration.
+        </p>
+        <p>
+          <code class="i">ORDER BY … LIMIT k</code> is the only shape the ANN index can serve.
+          A <code class="i">WHERE distance &lt; 0.3</code> threshold alone will not use it —
+          Postgres has no way to bound the scan.
+        </p>
+      </div>
+    </div>
+
+    <div class="code">
+      <div class="code-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="name">skill_embeddings.sql</span><span class="lang">sql · reference</span>
+      </div>
+<pre><span class="c">-- reference schema: a semantic index over a corpus of agent skills</span>
+<span class="k">CREATE EXTENSION IF NOT EXISTS</span> vector;
+
+<span class="k">CREATE TABLE</span> skill_embedding (
+  id            <span class="f">bigserial</span>   <span class="k">PRIMARY KEY</span>,
+  skill_slug    <span class="f">text</span>        <span class="k">NOT NULL</span>,
+  registry      <span class="f">text</span>        <span class="k">NOT NULL</span>,   <span class="c">-- which tap it came from</span>
+  chunk_kind    <span class="f">text</span>        <span class="k">NOT NULL</span>,   <span class="c">-- 'description' | 'body' | 'trigger'</span>
+  content       <span class="f">text</span>        <span class="k">NOT NULL</span>,
+  <span class="c">-- the model is part of the contract: pin it on the row</span>
+  model         <span class="f">text</span>        <span class="k">NOT NULL</span>,   <span class="c">-- pin it on the row: 'amazon.titan-embed-text-v2', 'voyage-4', …</span>
+  embedding     <span class="f">vector</span>(<span class="n">1024</span>) <span class="k">NOT NULL</span>,
+  updated_at    <span class="f">timestamptz</span> <span class="k">NOT NULL DEFAULT</span> now(),
+  <span class="k">UNIQUE</span> (skill_slug, chunk_kind, model)
+);
+
+<span class="c">-- ANN index. Cosine ⇒ vector_cosine_ops. Must match the query operator.</span>
+<span class="k">CREATE INDEX</span> skill_embedding_hnsw
+  <span class="k">ON</span> skill_embedding <span class="k">USING</span> hnsw (embedding vector_cosine_ops)
+  <span class="k">WITH</span> (m = <span class="n">16</span>, ef_construction = <span class="n">64</span>);
+
+<span class="c">-- ordinary btree for the metadata predicates we filter on</span>
+<span class="k">CREATE INDEX</span> skill_embedding_registry <span class="k">ON</span> skill_embedding (registry, chunk_kind);</pre>
+    </div>
+
+    <div class="code">
+      <div class="code-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="name">search.sql</span><span class="lang">sql</span>
+      </div>
+<pre><span class="c">-- $1 = query embedding (same model!), $2 = k</span>
+<span class="k">SELECT</span> skill_slug,
+       registry,
+       <span class="n">1</span> <span class="o">-</span> (embedding <span class="o">&lt;=&gt;</span> $1) <span class="k">AS</span> similarity
+<span class="k">FROM</span>   skill_embedding
+<span class="k">WHERE</span>  chunk_kind <span class="o">=</span> <span class="s">'description'</span>
+<span class="k">ORDER BY</span> embedding <span class="o">&lt;=&gt;</span> $1     <span class="c">-- ← this line is what the HNSW index serves</span>
+<span class="k">LIMIT</span>  $2;</pre>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Operator</th><th>Distance</th><th>Operator class</th><th>Use it when</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>&lt;=&gt;</td><td>Cosine</td><td>vector_cosine_ops</td><td>Default for text embeddings. Magnitude-insensitive.</td></tr>
+          <tr><td>&lt;-&gt;</td><td>L2 / Euclidean</td><td>vector_l2_ops</td><td>Image embeddings, or when magnitude carries signal.</td></tr>
+          <tr><td>&lt;#&gt;</td><td>Negative inner product</td><td>vector_ip_ops</td><td>Vectors already unit-normalized — fastest path.</td></tr>
+          <tr><td>&lt;+&gt;</td><td>L1 / Manhattan</td><td>vector_l1_ops</td><td>Rare; sparse or count-like features.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <b>Mismatch bug</b>
+      Building the index with <code class="i">vector_l2_ops</code> and querying with
+      <code class="i">&lt;=&gt;</code> does not error. Postgres silently falls back to a
+      sequential scan — correct results, terrible latency, and no warning anywhere. It shows up
+      as a p99 regression weeks later. Assert the operator class in a migration test.
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ================= INDEX ================= -->
+  <section id="index">
+    <div class="eyebrow">04 — the index</div>
+    <h2>HNSW vs. IVFFlat</h2>
+
+    <div class="duo">
+      <div class="card simple">
+        <h3><span class="badge">Simple</span> Two ways to avoid checking everything</h3>
+        <p>
+          Comparing your query against every single row works fine at a few thousand rows and
+          falls apart past that. Both index types are shortcuts that accept
+          <strong>"very likely the closest"</strong> instead of "provably the closest."
+        </p>
+        <p>
+          <strong>IVFFlat</strong> divides the map into neighbourhoods, then only searches the
+          few neighbourhoods nearest your query.
+        </p>
+        <p>
+          <strong>HNSW</strong> builds a layered network of shortcuts — start with long hops
+          across the map, then progressively shorter ones, like an express train down to local
+          stops. Faster and more accurate; costs more memory and takes longer to build.
+        </p>
+      </div>
+
+      <div class="card tech">
+        <h3><span class="badge">Technical</span> Recall/latency knobs</h3>
+        <ul>
+          <li><strong>HNSW</strong> — multi-layer navigable small-world graph. Build:
+              <code class="i">m</code> (edges/node, 16 default),
+              <code class="i">ef_construction</code> (64). Query:
+              <code class="i">SET hnsw.ef_search = 100</code> — the recall dial.</li>
+          <li><strong>IVFFlat</strong> — k-means partitions. Build:
+              <code class="i">lists</code> ≈ rows/1000 up to 1M rows, then √rows. Query:
+              <code class="i">SET ivfflat.probes = 10</code>.</li>
+          <li>IVFFlat <em>requires representative data present before you build it</em> — an
+              index built on an empty table produces garbage centroids and quietly awful recall.
+              HNSW has no such trap, which is why it's the default choice for pipelines that
+              backfill continuously.</li>
+          <li>Both are approximate. Recall is a tuning outcome you must measure, not a
+              guarantee — see <a href="#eval">§07</a>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 900 290" role="img" aria-label="IVFFlat partitions versus HNSW layered graph">
+          <!-- IVFFlat -->
+          <text class="svg-title" x="30" y="28">IVFFlat — partition &amp; probe</text>
+          <rect x="30" y="42" width="380" height="220" rx="12" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.09)"/>
+          <g stroke="rgba(255,255,255,.12)" stroke-dasharray="3 3" fill="none">
+            <path d="M150 42 L110 262"/><path d="M270 42 L300 262"/>
+            <path d="M30 150 L410 130"/>
+          </g>
+          <circle cx="90"  cy="95"  r="3.5" fill="#676d86"/><circle cx="118" cy="112" r="3.5" fill="#676d86"/>
+          <circle cx="200" cy="88"  r="3.5" fill="#22d3ee"/><circle cx="232" cy="104" r="3.5" fill="#22d3ee"/>
+          <circle cx="215" cy="120" r="3.5" fill="#22d3ee"/><circle cx="188" cy="118" r="3.5" fill="#22d3ee"/>
+          <circle cx="340" cy="90"  r="3.5" fill="#676d86"/><circle cx="360" cy="110" r="3.5" fill="#676d86"/>
+          <circle cx="80"  cy="200" r="3.5" fill="#676d86"/><circle cx="150" cy="220" r="3.5" fill="#676d86"/>
+          <circle cx="250" cy="205" r="3.5" fill="#676d86"/><circle cx="345" cy="215" r="3.5" fill="#676d86"/>
+          <rect x="176" y="72" width="80" height="66" rx="8" fill="rgba(34,211,238,.08)" stroke="rgba(34,211,238,.45)"/>
+          <path d="M210 60 l0 -14" stroke="#facc15" stroke-width="1.4"/>
+          <circle cx="210" cy="52" r="4" fill="#facc15"/>
+          <text class="svg-mut" x="228" y="52" fill="#facc15">query</text>
+          <text class="svg-mut" x="44" y="252">probes = 1 → scan the highlighted list only</text>
+
+          <!-- HNSW -->
+          <text class="svg-title" x="470" y="28">HNSW — layered shortcut graph</text>
+          <rect x="470" y="42" width="400" height="220" rx="12" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.09)"/>
+
+          <text class="svg-mut" x="482" y="70">layer 2 (long hops)</text>
+          <circle cx="620" cy="82" r="4" fill="#a855f7"/><circle cx="790" cy="82" r="4" fill="#a855f7"/>
+          <line x1="620" y1="82" x2="790" y2="82" stroke="rgba(168,85,247,.5)"/>
+
+          <text class="svg-mut" x="482" y="140">layer 1</text>
+          <circle cx="580" cy="150" r="4" fill="#38bdf8"/><circle cx="660" cy="142" r="4" fill="#38bdf8"/>
+          <circle cx="740" cy="155" r="4" fill="#38bdf8"/><circle cx="806" cy="146" r="4" fill="#38bdf8"/>
+          <g stroke="rgba(56,189,248,.45)"><line x1="580" y1="150" x2="660" y2="142"/><line x1="660" y1="142" x2="740" y2="155"/><line x1="740" y1="155" x2="806" y2="146"/></g>
+
+          <text class="svg-mut" x="482" y="212">layer 0 (all nodes)</text>
+          <g fill="#22d3ee">
+            <circle cx="552" cy="222" r="3.5"/><circle cx="596" cy="214" r="3.5"/><circle cx="638" cy="226" r="3.5"/>
+            <circle cx="682" cy="216" r="3.5"/><circle cx="722" cy="228" r="3.5"/><circle cx="768" cy="218" r="3.5"/>
+            <circle cx="812" cy="226" r="3.5"/><circle cx="848" cy="216" r="3.5"/>
+          </g>
+          <g stroke="rgba(34,211,238,.4)">
+            <line x1="552" y1="222" x2="596" y2="214"/><line x1="596" y1="214" x2="638" y2="226"/>
+            <line x1="638" y1="226" x2="682" y2="216"/><line x1="682" y1="216" x2="722" y2="228"/>
+            <line x1="722" y1="228" x2="768" y2="218"/><line x1="768" y1="218" x2="812" y2="226"/>
+            <line x1="812" y1="226" x2="848" y2="216"/>
+          </g>
+
+          <g stroke="#facc15" stroke-width="1.3" stroke-dasharray="3 2">
+            <line x1="620" y1="82" x2="660" y2="142"/>
+            <line x1="660" y1="142" x2="682" y2="216"/>
+          </g>
+          <text class="svg-mut" x="482" y="252" fill="#facc15">descend: coarse → fine, ef_search controls breadth</text>
+        </svg>
+      </div>
+      <figcaption>Fig 3 — IVFFlat narrows by region; HNSW navigates by graph. HNSW is the sane default.</figcaption>
+    </figure>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>&nbsp;</th><th>HNSW</th><th>IVFFlat</th></tr></thead>
+        <tbody>
+          <tr><td>build time</td><td>Slow (graph construction)</td><td>Fast (k-means)</td></tr>
+          <tr><td>memory</td><td>High — graph should fit in RAM</td><td>Low</td></tr>
+          <tr><td>recall @ speed</td><td>Better across the curve</td><td>Good, degrades faster</td></tr>
+          <tr><td>incremental writes</td><td>Handles them well</td><td>Centroids drift; needs periodic rebuild</td></tr>
+          <tr><td>empty-table build</td><td>Fine</td><td>Broken — must have data first</td></tr>
+          <tr><td>pick it when</td><td>Default. Read-heavy, latency-sensitive.</td><td>Huge corpus, tight RAM, batch refresh.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ================= BOOST EXAMPLE ================= -->
+  <section id="boost">
+    <div class="eyebrow">05 — reference design</div>
+    <h2>Semantic skill discovery, <span class="grad">on Postgres</span></h2>
+
+    <p class="lede">
+      boost catalogs <strong>100+ classified</strong> Git-hosted registries of AI-agent
+      skills, rules and workflows. A user types
+      <code class="i">boost search "keep my PRs from going stale"</code> — no keyword in
+      that sentence appears in the skill named <code class="i">babysit-prs</code>. This is
+      the synonymy problem from Fig 1, at registry scale.
+    </p>
+
+    <div class="note">
+      <b>What boost actually runs</b>
+      boost is my open-source agent-skill package manager, and it does not use pgvector.
+      Its shipped retrieval engine is BM25 written from scratch in pure standard-library
+      Python; an optional local sqlite-vec store sits behind an opt-in extra, embeddings
+      come from Voyage or OpenAI over urllib, and an optional LLM pass re-ranks the
+      shortlist. There is no Postgres, no HNSW and no SQL migration anywhere in it.
+      Everything below is how I would port that behaviour onto pgvector — a reference
+      design, not boost's architecture.
+    </div>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 900 330" role="img" aria-label="Reference design: skill search architecture from CLI query through embedding to pgvector and reranking">
+          <!-- indexing lane -->
+          <text class="svg-title" x="26" y="26">Index time (batch, on registry sync)</text>
+          <rect class="svg-box" x="26" y="40" width="150" height="48" rx="10"/>
+          <text class="svg-label" x="40" y="62">Git registries</text>
+          <text class="svg-mut" x="40" y="78">SKILL.md full bodies</text>
+
+          <path class="svg-flow" d="M186 64 H236" marker-end="url(#a2)"/>
+          <rect class="svg-box" x="246" y="40" width="150" height="48" rx="10"/>
+          <text class="svg-label" x="260" y="62">chunk + normalize</text>
+          <text class="svg-mut" x="260" y="78">~1k chars · 150 overlap</text>
+
+          <path class="svg-flow" d="M406 64 H456" marker-end="url(#a2)"/>
+          <rect x="466" y="40" width="150" height="48" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.4)"/>
+          <text class="svg-label" x="480" y="62" fill="#a855f7">embedding model</text>
+          <text class="svg-mut" x="480" y="78">1024-d, unit-normed</text>
+
+          <path class="svg-flow" d="M626 64 H676" marker-end="url(#a2)"/>
+          <rect x="686" y="34" width="188" height="60" rx="10" fill="rgba(34,211,238,.07)" stroke="rgba(34,211,238,.45)"/>
+          <text class="svg-label" x="700" y="56" fill="#22d3ee">PostgreSQL + pgvector</text>
+          <text class="svg-mut" x="700" y="72">skill_embedding</text>
+          <text class="svg-mut" x="700" y="86">HNSW · vector_cosine_ops</text>
+
+          <line x1="26" y1="122" x2="874" y2="122" stroke="rgba(255,255,255,.06)"/>
+
+          <!-- query lane -->
+          <text class="svg-title" x="26" y="152">Query time (per CLI invocation)</text>
+          <rect class="svg-box" x="26" y="166" width="176" height="52" rx="10"/>
+          <text class="svg-label" x="40" y="188">$ boost search</text>
+          <text class="svg-mut" x="40" y="204">"keep PRs from going stale"</text>
+
+          <path class="svg-flow" d="M212 192 H258" marker-end="url(#a2)"/>
+          <rect x="268" y="166" width="150" height="52" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.4)"/>
+          <text class="svg-label" x="282" y="188" fill="#a855f7">same model</text>
+          <text class="svg-mut" x="282" y="204">← non-negotiable</text>
+
+          <path class="svg-flow" d="M428 192 H474" marker-end="url(#a2)"/>
+          <rect x="484" y="160" width="176" height="64" rx="10" fill="rgba(34,211,238,.07)" stroke="rgba(34,211,238,.45)"/>
+          <text class="svg-label" x="498" y="182" fill="#22d3ee">ORDER BY &lt;=&gt; LIMIT 50</text>
+          <text class="svg-mut" x="498" y="198">+ WHERE registry = ANY(...)</text>
+          <text class="svg-mut" x="498" y="214">ef_search = 100</text>
+
+          <path class="svg-flow" d="M670 192 H716" marker-end="url(#a2)"/>
+          <rect class="svg-box" x="726" y="160" width="148" height="64" rx="10"/>
+          <text class="svg-label" x="740" y="182">rerank → top 10</text>
+          <text class="svg-mut" x="740" y="198">blend: vector score</text>
+          <text class="svg-mut" x="740" y="214">+ lexical rank</text>
+
+          <!-- output -->
+          <rect x="26" y="252" width="848" height="56" rx="10" fill="rgba(74,222,128,.05)" stroke="rgba(74,222,128,.3)"/>
+          <text class="svg-label" x="42" y="274" fill="#4ade80">1. babysit-prs   2. pr-review-loop   3. stale-branch-audit</text>
+          <text class="svg-mut" x="42" y="294">illustrative ordering — zero literal token overlap with the query</text>
+
+          <defs>
+            <marker id="a2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 z" fill="rgba(255,255,255,.35)"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      <figcaption>Fig 4 — the same two lanes on pgvector: batch indexing on registry sync, one indexed lookup per CLI call. Illustrative design; no measured figures.</figcaption>
+    </figure>
+
+    <div class="duo" style="margin-top:26px">
+      <div class="card simple">
+        <h3><span class="badge">Simple</span> Why a hybrid score</h3>
+        <p>
+          Pure meaning-matching has a blind spot: exact names. Someone searching
+          <code class="i">jira-integration</code> wants <em>that skill</em>, not the five
+          conceptually-similar ticketing skills.
+        </p>
+        <p>
+          So take the top ~50 by meaning, then re-rank with a small bonus for literal name and
+          trigger-word hits. Best of both: recall from the vectors, precision from the keywords.
+        </p>
+      </div>
+      <div class="card tech">
+        <h3><span class="badge">Technical</span> Over-fetch, then fuse</h3>
+        <p>
+          Retrieve <code class="i">k=50</code> from the ANN index and fuse with a lexical signal
+          (<code class="i">ts_rank_cd</code> or trigram similarity) before truncating to 10.
+          Over-fetching is what buys back the recall that approximate search gives up.
+        </p>
+        <p>
+          Postgres makes this a single query — the lexical index and the vector index live in the
+          same table. With a separate vector store you'd be doing two round trips and
+          reconciling IDs in application code.
+        </p>
+        <p>
+          For the record, boost does not do this in Postgres. It over-fetches roughly 60
+          candidates from BM25 — or from a local sqlite-vec store when embeddings are
+          configured — and then re-ranks that shortlist with an LLM, falling back to the
+          BM25 order when no model is available. The principle is the same: over-fetch,
+          then apply a second, sharper signal.
+        </p>
+      </div>
+    </div>
+
+    <div class="code">
+      <div class="code-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="name">semantic_search.py</span><span class="lang">python · reference</span>
+      </div>
+<pre><span class="c"># reference implementation — not boost's shipped code; boost retrieves with BM25</span>
+<span class="k">from</span> pgvector.psycopg <span class="k">import</span> register_vector
+<span class="k">import</span> psycopg
+
+SEARCH_SQL <span class="o">=</span> <span class="s">"""
+WITH ann AS (
+    SELECT skill_slug,
+           registry,
+           content,
+           1 - (embedding &lt;=&gt; %(q)s) AS vec_score
+    FROM   skill_embedding
+    WHERE  chunk_kind = 'description'
+      AND  (%(registries)s::text[] IS NULL OR registry = ANY(%(registries)s))
+    ORDER BY embedding &lt;=&gt; %(q)s
+    LIMIT  %(fetch_k)s              -- over-fetch, then rerank
+)
+SELECT skill_slug,
+       registry,
+       vec_score,
+       ts_rank_cd(to_tsvector('english', content),
+                  plainto_tsquery('english', %(raw)s)) AS lex_score
+FROM   ann
+ORDER BY (0.75 * vec_score
+        + 0.25 * LEAST(ts_rank_cd(to_tsvector('english', content),
+                       plainto_tsquery('english', %(raw)s)), 1.0)) DESC
+LIMIT  %(top_k)s;
+"""</span>
+
+
+<span class="k">def</span> <span class="f">search</span>(conn: psycopg.Connection, query: <span class="f">str</span>, *,
+           registries: <span class="f">list</span>[<span class="f">str</span>] <span class="o">|</span> <span class="k">None</span> <span class="o">=</span> <span class="k">None</span>,
+           top_k: <span class="f">int</span> <span class="o">=</span> <span class="n">10</span>) <span class="o">-&gt;</span> <span class="f">list</span>[Hit]:
+    <span class="s">"""Semantic skill lookup. Embeds with the SAME model used at index time."""</span>
+    register_vector(conn)
+
+    <span class="c"># The most commonly reported production bug with this stack is embedding</span>
+    <span class="c"># the query with a different model than the corpus. Read the pin, don't</span>
+    <span class="c"># hardcode it.</span>
+    model <span class="o">=</span> current_index_model(conn)
+    q_vec <span class="o">=</span> embed(query, model<span class="o">=</span>model)          <span class="c"># unit-normalized</span>
+
+    <span class="k">with</span> conn.cursor(row_factory<span class="o">=</span>dict_row) <span class="k">as</span> cur:
+        cur.execute(<span class="s">"SET LOCAL hnsw.ef_search = 100"</span>)   <span class="c"># recall dial</span>
+        cur.execute(SEARCH_SQL, {
+            <span class="s">"q"</span>: q_vec,
+            <span class="s">"raw"</span>: query,
+            <span class="s">"registries"</span>: registries,
+            <span class="s">"fetch_k"</span>: top_k <span class="o">*</span> <span class="n">5</span>,
+            <span class="s">"top_k"</span>: top_k,
+        })
+        <span class="k">return</span> [Hit(<span class="o">**</span>r) <span class="k">for</span> r <span class="k">in</span> cur.fetchall()]</pre>
+    </div>
+
+    <div class="code">
+      <div class="code-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="name">zsh — example session</span><span class="lang">shell</span>
+      </div>
+<pre><span class="o">$</span> boost search <span class="s">"keep my PRs from going stale"</span>
+
+  <span class="c">1.</span> babysit-prs          <span class="c">watches open PRs, nudges reviewers</span>
+  <span class="c">2.</span> pr-review-loop       <span class="c">iterative review until green</span>
+  <span class="c">3.</span> stale-branch-audit   <span class="c">flags branches with no recent activity</span>
+
+  <span class="c">→ 0 of 3 share a keyword with the query.   (illustrative output)</span></pre>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ================= RAG EXAMPLE ================= -->
+  <section id="rag">
+    <div class="eyebrow">06 — reference design</div>
+    <h2>Reference design: retrieval for a document-intelligence pipeline</h2>
+
+    <p class="lede">
+      The second pattern is retrieval-augmented generation. In a document-intelligence
+      pipeline — unstructured documents in, structured findings out — the model cannot be
+      handed a 200-page document, so something has to decide which few paragraphs it sees.
+      This section works through pgvector as that component.
+    </p>
+
+    <div class="note">
+      <b>Scope</b>
+      This is a reference design, not a diagram of a system I have run. I have not
+      deployed a vector database in production. What carries over is the reasoning below:
+      structure-aware chunking, provenance on every row, filtering before ranking, and
+      treating embeddings as inheriting the classification of their source text.
+    </div>
+
+    <div class="duo">
+      <div class="card simple">
+        <h3><span class="badge">Simple</span> Open to the right page first</h3>
+        <p>
+          A language model has a limited amount it can read at once, and its accuracy drops as
+          you stuff more in. Feeding it the entire document is both expensive and worse.
+        </p>
+        <p>
+          So: split the document into paragraph-sized chunks ahead of time, pin each one on the
+          map, and when a question comes in, retrieve only the handful of chunks nearest to it.
+          Then hand <em>those</em> to the model.
+        </p>
+        <p>
+          It's the difference between reading a whole manual and flipping straight to the right
+          page — and because every chunk keeps its page reference, the answer can cite where it
+          came from.
+        </p>
+      </div>
+      <div class="card tech">
+        <h3><span class="badge">Technical</span> Retrieval as a context filter</h3>
+        <ul>
+          <li><strong>Chunking dominates quality.</strong> Split on document structure, not a
+              fixed character count — a table row severed mid-way embeds to noise.</li>
+          <li><strong>Keep provenance on the row</strong> — doc id, page, bounding box. Without
+              it you can't cite, and an uncitable extraction is not reviewable.</li>
+          <li><strong>Filter before you rank.</strong> A document- or scope-level predicate in
+              the same <code class="i">WHERE</code> as the vector ordering is a correctness and
+              access-control requirement, not an optimization.</li>
+          <li><strong>Embedding text is still the source text.</strong> If a data-classification
+              review says the source is confidential, the embeddings and the model that produced
+              them fall inside that same boundary — which is what pushes deployments from a
+              managed API toward Bedrock or a self-hosted model.</li>
+        </ul>
+      </div>
+    </div>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" role="img" aria-label="RAG pipeline: ingest, chunk, embed, store in pgvector, retrieve, generate">
+          <!-- ingest row -->
+          <rect class="svg-box" x="24" y="34" width="132" height="52" rx="10"/>
+          <text class="svg-label" x="38" y="56">S3 file drop</text>
+          <text class="svg-mut" x="38" y="72">PDF / scan</text>
+
+          <path class="svg-flow" d="M166 60 H206" marker-end="url(#a3)"/>
+          <rect class="svg-box" x="216" y="34" width="132" height="52" rx="10"/>
+          <text class="svg-label" x="230" y="56">OCR / extract</text>
+          <text class="svg-mut" x="230" y="72">layout + text</text>
+
+          <path class="svg-flow" d="M358 60 H398" marker-end="url(#a3)"/>
+          <rect class="svg-box" x="408" y="34" width="132" height="52" rx="10"/>
+          <text class="svg-label" x="422" y="56">chunk</text>
+          <text class="svg-mut" x="422" y="72">structure-aware</text>
+
+          <path class="svg-flow" d="M550 60 H590" marker-end="url(#a3)"/>
+          <rect x="600" y="34" width="132" height="52" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.4)"/>
+          <text class="svg-label" x="614" y="56" fill="#a855f7">embed</text>
+          <text class="svg-mut" x="614" y="72">batched</text>
+
+          <path class="svg-flow" d="M742 60 V60 H772 V116" marker-end="url(#a3)"/>
+
+          <!-- store -->
+          <rect x="612" y="126" width="264" height="70" rx="12" fill="rgba(34,211,238,.07)" stroke="rgba(34,211,238,.45)"/>
+          <text class="svg-label" x="628" y="148" fill="#22d3ee">PostgreSQL + pgvector</text>
+          <text class="svg-mut" x="628" y="164">doc_chunk(doc_id, page, bbox,</text>
+          <text class="svg-mut" x="628" y="178">        content, embedding vector(1024))</text>
+          <text class="svg-mut" x="628" y="192">HNSW + btree(doc_id)</text>
+
+          <!-- query -->
+          <rect class="svg-box" x="24" y="150" width="150" height="48" rx="10"/>
+          <text class="svg-label" x="38" y="172">reviewer question</text>
+          <text class="svg-mut" x="38" y="188">"what's the renewal term?"</text>
+          <path class="svg-flow" d="M184 174 H228" marker-end="url(#a3)"/>
+          <rect x="238" y="150" width="140" height="48" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.4)"/>
+          <text class="svg-label" x="252" y="174" fill="#a855f7">embed query</text>
+          <text class="svg-mut" x="252" y="190">same model</text>
+          <path class="svg-flow" d="M388 174 H430" marker-end="url(#a3)"/>
+          <rect x="440" y="144" width="150" height="60" rx="10" fill="rgba(34,211,238,.06)" stroke="rgba(34,211,238,.35)"/>
+          <text class="svg-label" x="454" y="166" fill="#22d3ee">top-k retrieve</text>
+          <text class="svg-mut" x="454" y="182">WHERE doc_id = $1</text>
+          <text class="svg-mut" x="454" y="196">ORDER BY &lt;=&gt; LIMIT 6</text>
+          <path class="svg-flow" d="M600 174 H612" marker-end="url(#a3)"/>
+
+          <!-- generate -->
+          <path class="svg-flow" d="M744 200 V238 H520" marker-end="url(#a3)"/>
+          <rect x="330" y="222" width="180" height="56" rx="10" fill="rgba(244,114,208,.07)" stroke="rgba(244,114,208,.4)"/>
+          <text class="svg-label" x="344" y="244" fill="#f472d0">LLM (Bedrock / self-hosted)</text>
+          <text class="svg-mut" x="344" y="260">6 chunks, not 200 pages</text>
+
+          <path class="svg-flow" d="M330 250 H250" marker-end="url(#a3)"/>
+          <rect x="70" y="222" width="170" height="56" rx="10" fill="rgba(74,222,128,.06)" stroke="rgba(74,222,128,.35)"/>
+          <text class="svg-label" x="84" y="244" fill="#4ade80">structured finding</text>
+          <text class="svg-mut" x="84" y="260">+ page citation</text>
+
+          <defs>
+            <marker id="a3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 z" fill="rgba(255,255,255,.35)"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      <figcaption>Fig 5 — reference design. pgvector sits between extraction and generation: it never talks to the model, it decides what the model reads. The whole diagram is an illustrative architecture, not a system I have deployed.</figcaption>
+    </figure>
+
+    <div class="code">
+      <div class="code-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="name">DocChunkRepository.java</span><span class="lang">java</span>
+      </div>
+<pre><span class="c">// Spring Boot + JdbcTemplate. pgvector is just another column type;</span>
+<span class="c">// the scope/document predicate rides in the SAME query as the ranking.</span>
+<span class="k">@Repository</span>
+<span class="k">public class</span> <span class="f">DocChunkRepository</span> {
+
+    <span class="k">private static final</span> <span class="f">String</span> RETRIEVE <span class="o">=</span> <span class="s">"""
+        SELECT page, bbox, content,
+               1 - (embedding &lt;=&gt; CAST(? AS vector)) AS score
+        FROM   doc_chunk
+        WHERE  doc_id = ?
+          AND  scope_id  = ?            -- access control, not an optimization
+        ORDER BY embedding &lt;=&gt; CAST(? AS vector)
+        LIMIT  ?
+        """</span>;
+
+    <span class="k">public</span> <span class="f">List</span>&lt;<span class="f">Chunk</span>&gt; <span class="f">retrieve</span>(<span class="f">UUID</span> docId, <span class="f">String</span> scopeId,
+                                <span class="f">float</span>[] queryVec, <span class="f">int</span> k) {
+        <span class="f">String</span> vec <span class="o">=</span> toVectorLiteral(queryVec);   <span class="c">// "[0.021,-0.114,...]"</span>
+        <span class="k">return</span> jdbc.query(RETRIEVE,
+            <span class="k">new</span> <span class="f">Object</span>[]{ vec, docId, scopeId, vec, k },
+            <span class="f">CHUNK_MAPPER</span>);
+    }
+}</pre>
+    </div>
+
+    <div class="note">
+      <b>Filtered search — the sharp edge</b>
+      With a highly selective predicate (one document out of millions of chunks), HNSW walks its
+      graph <em>then</em> discards non-matching rows — so it can return fewer than
+      <code class="i">k</code> results, or fall back to a slow scan. Two fixes:
+      <strong>partial indexes</strong> per high-traffic scope, or <strong>partitioning</strong>
+      by scope/doc so each partition carries its own smaller HNSW index. Verify with
+      <code class="i">EXPLAIN (ANALYZE, BUFFERS)</code> that you're getting an Index Scan and not
+      a Seq Scan — this is the most commonly reported "it worked in staging" surprise.
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ================= EVAL ================= -->
+  <section id="eval">
+    <div class="eyebrow">07 — measurement</div>
+    <h2>Proving retrieval actually works</h2>
+
+    <div class="duo">
+      <div class="card simple">
+        <h3><span class="badge">Simple</span> "Looks right" isn't a result</h3>
+        <p>
+          Because the index is approximate, it can quietly get <em>worse</em> — after a model
+          swap, a parameter change, or a corpus doubling — and nothing crashes. The queries
+          still return ten results. They're just the wrong ten.
+        </p>
+        <p>
+          The fix is a fixed list of questions with known correct answers — a golden set — that
+          runs in CI. If the score drops, the build fails, the same as a broken unit test.
+        </p>
+      </div>
+      <div class="card tech">
+        <h3><span class="badge">Technical</span> Golden-set gates</h3>
+        <ul>
+          <li><strong>recall@k</strong> — is the known-correct doc in the top k? The headline
+              number for a retrieval layer.</li>
+          <li><strong>MRR</strong> — reciprocal rank of the first correct hit. Rewards putting
+              it at position 1, not 8.</li>
+          <li><strong>nDCG@k</strong> — graded relevance with positional discount, for when
+              "correct" isn't binary.</li>
+          <li>Gate on a delta against the recorded baseline, and use a significance test when
+              comparing two retrieval configurations — a 2-point move on 40 queries is noise.</li>
+        </ul>
+        <p>
+          This is the harness I built for boost's retrieval engine, with one distinction
+          worth keeping straight. The golden-set retrieval metrics — recall@k, MRR,
+          nDCG@k — are enforced as CI gates, against absolute floors and a seeded
+          10,000-resample paired-bootstrap regression test that requires a drop to be both
+          large and statistically significant. The ragas-methodology faithfulness score is
+          deliberately <em>not</em> a merge gate: it runs as a scheduled, non-blocking
+          monitor, because gating a merge on a non-deterministic, token-costing metric
+          buys flakiness and a bill, not quality.
+        </p>
+      </div>
+    </div>
+
+    <div class="code">
+      <div class="code-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="name">test_pgvector_recall.py</span><span class="lang">python · reference</span>
+      </div>
+<pre><span class="c"># reference test — the pgvector equivalent of the harness described above.</span>
+<span class="c"># boost's own gate has no Postgres and no ef_search; it scores BM25 and sqlite-vec.</span>
+<span class="k">import</span> pytest
+
+GOLDEN <span class="o">=</span> load_golden(<span class="s">"golden/queries.jsonl"</span>)      <span class="c"># query → expected doc id</span>
+BASELINE <span class="o">=</span> load_baseline(<span class="s">"baseline.json"</span>)
+
+
+<span class="k">def</span> <span class="f">recall_at_k</span>(hits, expected, k):
+    <span class="k">return</span> <span class="f">float</span>(expected <span class="k">in</span> [h.doc_id <span class="k">for</span> h <span class="k">in</span> hits[:k]])
+
+
+<span class="k">def</span> <span class="f">reciprocal_rank</span>(hits, expected):
+    <span class="k">for</span> i, h <span class="k">in</span> <span class="f">enumerate</span>(hits, start<span class="o">=</span><span class="n">1</span>):
+        <span class="k">if</span> h.doc_id <span class="o">==</span> expected:
+            <span class="k">return</span> <span class="n">1.0</span> <span class="o">/</span> i
+    <span class="k">return</span> <span class="n">0.0</span>
+
+
+<span class="k">@pytest.mark.parametrize</span>(<span class="s">"ef_search"</span>, [<span class="n">40</span>, <span class="n">100</span>, <span class="n">200</span>])
+<span class="k">def</span> <span class="f">test_recall_does_not_regress</span>(conn, ef_search):
+    <span class="s">"""HNSW is approximate — recall is measured, never assumed."""</span>
+    results <span class="o">=</span> [search(conn, g.query, ef_search<span class="o">=</span>ef_search) <span class="k">for</span> g <span class="k">in</span> GOLDEN]
+
+    r_at_10 <span class="o">=</span> mean(recall_at_k(h, g.expected_doc, <span class="n">10</span>)
+                   <span class="k">for</span> h, g <span class="k">in</span> <span class="f">zip</span>(results, GOLDEN))
+    mrr     <span class="o">=</span> mean(reciprocal_rank(h, g.expected_doc)
+                   <span class="k">for</span> h, g <span class="k">in</span> <span class="f">zip</span>(results, GOLDEN))
+
+    floor <span class="o">=</span> BASELINE[<span class="f">str</span>(ef_search)]
+    <span class="k">assert</span> r_at_10 <span class="o">&gt;=</span> floor[<span class="s">"recall@10"</span>] <span class="o">-</span> <span class="n">0.02</span>, \
+        <span class="s">f"recall@10 regressed: {r_at_10:.3f} &lt; {floor['recall@10']:.3f}"</span>
+    <span class="k">assert</span> mrr <span class="o">&gt;=</span> floor[<span class="s">"mrr"</span>] <span class="o">-</span> <span class="n">0.02</span>, <span class="s">f"MRR regressed: {mrr:.3f}"</span></pre>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ================= OPS ================= -->
+  <section id="ops">
+    <div class="eyebrow">08 — operational notes</div>
+    <h2>Operating it</h2>
+
+    <p class="lede">
+      Most pgvector failures are not vector problems. They are ordinary Postgres capacity
+      problems wearing a new hat — which is the argument for keeping vectors inside
+      Postgres: the tooling and the runbooks already exist. The notes below are what to
+      plan for, drawn from the extension's behaviour rather than from a deployment of my
+      own.
+    </p>
+
+    <div class="grid3">
+      <div class="card">
+        <h3>Index builds</h3>
+        <p>
+          HNSW build time is dominated by <code class="i">maintenance_work_mem</code>. If the
+          graph doesn't fit, the build spills to disk and takes hours instead of minutes. Raise
+          it for the session, use <code class="i">max_parallel_maintenance_workers</code>, and
+          build <code class="i">CONCURRENTLY</code> against a live table.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Storage &amp; bloat</h3>
+        <p>
+          At 1024 dims a vector is ~4 KB — larger than most rows you're used to, so it's
+          TOASTed. Re-embedding rewrites every row and generates real bloat; plan the vacuum.
+          <code class="i">halfvec</code> halves storage at a usually-negligible recall cost.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Re-embedding</h3>
+        <p>
+          Model changes are migrations. Write the new model's rows alongside the old
+          (<code class="i">model</code> is in the unique key for exactly this), cut reads over
+          once the backfill and evals pass, then drop the old generation.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Read replicas</h3>
+        <p>
+          Vector search is read-heavy and CPU-hungry. Route it to replicas so a burst of
+          similarity queries doesn't contend with transactional write traffic on the primary.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Observability</h3>
+        <p>
+          Emit distance-score distributions, not just latency. A shift in the score histogram is
+          the earliest signal that an upstream embedding change broke retrieval — long before
+          anyone files a "search feels worse" ticket.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Sensitive data</h3>
+        <p>
+          Embeddings inherit the classification of their source text and are partially
+          invertible. They belong inside the same boundary — which is what drives a move from a
+          managed embedding API to Bedrock or a self-hosted deployment.
+        </p>
+      </div>
+    </div>
+
+    <div class="note ok">
+      <b>The short version</b>
+      Use pgvector when your vectors need to live next to relational data you already own —
+      scope filters, joins, transactions, one backup story, one access-control model. Reach for
+      a dedicated vector database when scale or specialized index features genuinely exceed what
+      Postgres will do, and be honest that you're accepting a second system of record to get it.
+      For most teams already running Postgres, that threshold arrives much later than the hype
+      suggests.
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Written by Jonathan Reyes · worked reference designs, not deployed systems ·
+  <a href="index.html">Library</a> ·
+  <a href="../index.html">Portfolio</a> ·
+  <a href="../contact.html">Contact</a>
+</footer>
+
+</body>
+</html>
