@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contact — Jonathan Reyes</title>
-<meta name="description" content="Get in touch with Jonathan Reyes — Lead Software Engineer in Fort Worth, TX. Production LLM systems, evaluation harnesses, and the platforms underneath them.">
+<title>Library — Jonathan Reyes</title>
+<meta name="description" content="Technical reference guides on production LLM systems: retrieval, evaluation, and the parts that are easy to get wrong.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3Ejr%3C/text%3E%3C/svg%3E">
 <script>document.documentElement.classList.add("js")</script>
 <style>
@@ -19,17 +19,23 @@
     --text: #e9ebf5;
     --text-2: #9298b0;
     --text-3: #676d86;
-    --amber: #22d3ee;
-    --orange: #38bdf8;
+    --amber: #22d3ee;   /* primary accent → cyan */
+    --orange: #38bdf8;  /* cyan-blue */
     --pink: #f472d0;
     --violet: #a855f7;
+    --blue: #38bdf8;
+    --sky: #7dd3fc;
+    --green: #4ade80;
+    --yellow: #facc15;
+    --term-bg: #0d1024;
+    --term-bar: #171a33;
     --cyan: #22d3ee;
     --grad: linear-gradient(96deg, #22d3ee 0%, #a855f7 52%, #f472d0 100%);
     --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; scroll-padding-top: 84px; }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .reveal { transition: none !important; transform: none !important; opacity: 1 !important; }
@@ -43,7 +49,6 @@
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
-  /* ambient aurora drift — slow, low, "alive but not distracting" */
   body::before {
     content: "";
     position: fixed; inset: -25vmax; z-index: 0; pointer-events: none;
@@ -98,8 +103,29 @@
   .nav ul a:hover { color: var(--text); background: var(--panel); }
   .nav ul a.cta { color: var(--text); font-weight: 600; }
 
+  /* ---------- shared section chrome ---------- */
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    letter-spacing: .24em; text-transform: uppercase;
+    background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+    display: block; text-align: center; margin-bottom: 18px;
+  }
+  .sec-title {
+    font-size: clamp(30px, 4.5vw, 50px); font-weight: 800; letter-spacing: -.025em;
+    line-height: 1.1; text-align: center; text-wrap: balance;
+  }
+  .sec-sub {
+    max-width: 640px; margin: 18px auto 0; text-align: center;
+    color: var(--text-2); font-size: 17.5px; text-wrap: balance;
+  }
+  .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+  .js .reveal.in { opacity: 1; transform: none; }
+  @media print {
+    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  }
+
   /* ---------- hero ---------- */
-  .hero { padding: 96px 0 10px; text-align: center; }
+  .hero { padding: 96px 0 30px; }
   .badge {
     display: inline-flex; align-items: center; gap: 8px;
     font-family: var(--mono); font-size: 12.5px; color: #c9e9f5;
@@ -115,43 +141,14 @@
   }
   @keyframes badge-breathe { 0%,100% { opacity: .45; transform: scale(.82); } 50% { opacity: 1; transform: scale(1.15); } }
   .hero h1 {
-    font-size: clamp(40px, 6.5vw, 76px); font-weight: 800;
-    letter-spacing: -.035em; line-height: 1.05; text-wrap: balance;
+    font-size: clamp(44px, 7.2vw, 86px); font-weight: 800;
+    letter-spacing: -.035em; line-height: 1.02; max-width: 900px; text-wrap: balance;
   }
   .hero h1 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .hero p.lede { max-width: 620px; margin: 26px auto 0; font-size: 19px; color: var(--text-2); text-wrap: balance; }
+  .hero p.lede { max-width: 700px; margin-top: 30px; font-size: 19px; color: var(--text-2); }
   .hero p.lede b { color: var(--text); font-weight: 650; }
-  .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
-  .js .reveal.in { opacity: 1; transform: none; }
-  @media print {
-    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
-  }
 
-  /* ---------- contact cards ---------- */
-  .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 860px; margin: 64px auto 0; }
-  .card {
-    display: block; text-decoration: none;
-    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
-    padding: 30px 28px; text-align: left;
-    transition: border-color .15s ease, transform .15s ease;
-  }
-  a.card:hover { border-color: rgba(255,255,255,.22); transform: translateY(-2px); }
-  .card .ic {
-    width: 46px; height: 46px; border-radius: 13px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 21px; margin-bottom: 18px;
-    background: var(--ic-bg, rgba(255,255,255,.06)); color: var(--ic-fg, var(--text));
-    border: 1px solid var(--line-soft);
-  }
-  .card .tag {
-    font-family: var(--mono); font-size: 11px; font-weight: 700;
-    letter-spacing: .2em; text-transform: uppercase; color: var(--text-2);
-  }
-  .card h3 { font-size: 19px; font-weight: 750; letter-spacing: -.01em; margin-top: 6px; overflow-wrap: anywhere; }
-  .card p { font-size: 14px; color: var(--text-2); margin-top: 8px; }
-
-  /* ---------- cta ---------- */
-  .cta-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 56px; }
+  /* ---------- buttons ---------- */
   .btn {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 15.5px; font-weight: 650; text-decoration: none;
@@ -167,6 +164,24 @@
   .btn-grad:hover { box-shadow: 0 12px 40px rgba(168,85,247,.5); }
   .btn-ghost { color: var(--text); border-color: var(--line); background: var(--panel); }
   .btn-ghost:hover { border-color: rgba(255,255,255,.2); }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 38px; }
+
+  /* ---------- library items ---------- */
+  .edu {
+    max-width: 760px; margin: 56px auto 0;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    padding: 34px 34px 30px;
+  }
+  .edu h3 { font-size: 21px; font-weight: 750; letter-spacing: -.01em; }
+  .edu .dates { font-family: var(--mono); font-size: 12.5px; color: var(--text-2); margin-top: 4px; display: block; }
+  .edu p { font-size: 15px; color: var(--text-2); margin-top: 12px; }
+  .edu .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
+  .edu .tags code {
+    font-size: 12px; color: #d5d5e2; background: rgba(255,255,255,.06);
+    border: 1px solid var(--line-soft); border-radius: 7px; padding: 3px 9px;
+  }
+  a.edu { display: block; text-decoration: none; }
+  .xp-cta { text-align: center; margin-top: 44px; }
 
   /* ---------- footer ---------- */
   footer { margin-top: 130px; border-top: 1px solid var(--line-soft); padding: 44px 0 60px; text-align: center; }
@@ -178,33 +193,36 @@
   footer .links a:hover { color: var(--text); }
 
   /* ---------- Aurora living-glass cards: glass + cursor glow ---------- */
-  .card {
+  .edu {
     position: relative; overflow: hidden;
     backdrop-filter: blur(14px) saturate(130%);
     -webkit-backdrop-filter: blur(14px) saturate(130%);
-    transition: transform .3s cubic-bezier(.2,.7,.2,1), border-color .3s ease, box-shadow .35s ease;
+    transition: transform .3s cubic-bezier(.2,.7,.2,1), border-color .3s ease,
+                background .3s ease, box-shadow .35s ease;
   }
-  .card > * { position: relative; z-index: 1; }
-  .card::before {
+  .edu > * { position: relative; z-index: 1; }
+  .edu::before {
     content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit;
     pointer-events: none; opacity: 0; transition: opacity .35s ease;
     background: radial-gradient(320px circle at var(--mx,50%) var(--my,50%),
                 rgba(34,211,238,.16), rgba(168,85,247,.10) 42%, transparent 70%);
   }
-  a.card:hover {
+  .edu:hover {
     transform: translateY(-4px);
     border-color: var(--line-hi);
-    box-shadow: 0 22px 60px -22px rgba(168,85,247,.5), inset 0 0 0 1px rgba(34,211,238,.12);
+    background: rgba(255,255,255,.06);
+    box-shadow: 0 22px 60px -22px rgba(168,85,247,.5),
+                inset 0 0 0 1px rgba(34,211,238,.12);
   }
-  a.card:hover::before { opacity: 1; }
+  .edu:hover::before { opacity: 1; }
   @media (prefers-reduced-motion: reduce) {
-    .card { transition: border-color .3s ease, box-shadow .3s ease; }
-    a.card:hover { transform: none; }
+    .edu { transition: border-color .3s ease, box-shadow .3s ease; }
+    .edu:hover { transform: none; }
     .badge::before { animation: none !important; }
   }
 
   @media (max-width: 620px) {
-    .cards { grid-template-columns: 1fr; }
+    .hero { padding: 84px 0 10px; }
   }
 </style>
 <script type="text/javascript">
@@ -221,59 +239,70 @@
 
 <header>
   <div class="wrap nav">
-    <a class="logo" href="index.html"><b>jreyes</b><span>Software Engineer</span></a>
+    <a class="logo" href="../index.html"><b>jreyes</b><span>Software Engineer</span></a>
     <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="index.html#ai">AI Systems</a></li>
-      <li><a href="index.html#evals">Evaluation</a></li>
-      <li><a href="index.html#experience">Experience</a></li>
-      <li><a href="docs/">Library</a></li>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#ai">AI Systems</a></li>
+      <li><a href="../index.html#evals">Evaluation</a></li>
+      <li><a href="../index.html#experience">Experience</a></li>
+      <li><a href="index.html">Library</a></li>
       <li><a href="https://jonnyeclectic.github.io/boost/">boost&nbsp;↗</a></li>
-      <li><a href="cerebro/">Cerebro&nbsp;↗</a></li>
-      <li><a href="resume.html">Résumé</a></li>
-      <li><a class="cta" href="contact.html">Contact</a></li>
+      <li><a href="../cerebro/">Cerebro&nbsp;↗</a></li>
+      <li><a href="../resume.html">Résumé</a></li>
+      <li><a class="cta" href="../contact.html">Contact</a></li>
     </ul>
   </div>
 </header>
 
-<main>
+<main id="top">
   <div class="wrap hero">
-    <span class="badge">Fort Worth, TX · Open to lead AI engineering roles</span>
-    <h1>Let's <span class="grad">talk.</span></h1>
-    <p class="lede">Whether it's production LLM systems, evaluation and reliability, or
-      the distributed platforms underneath them — the fastest way to reach me is
-      <b>email or LinkedIn</b>.</p>
+    <span class="badge">Training &amp; reference · added as I write it</span>
+    <h1>The reference material <span class="grad">behind the work.</span></h1>
+    <p class="lede">
+      This is where I put the guides I write to teach a subject properly: to myself
+      first, then to the engineers I work with. Each one is a complete working
+      reference — the plain-English explanation and the engineering explanation side by
+      side, with the failure modes named. Every worked example is a reference design
+      unless it says otherwise, and where a real system is named, what it actually runs
+      on is stated plainly. Project-specific walkthroughs live with their projects and
+      are listed below.
+    </p>
 
-    <div class="cards">
-      <a class="card reveal" href="mailto:jreyes.me@protonmail.com" style="--ic-bg: rgba(34,211,238,.12); --ic-fg: #7dd3fc;">
-        <div class="ic">✉</div>
-        <span class="tag">Email</span>
-        <h3>jreyes.me@protonmail.com</h3>
-        <p>Best for anything longer than a sentence.</p>
-      </a>
-      <a class="card reveal" href="https://www.linkedin.com/in/reyesjon" style="--ic-bg: rgba(96,165,250,.12); --ic-fg: #93c5fd;">
-        <div class="ic">in</div>
-        <span class="tag">LinkedIn</span>
-        <h3>linkedin.com/in/reyesjon</h3>
-        <p>Career history, recommendations, and DMs.</p>
-      </a>
-      <a class="card reveal" href="https://github.com/jonnyeclectic" style="--ic-bg: rgba(167,139,250,.12); --ic-fg: #c4b5fd;">
-        <div class="ic">&lt;/&gt;</div>
-        <span class="tag">GitHub</span>
-        <h3>github.com/jonnyeclectic</h3>
-        <p>boost, its MCP server, and the evaluation harnesses behind them.</p>
-      </a>
-      <a class="card reveal" href="tel:+14693508666" style="--ic-bg: rgba(74,222,128,.1); --ic-fg: #86efac;">
-        <div class="ic">☎</div>
-        <span class="tag">Phone</span>
-        <h3>469-350-8666</h3>
-        <p>Fort Worth, TX (Central Time).</p>
-      </a>
-    </div>
+    <a class="edu reveal" href="pgvector-guide.html">
+      <h3>pgvector, explained twice — vector search in PostgreSQL</h3>
+      <span class="dates">Reference guide · retrieval and evaluation</span>
+      <p>Every section written twice: the plain-English version and the engineering
+        version, side by side. Embeddings as a schema contract, HNSW versus IVFFlat, the
+        operator-class mismatch that degrades to a sequential scan, over-fetch-and-fuse
+        ranking, and the recall@k / MRR / nDCG golden-set gates that catch recall loss
+        before a user does. The worked examples are reference designs, not systems I
+        have deployed.</p>
+      <div class="tags"><code>pgvector</code><code>PostgreSQL</code><code>HNSW</code><code>retrieval</code><code>evals</code></div>
+    </a>
 
-    <div class="cta-row reveal">
-      <a class="btn btn-grad" href="images/Jonathan Reyes Resume.pdf" download data-goatcounter-click="resume-pdf-download">Download résumé PDF ↓</a>
-      <a class="btn btn-ghost" href="resume.html">Read the résumé online</a>
+    <a class="edu reveal" href="../cerebro/">
+      <h3>Cerebro — a research platform, documented end to end</h3>
+      <span class="dates">Architecture guide · seven pages · lives with the project</span>
+      <p>How a research system is built so its own numbers can be trusted: point-in-time
+        universe construction, an execution model that makes look-ahead structurally
+        impossible, and walk-forward out-of-sample validation. The performance layer is
+        one I rebuilt from the account and fill streams after the engine's built-in
+        analyzer reported wrong numbers. Cerebro is my own independent project and
+        contains no ML.</p>
+      <div class="tags"><code>evaluation</code><code>out-of-sample validation</code><code>Nautilus Trader</code><code>Python</code></div>
+    </a>
+
+    <a class="edu reveal" href="https://jonnyeclectic.github.io/boost/">
+      <h3>boost — the visual guide</h3>
+      <span class="dates">Project documentation · lives with the project</span>
+      <p>The reference site for boost, my open-source agent-skills CLI: what an agent
+        skill is, how registries, taps and the lock file fit together, and how the
+        pure-stdlib BM25 retrieval engine and its CI evaluation gates work.</p>
+      <div class="tags"><code>retrieval</code><code>BM25</code><code>MCP</code><code>CI eval gates</code></div>
+    </a>
+
+    <div class="xp-cta reveal">
+      <a class="btn btn-ghost" href="../index.html">← Back to the portfolio</a>
     </div>
   </div>
 
@@ -282,9 +311,11 @@
       <p class="brand"><b>jreyes</b> · Jonathan Reyes · Lead Software Engineer</p>
       <p class="meta">Fort Worth, TX · © 2026 Jonathan Reyes. All rights reserved.</p>
       <p class="links">
-        <a href="index.html">Home</a> ·
-        <a href="resume.html">Résumé</a> ·
-        <a href="docs/">Library</a> ·
+        <a href="../index.html">Home</a> ·
+        <a href="mailto:jreyes.me@protonmail.com">Email</a> ·
+        <a href="https://www.linkedin.com/in/reyesjon">LinkedIn</a> ·
+        <a href="https://github.com/jonnyeclectic">GitHub</a> ·
+        <a href="../resume.html">Résumé</a> ·
         <a href="https://jonnyeclectic.github.io/boost/">boost</a>
       </p>
     </div>
@@ -306,7 +337,7 @@ if (!reduce && "IntersectionObserver" in window) {
 }
 
 // ---------- cursor-following glow on glass cards ----------
-document.querySelectorAll(".card").forEach((el) => {
+document.querySelectorAll(".edu").forEach((el) => {
   el.addEventListener("pointermove", (e) => {
     const r = el.getBoundingClientRect();
     el.style.setProperty("--mx", (e.clientX - r.left) + "px");
