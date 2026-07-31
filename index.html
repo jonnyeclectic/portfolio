@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jonathan Reyes — Lead Software Engineer</title>
-<meta name="description" content="Jonathan Reyes — Lead Software Engineer at Capital One. 11 years building distributed systems, APIs, and developer platforms in regulated environments. Java and Python on AWS.">
+<title>Jonathan Reyes — Production LLM systems, evals &amp; agent tooling</title>
+<meta name="description" content="I build and run LLM systems in regulated finance: document intelligence on a self-hosted vision-language model, MCP integrations, retrieval evals gated in CI.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3Ejr%3C/text%3E%3C/svg%3E">
 <script>document.documentElement.classList.add("js")</script>
 <style>
@@ -277,6 +277,20 @@
   .tdim { color: #9d9dbd; }
   .cm  { color: #9d9dbd; font-style: italic; }
 
+  /* ---------- bullet lists ---------- */
+  .bullets { list-style: none; display: grid; gap: 8px; margin-top: 12px; }
+  .bullets li { position: relative; padding-left: 19px; }
+  .bullets li::before {
+    content: ""; position: absolute; left: 2px; top: .6em;
+    width: 5px; height: 5px; border-radius: 50%; background: var(--grad);
+  }
+  .bullets li b { color: var(--text); font-weight: 650; }
+  .cap .bullets { font-size: 14.5px; color: var(--text-2); }
+  .role .bullets { font-size: 15px; color: var(--text-2); max-width: 700px; }
+  .edu .bullets { font-size: 15px; color: var(--text-2); }
+  .feature-copy .bullets { font-size: 17px; color: var(--text-2); margin-bottom: 22px; }
+  .feature-copy .bullets li { padding-left: 21px; }
+
   /* ---------- education ---------- */
   .edu {
     max-width: 760px; margin: 56px auto 0;
@@ -291,6 +305,7 @@
     font-size: 12px; color: #d5d5e2; background: rgba(255,255,255,.06);
     border: 1px solid var(--line-soft); border-radius: 7px; padding: 3px 9px;
   }
+  a.edu { display: block; text-decoration: none; }
 
   /* ---------- contact strip ---------- */
   .contact-strip { text-align: center; margin-top: 56px; }
@@ -371,10 +386,11 @@
   <div class="wrap nav">
     <a class="logo" href="#top"><b>jreyes</b><span>Software Engineer</span></a>
     <ul>
-      <li><a href="#work">Highlights</a></li>
+      <li><a href="#ai">AI Systems</a></li>
+      <li><a href="#evals">Evaluation</a></li>
       <li><a href="#experience">Experience</a></li>
       <li><a href="#skills">Technologies</a></li>
-      <li><a href="#education">Education</a></li>
+      <li><a href="docs/">Library</a></li>
       <li><a href="https://jonnyeclectic.github.io/boost/">boost&nbsp;↗</a></li>
       <li><a href="cerebro/">Cerebro&nbsp;↗</a></li>
       <li><a href="resume.html">Résumé</a></li>
@@ -388,71 +404,208 @@
   <!-- ================= HERO ================= -->
   <div class="wrap hero">
     <span class="badge">Lead Software Engineer · Capital One · Fort&nbsp;Worth,&nbsp;TX</span>
-    <h1>Distributed systems, APIs &amp; <span class="grad">developer platforms.</span></h1>
+    <h1>Production LLM systems <span class="grad">and the evals that keep them honest.</span></h1>
     <p class="lede">
-      I'm <b>Jonathan Reyes</b>, a lead software engineer with 11 years in regulated
-      financial services. At Capital One, I lead architecture for a high-throughput
-      platform that orchestrates communications with external dealership partners, and
-      I previously ran the platform ecosystem around the company-wide JFrog Artifactory
-      repository. On my own time, I build <b>boost</b> — an open-source package manager
-      for AI coding skills, shaped by what running enterprise developer tooling teaches
-      you. I work primarily in <b>Java and Python on AWS</b>, with a track record of
-      setting standards that spread beyond team boundaries.
+      I'm <b>Jonathan Reyes</b>, a lead software engineer at Capital One. I build
+      production LLM systems in regulated financial services, on 11 years of
+      distributed-systems and platform work. Right now that means a document-intelligence
+      pipeline on <b>Python, a self-hosted vision-language model (Llama) and S3</b>,
+      which I moved off AWS Textract and Bedrock when phone-camera submissions started
+      defeating OCR. I also run <b>production MCP integrations</b> across Jira,
+      Confluence and GitHub, and set test strategy for four engineering teams. Off the
+      clock I build <b>boost</b>, an open-source CLI whose retrieval engine is gated in
+      CI on recall@k, MRR and nDCG@k.
     </p>
     <div class="cta-row">
-      <a class="btn btn-grad" href="resume.html">View my résumé →</a>
-      <a class="btn btn-ghost" href="https://jonnyeclectic.github.io/boost/">Explore boost, my open-source AI tooling</a>
+      <a class="btn btn-grad" href="#evals">See how I gate an LLM system →</a>
+      <a class="btn btn-ghost" href="https://github.com/jonnyeclectic/boost">Read the source →</a>
     </div>
     <div class="stats">
-      <div class="stat reveal"><b>11</b><span>Years of engineering</span></div>
-      <div class="stat reveal"><b>Millions</b><span>of events processed monthly</span></div>
-      <div class="stat reveal"><b>10K+</b><span>AI skills indexed by boost</span></div>
-      <div class="stat reveal"><b>AWS</b><span>Certified Solutions Architect</span></div>
+      <div class="stat reveal"><b>11</b><span>Years building distributed systems</span></div>
+      <div class="stat reveal"><b>VLM</b><span>Self-hosted vision-language inference</span></div>
+      <div class="stat reveal"><b>5</b><span>Retrieval metrics gated in CI</span></div>
+      <div class="stat reveal"><b>PCI · NPI</b><span>Data-classification &amp; model-risk reviews</span></div>
     </div>
   </div>
 
-  <!-- ================= HIGHLIGHTS ================= -->
-  <section id="work">
+  <!-- ================= AI SYSTEMS ================= -->
+  <section id="ai">
     <div class="wrap">
-      <span class="eyebrow">Highlights</span>
-      <h2 class="sec-title">What I've been building</h2>
-      <p class="sec-sub">Work at Capital One spanning a high-throughput orchestration
-        backbone and a document-intelligence pipeline — plus boost, the open-source
-        developer tool I build outside of work.</p>
+      <span class="eyebrow">AI in production</span>
+      <h2 class="sec-title">LLM systems that run inside a regulated bank</h2>
+      <p class="sec-sub">Document intelligence on Python, a self-hosted vision-language
+        model and S3, plus the MCP integrations engineers on my teams use daily.</p>
 
       <div class="caps">
-        <div class="cap reveal" style="--ic-bg: rgba(96,165,250,.12); --ic-fg: #93c5fd;">
-          <div class="ic">⇄</div>
-          <h3>Communications platform</h3>
-          <p>Lead architecture, technical direction, and delivery for a high-throughput platform orchestrating communications with external dealership partners, built on AWS microservices (Docker, SQS, Kafka, Postgres, ECS).
-            </p>
-          <div class="tags"><code>AWS</code><code>ECS</code><code>Docker</code><code>microservices</code><code>messaging</code></div>
-        </div>
-        <a class="cap reveal" href="https://jonnyeclectic.github.io/boost/" style="--ic-bg: rgba(236,72,153,.12); --ic-fg: #f9a8d4;">
-          <div class="ic">✦</div>
-          <h3>boost — open-source AI skills package manager</h3>
-          <p>An independent side project: a CLI that finds, installs, and governs the
-            skill files AI coding agents run on, then keeps them in sync across every
-            agent at once. Grounded in daily, hands-on AI-assisted engineering with
-            Claude Code and Windsurf.</p>
-          <div class="tags"><code>CLI</code><code>open source</code><code>Python</code><code>AI tooling</code></div>
-          <span class="more">See the full visual guide →</span>
-        </a>
-        <a class="cap reveal" href="cerebro/" style="--ic-bg: rgba(34,211,238,.12); --ic-fg: #22d3ee;">
-          <div class="ic">◨</div>
-          <h3>Cerebro — systematic trading research platform</h3>
-          <p>An independent side project: a paper-first, multi-asset trading bot on
-            Nautilus Trader with a strict "honest measurement" pipeline — promotion gates,
-            out-of-sample validation, and a risk layer consulted on every bar. Shipped with
-            a full visual architecture guide.</p>
-          <div class="tags"><code>Python</code><code>Nautilus Trader</code><code>quant</code><code>IBKR</code></div>
-          <span class="more">Explore the architecture docs →</span>
-        </a>
         <div class="cap reveal" style="--ic-bg: rgba(74,222,128,.1); --ic-fg: #86efac;">
           <div class="ic">◈</div>
-          <h3>Document intelligence pipeline</h3>
-          <p>Built a document-intelligence pipeline using AWS Textract that extracts structured findings from unstructured partner documents, replacing manual review for analyst teams.</p>
-          <div class="tags"><code>AWS Textract</code><code>Python</code><code>document AI</code></div>
+          <h3>Document intelligence, from pilot to production</h3>
+          <p>I built this pipeline as a solo pilot and scaled it with a team once it
+            proved out. It turns unstructured documents into structured findings.</p>
+          <ul class="bullets">
+            <li>A fifth of submissions arrived as phone-camera photos, not PDFs, and
+              OCR failed on them.</li>
+            <li>I re-architected the LLM solution from <b>AWS Textract</b> through
+              <b>AWS Bedrock</b> to a <b>self-hosted vision-language model
+              (Llama)</b>.</li>
+            <li>It reads images against the same extraction schemas, at the accuracy
+              analysts relied on.</li>
+          </ul>
+          <div class="tags"><code>Python</code><code>VLM (Llama)</code><code>S3</code><code>AWS Bedrock</code></div>
+        </div>
+        <a class="cap reveal" href="https://github.com/jonnyeclectic/boost" style="--ic-bg: rgba(168,85,247,.12); --ic-fg: #c4b5fd;">
+          <div class="ic">⌁</div>
+          <h3>Agent tooling and MCP</h3>
+          <p>Production MCP integrations across Jira, Confluence and GitHub, plus the
+            team conventions for using them. boost ships its own MCP server:</p>
+          <ul class="bullets">
+            <li>Hand-written <b>JSON-RPC 2.0</b> over newline-delimited stdio, protocol
+              version 2024-11-05.</li>
+            <li>Six tools exposed to agents.</li>
+            <li>A failing or unknown tool returns an error result instead of killing a
+              long-lived session.</li>
+          </ul>
+          <div class="tags"><code>MCP</code><code>JSON-RPC 2.0</code><code>stdio</code><code>agent tooling</code><code>Claude Code</code></div>
+          <span class="more">See how the MCP server is built →</span>
+        </a>
+        <div class="cap reveal" style="--ic-bg: rgba(96,165,250,.12); --ic-fg: #93c5fd;">
+          <div class="ic">⇉</div>
+          <h3>The platform underneath</h3>
+          <p>Inference is one stage. The rest is durable orchestration and proof the
+            work landed.</p>
+          <ul class="bullets">
+            <li><b>EventBridge</b> rules trigger <b>Step Functions</b>, which orchestrate
+              <b>AWS Batch</b> jobs over S3 file drops.</li>
+            <li>Companion state machines verify downstream delivery and alarm when a
+              file never arrives.</li>
+            <li>Instrumented with <b>OpenTelemetry</b>. I am the engineer paged when it
+              breaks.</li>
+          </ul>
+          <div class="tags"><code>EventBridge</code><code>Step Functions</code><code>AWS Batch</code><code>S3</code><code>OpenTelemetry</code><code>on-call</code><code>incident response</code></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EVALUATION ================= -->
+  <section id="evals">
+    <div class="wrap">
+      <span class="eyebrow">Evaluation</span>
+      <h2 class="sec-title">The hard part is knowing whether it works</h2>
+      <p class="sec-sub">A model swap, a prompt change or a schema change can make a
+        system worse without anything failing.</p>
+
+      <div class="caps">
+        <div class="cap reveal" style="--ic-bg: rgba(125,211,252,.12); --ic-fg: #bae6fd;">
+          <div class="ic">⛨</div>
+          <h3>Golden sets against a production pipeline</h3>
+          <p>The document-intelligence pipeline's golden sets are built from
+            analyst-provided reports, so every model or schema change is scored before
+            it ships. A wrong extraction still comes back confident and well-formed, so
+            nothing fails on its own. The same reviews cover the data: <b>PCI, NPI and
+            model-risk</b>, including tokenization and masking.</p>
+          <div class="tags"><code>golden-set evals</code><code>extraction schema tuning</code><code>prompt tuning</code><code>model risk</code><code>PCI</code><code>NPI</code><code>tokenization &amp; masking</code></div>
+        </div>
+        <a class="cap reveal" href="https://jonnyeclectic.github.io/boost/" style="--ic-bg: rgba(34,211,238,.12); --ic-fg: #22d3ee;">
+          <div class="ic">◎</div>
+          <h3>Retrieval evaluation, enforced in CI</h3>
+          <p>boost gates every merge on five retrieval metrics: recall@5, recall@10,
+            MRR, nDCG@5 and nDCG@10.</p>
+          <ul class="bullets">
+            <li>Absolute floors, calibrated below first measurement.</li>
+            <li>A seeded <b>10,000-resample paired bootstrap</b>, so a regression has to
+              be both large and statistically significant to fail the build.</li>
+            <li>A graded golden set of <b>36 queries and 107 relevance judgments</b>;
+              its generator refuses any judgment naming a skill missing from the
+              corpus.</li>
+            <li>Ragas-methodology faithfulness scoring monitors on a schedule instead of
+              gating merges, since a non-deterministic, token-costing metric makes the
+              build flaky and expensive.</li>
+          </ul>
+          <div class="tags"><code>recall@k</code><code>MRR</code><code>nDCG@k</code><code>ragas</code><code>ranx</code><code>CI gates</code></div>
+          <span class="more">Read the harness design →</span>
+        </a>
+        <a class="cap reveal" href="cerebro/" style="--ic-bg: rgba(167,139,250,.12); --ic-fg: #c4b5fd;">
+          <div class="ic">◨</div>
+          <h3>Cerebro — promotion gates for an autonomous system</h3>
+          <p>An independent systematic-trading research platform on <b>Nautilus
+            Trader</b>. It contains no ML. What transfers is the gate structure: no
+            strategy reaches capital until it clears four of them.</p>
+          <ul class="bullets">
+            <li>In-sample backtest.</li>
+            <li>Walk-forward out-of-sample validation, with a Sharpe deflated for the
+              number of configurations tried.</li>
+            <li>Two weeks of paper trading.</li>
+            <li>A human sign-off no code path can grant itself.</li>
+          </ul>
+          <p>I rebuilt the performance layer from the account and fill streams after the
+            engine's built-in analyzer reported wrong numbers.</p>
+          <div class="tags"><code>Python</code><code>Nautilus Trader</code><code>out-of-sample validation</code><code>human-in-the-loop</code><code>IBKR</code></div>
+          <span class="more">Explore the architecture guide →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= OPEN SOURCE ================= -->
+  <section id="opensource">
+    <div class="wrap">
+      <span class="eyebrow">Open Source</span>
+      <h2 class="sec-title">boost — an agent-skills CLI and the harness that grades it</h2>
+      <p class="sec-sub">An independent, open-source CLI and MCP server that finds,
+        installs and governs the skill files AI coding agents run on. Every merge is
+        gated on what its retrieval core returns.</p>
+
+      <div class="feature-grid">
+        <div class="feature-copy reveal">
+          <p>Its retrieval engine is <b>BM25 written from scratch in pure
+            standard-library Python</b>: inverted postings, IDF, document-length
+            normalization, and chunking on paragraph boundaries with overlap. A
+            two-stage RAG pipeline retrieves a shortlist, then re-ranks it with an
+            LLM.</p>
+          <ul class="bullets">
+            <li><b>An optional dense backend</b> embeds the same chunks through Voyage
+              or OpenAI over plain <span class="chip-code">urllib</span>, no vendor
+              client library, and drops back to BM25 when a key or model is
+              missing.</li>
+            <li><b>A hermetic CI gate</b> scores retrieval over a generated 57-item
+              corpus that needs no network access or API key.</li>
+            <li><b>A second, independent CI gate</b> runs over a pinned set of real
+              registries with a recall floor.</li>
+          </ul>
+          <p>boost scans installed Markdown for <b>prompt injection and leaked
+            credentials</b> before an agent executes it as instructions. Findings are
+            advisory by design. Every subsystem degrades instead of raising: without a
+            model, key, index or the <span class="chip-code">gh</span> CLI, it still
+            returns an answer.</p>
+          <p>boost pulls agent skills from Git-hosted registries into Claude Code,
+            Windsurf and Cursor in one step. <b>70+ commands across 8 groups</b> run
+            over a curated catalog of <b>101 classified</b> skill, rule and workflow
+            registries. It ships on PyPI as
+            <span class="chip-code">boost-skill-cli</span>.</p>
+          <div class="cta-row">
+            <a class="btn btn-grad" href="https://jonnyeclectic.github.io/boost/">Explore the visual guide →</a>
+            <a class="btn btn-ghost" href="https://github.com/jonnyeclectic/boost">Read the source →</a>
+          </div>
+        </div>
+        <div class="window reveal">
+          <div class="bar"><div class="dots"><i></i><i></i><i></i></div>
+            <div class="bar-title">zsh — boost evals</div></div>
+          <pre><span class="tp">$</span> <span class="tv">python</span> scripts/eval_gate.py <span class="tc">--run</span>
+  <span class="tdim">corpus</span>  57 entries · 36 queries · 107 graded judgments
+  <span class="tdim">arm</span>     bm25 (shipped)          catalog (reference)
+
+  recall@5    <span class="tok">0.507</span>  floor 0.45  <span class="tok">PASS</span>      <span class="tdim">0.403</span>
+  recall@10   <span class="tok">0.602</span>  floor 0.55  <span class="tok">PASS</span>      <span class="tdim">0.535</span>
+  MRR         <span class="tok">0.838</span>  floor 0.78  <span class="tok">PASS</span>      <span class="tdim">0.733</span>
+  nDCG@5      <span class="tok">0.692</span>  floor 0.64  <span class="tok">PASS</span>      <span class="tdim">0.550</span>
+  nDCG@10     <span class="tok">0.714</span>  floor 0.66  <span class="tok">PASS</span>      <span class="tdim">0.583</span>
+
+  <span class="tdim">paired bootstrap · 10,000 resamples · no significant regression</span>
+  <span class="tok">GATE PASS</span>
+
+<span class="cm"># hermetic run · internal baseline, committed at evals/baseline.json</span>
+<span class="cm"># source · github.com/jonnyeclectic/boost</span></pre>
         </div>
       </div>
     </div>
@@ -462,9 +615,9 @@
   <section id="experience">
     <div class="wrap">
       <span class="eyebrow">Experience</span>
-      <h2 class="sec-title">Eleven years, two companies, five roles</h2>
-      <p class="sec-sub">From SoftLayer APIs to leading architecture for a major bank's
-        dealer-communications platform.</p>
+      <h2 class="sec-title">Eleven years across two companies</h2>
+      <p class="sec-sub">Same problem twice: distributing versioned artifacts engineers
+        depend on. First binaries for an enterprise, now the skills agents run on.</p>
 
       <div class="xp">
         <div class="company reveal">
@@ -474,37 +627,53 @@
         <div class="role reveal">
           <h4>Lead Software Engineer</h4>
           <span class="dates">Feb 2023 – Present · Remote</span>
-          <p>Lead architecture and delivery for a high-throughput
-            dealer-communications platform and a Textract document-intelligence
-            pipeline; re-architected its LLM solution from Textract to <b>AWS Bedrock</b>
-            and a self-hosted vLLM (Llama) deployment after a data-classification review.
-            Own production operations end to end — on-call, incident triage, root-cause
-            investigation, monitoring. Serve as <b>Sales Testing Champion</b>, defining
-            test strategy and quality standards adopted across four engineering teams;
-            mentor engineers and lead cross-functional delivery from scoping through
-            production. Recognized with <b>two ACE Awards for Technical Engineering
-            Excellence</b> (2024, 2025) and the <b>Diamond Dealer Award</b> (2024).</p>
-          <div class="chips"><code>Java</code><code>Python</code><code>AWS ECS</code><code>AWS Bedrock</code><code>Docker</code><code>Claude Code</code></div>
+          <p>I lead architecture and delivery for a document-intelligence pipeline on
+            <b>Python, a self-hosted vision-language model (Llama) and S3</b>, built as
+            a solo pilot and scaled with a team once it proved out.</p>
+          <ul class="bullets">
+            <li>Re-architected the LLM solution from <b>AWS Textract</b> through <b>AWS
+              Bedrock</b> to self-hosted inference when image-based submissions defeated
+              OCR, tuning extraction schemas, prompts and <b>golden-set evaluations in
+              production</b>.</li>
+            <li>Run <b>production MCP integrations</b> across Jira, Confluence and
+              GitHub, and set the team conventions for agent tooling.</li>
+            <li>Lead architecture for a high-throughput platform orchestrating
+              communications with external dealership partners, including a zero-loss
+              migration of a highly stateful distributed system between AWS accounts by
+              <b>traffic splitting</b> live workloads.</li>
+            <li>Support <b>PCI, NPI and model-risk reviews</b>, including tokenization
+              and masking.</li>
+            <li>Own production operations: on-call, incident triage, root-cause
+              investigation, and observability on <b>OpenTelemetry, CloudWatch, New
+              Relic, Splunk, PagerDuty and Prometheus</b>.</li>
+            <li>Serve as <b>Testing Champion for the Sales organization</b>, defining
+              test strategy adopted across four engineering teams.</li>
+            <li>Recognized with <b>two ACE Awards for Technical Engineering
+              Excellence</b> (2024, 2025) and the <b>Diamond Dealer Award</b>
+              (2024).</li>
+          </ul>
+          <div class="chips"><code>Python</code><code>Java</code><code>VLM (Llama)</code><code>S3</code><code>AWS Bedrock</code><code>MCP</code><code>OpenTelemetry</code></div>
         </div>
         <div class="role reveal">
           <h4>Principal Associate Software Engineer · Prequalified Applications</h4>
           <span class="dates">June 2021 – Feb 2023 · Remote</span>
           <p>Architected and operated <b>external-facing services powering auto loan
-            prequalification</b> for public applicants — owning API contracts, data models,
-            AWS deployment, and production support end to end. Partnered with product and
-            risk stakeholders to translate regulated lending requirements into resilient,
-            scalable service architecture.</p>
+            prequalification</b> for public applicants, owning the API contracts, data
+            models, AWS deployment and production support. Partnered with product and
+            risk stakeholders to turn regulated lending requirements into service
+            architecture.</p>
           <div class="chips"><code>API design</code><code>AWS</code><code>regulated lending</code></div>
         </div>
         <div class="role reveal">
           <h4>Principal Associate Software Engineer · Artifactory Platform &amp; Metrics</h4>
           <span class="dates">June 2019 – June 2021</span>
-          <p>Ran the platform ecosystem around <b>JFrog Artifactory</b>, the company-wide
-            binary repository (services deployed via Terraform). Automated artifact
-            promotion in production pipelines with <b>AWS Lambda and DynamoDB</b>,
-            eliminating a manual release step for engineering teams across the enterprise;
-            delivered performance-analytics microservices and metrics pipelines feeding
-            <b>machine learning models</b>.</p>
+          <p>Ran the platform around <b>JFrog Artifactory</b>, the company-wide binary
+            repository, with services deployed via Terraform. Automated artifact
+            promotion in production pipelines using <b>AWS Lambda and DynamoDB</b>,
+            which removed a manual release step for engineering teams across the
+            enterprise. Also delivered performance-analytics microservices and metrics
+            pipelines feeding <b>machine learning models</b>. boost solves the same
+            problem for agents: a registry, a promotion path and a lockfile.</p>
           <div class="chips"><code>JFrog Artifactory</code><code>AWS Lambda</code><code>DynamoDB</code><code>Terraform</code></div>
         </div>
 
@@ -515,18 +684,18 @@
         <div class="role reveal">
           <h4>Software Engineer II</h4>
           <span class="dates">2017 – 2019</span>
-          <p>Built OpenShift (Kubernetes) deployments for microservices; migrated server provisioning to
-            <b>Netflix Conductor</b> workflow orchestration, converting sequential job
-            scheduling to parallel execution and cutting large-data processing
-            <b>from hours to minutes</b>.</p>
+          <p>Built <b>OpenShift (Kubernetes)</b> deployments for microservices. Migrated
+            server provisioning to <b>Netflix Conductor</b> workflow orchestration:
+            sequential job scheduling became parallel execution, and large-data
+            processing dropped <b>from hours to minutes</b>.</p>
           <div class="chips"><code>OpenShift</code><code>Netflix Conductor</code></div>
         </div>
         <div class="role reveal">
           <h4>Software Engineer I · SoftLayer (acquired by IBM)</h4>
           <span class="dates">2015 – 2017</span>
-          <p>Developed APIs for globally integrated services; built <b>Splunk dashboards</b>
-            for service metrics and health checks and contributed to the CI/CD functional
-            test framework.</p>
+          <p>Developed APIs for globally integrated services. Built <b>Splunk</b>
+            dashboards for service metrics and health checks, and contributed to the
+            CI/CD functional test framework.</p>
           <div class="chips"><code>APIs</code><code>Splunk</code><code>CI/CD</code></div>
         </div>
       </div>
@@ -537,88 +706,85 @@
     </div>
   </section>
 
-  <!-- ================= FEATURED PROJECT ================= -->
-  <section id="project">
-    <div class="wrap">
-      <span class="eyebrow">Open Source</span>
-      <h2 class="sec-title">boost — a package manager for what your agent knows</h2>
-      <p class="sec-sub">An independent, open-source CLI that installs and governs AI
-        agent skills. Built and maintained on my own time.</p>
-
-      <div class="feature-grid">
-        <div class="feature-copy reveal">
-          <p>boost pulls AI coding skills out of Git-hosted registries and lands them
-            in Claude Code, Windsurf, and Cursor in one step — 72 commands spanning
-            install, discovery, AI-assisted authoring, governance, and team rollout.</p>
-          <p>Skills get handled like real dependencies instead of files you paste
-            around: a lock file pins exact state, <span class="chip-code">boost audit</span>
-            screens against safety blocklists, and Boostfile bundles hand an entire
-            setup to someone else intact.</p>
-          <a class="btn btn-grad" href="https://jonnyeclectic.github.io/boost/">Explore the visual guide →</a>
-        </div>
-        <div class="window reveal">
-          <div class="bar"><div class="dots"><i></i><i></i><i></i></div>
-            <div class="bar-title">zsh — boost</div></div>
-          <pre><span class="tp">$</span> <span class="tv">boost</span> <span class="tc">install</span> jira-integration
-  <span class="tok">✓</span> copied to ~/.agents/skills/jira-integration
-  <span class="tok">✓</span> linked → claude-code · windsurf · cursor
-  <span class="tok">✓</span> lock updated (.skill-lock.json)
-
-<span class="tp">$</span> <span class="tv">boost</span> <span class="tc">doctor</span>
-  <span class="tok">✓</span> 14 skills installed · 2 taps synced
-  <span class="tok">✓</span> lock file integrity OK
-
-<span class="cm"># open source · github.com/jonnyeclectic/boost</span></pre>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- ================= TECHNOLOGIES ================= -->
   <section id="skills">
     <div class="wrap">
       <span class="eyebrow">Technologies</span>
       <h2 class="sec-title">The stack I work in</h2>
-      <p class="sec-sub">Deep in Java and Python on AWS, with the platform and
-        delivery tooling around them.</p>
+      <p class="sec-sub">AI systems and the platform they run on.</p>
 
       <div class="caps">
-        <div class="cap reveal" style="--ic-bg: rgba(34,211,238,.12); --ic-fg: #7dd3fc;">
-          <div class="ic">{ }</div>
-          <h3>Languages &amp; frameworks</h3>
-          <p>The core toolkit for services and automation.</p>
-          <div class="tags"><code>Java</code><code>Spring Boot</code><code>Python</code><code>SQL</code><code>Bash</code></div>
+        <div class="cap reveal" style="--ic-bg: rgba(167,139,250,.12); --ic-fg: #c4b5fd;">
+          <div class="ic">✦</div>
+          <h3>AI &amp; LLM systems</h3>
+          <p>I run all of this inside a data-classification boundary.</p>
+          <div class="tags"><code>AWS Bedrock</code><code>self-hosted VLM (Llama)</code><code>Python</code><code>S3</code><code>prompt &amp; schema tuning</code></div>
+        </div>
+        <div class="cap reveal" style="--ic-bg: rgba(34,211,238,.12); --ic-fg: #22d3ee;">
+          <div class="ic">◎</div>
+          <h3>Evaluation &amp; retrieval quality</h3>
+          <p>Five metrics, absolute floors and a seeded bootstrap that all have to agree
+            before a merge lands.</p>
+          <div class="tags"><code>golden-set evaluation</code><code>recall@k</code><code>MRR</code><code>nDCG@k</code><code>ragas</code><code>ranx</code><code>BM25 retrieval</code><code>retrieval-augmented generation (RAG)</code><code>CI eval gates</code></div>
+        </div>
+        <div class="cap reveal" style="--ic-bg: rgba(236,72,153,.12); --ic-fg: #f9a8d4;">
+          <div class="ic">⌁</div>
+          <h3>Agent tooling</h3>
+          <p>The protocol layer agents call, plus the scanners that vet what they
+            execute.</p>
+          <div class="tags"><code>MCP</code><code>JSON-RPC over stdio</code><code>prompt-injection scanning</code><code>secret scanning</code><code>Claude Code</code><code>Windsurf</code><code>LLM re-ranking</code></div>
+        </div>
+        <div class="cap reveal" style="--ic-bg: rgba(125,211,252,.12); --ic-fg: #bae6fd;">
+          <div class="ic">◉</div>
+          <h3>Observability &amp; operations</h3>
+          <p>Instrumented and alarmed. I carry the pager.</p>
+          <div class="tags"><code>OpenTelemetry</code><code>CloudWatch</code><code>New Relic</code><code>Prometheus</code><code>Splunk</code><code>PagerDuty</code><code>on-call</code><code>incident response</code></div>
         </div>
         <div class="cap reveal" style="--ic-bg: rgba(96,165,250,.12); --ic-fg: #93c5fd;">
           <div class="ic">☁</div>
-          <h3>Cloud &amp; infrastructure</h3>
-          <p>Production AWS services, with containers everywhere.</p>
-          <div class="tags"><code>AWS ECS</code><code>Bedrock</code><code>Textract</code><code>Aurora</code><code>SQS</code><code>Docker</code><code>Terraform</code><code>Linux</code></div>
-        </div>
-        <div class="cap reveal" style="--ic-bg: rgba(236,72,153,.12); --ic-fg: #f9a8d4;">
-          <div class="ic">✦</div>
-          <h3>AI &amp; automation</h3>
-          <p>Daily AI-assisted engineering, and building the tools for it.</p>
-          <div class="tags"><code>Claude Code</code><code>Windsurf</code><code>MCP</code><code>document intelligence</code><code>metrics-to-ML</code></div>
-        </div>
-        <div class="cap reveal" style="--ic-bg: rgba(167,139,250,.12); --ic-fg: #c4b5fd;">
-          <div class="ic">⛭</div>
-          <h3>Platform &amp; delivery</h3>
-          <p>The pipelines and platforms teams ship through.</p>
-          <div class="tags"><code>JFrog Artifactory</code><code>CI/CD</code><code>Netflix Conductor</code><code>OpenTelemetry</code><code>Splunk</code></div>
+          <h3>Cloud &amp; distributed systems</h3>
+          <p>AWS since 2019, on eleven years of distributed systems.</p>
+          <div class="tags"><code>AWS ECS</code><code>Lambda</code><code>Step Functions</code><code>EventBridge</code><code>API Gateway</code><code>DynamoDB</code><code>Aurora</code><code>IAM</code><code>SQS</code><code>Kafka</code><code>Docker</code><code>Terraform</code><code>Linux</code></div>
         </div>
         <div class="cap reveal" style="--ic-bg: rgba(74,222,128,.1); --ic-fg: #86efac;">
           <div class="ic">⇄</div>
-          <h3>APIs &amp; data</h3>
-          <p>External-facing contracts and the data behind them.</p>
-          <div class="tags"><code>REST API design &amp; versioning</code><code>microservices</code><code>messaging (Kafka, SQS)</code><code>PostgreSQL</code><code>Oracle</code><code>relational design</code></div>
+          <h3>Languages, APIs &amp; data</h3>
+          <p>External contracts and the data behind them.</p>
+          <div class="tags"><code>Java</code><code>Spring Boot</code><code>Python</code><code>SQL</code><code>PostgreSQL</code><code>Oracle</code><code>REST API design &amp; versioning</code><code>microservices</code><code>Bash</code></div>
         </div>
-        <div class="cap reveal" style="--ic-bg: rgba(125,211,252,.12); --ic-fg: #bae6fd;">
-          <div class="ic">⛨</div>
-          <h3>Quality &amp; operations</h3>
-          <p>Test strategy champion; production ownership end to end.</p>
-          <div class="tags"><code>test strategy</code><code>on-call</code><code>incident response</code><code>monitoring &amp; alerting</code></div>
-        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LIBRARY ================= -->
+  <section id="library">
+    <div class="wrap">
+      <span class="eyebrow">Library</span>
+      <h2 class="sec-title">Technical guides I write</h2>
+      <p class="sec-sub">Guides I write for myself and the engineers I work with, on the
+        parts of an LLM system that are easy to get wrong. The worked examples in them
+        are reference designs, not descriptions of systems I run. Project-specific
+        walkthroughs live with their projects: the boost visual guide and the Cerebro
+        architecture docs.</p>
+
+      <a class="edu reveal" href="docs/pgvector-guide.html">
+        <h3>pgvector, explained twice — vector search in PostgreSQL</h3>
+        <span class="dates">Reference guide · retrieval and evaluation</span>
+        <p>Every section written twice: the plain-English version and the engineering
+          version, side by side.</p>
+        <ul class="bullets">
+          <li>Embeddings as a schema contract.</li>
+          <li>HNSW versus IVFFlat.</li>
+          <li>The operator-class mismatch that degrades to a sequential scan.</li>
+          <li>Over-fetch-and-fuse ranking.</li>
+          <li>recall@k, MRR and nDCG golden-set gates that catch recall loss before a
+            user does.</li>
+        </ul>
+        <div class="tags"><code>pgvector</code><code>PostgreSQL</code><code>HNSW</code><code>retrieval</code><code>evals</code></div>
+      </a>
+
+      <div class="xp-cta reveal">
+        <a class="btn btn-ghost" href="docs/">Browse the library →</a>
       </div>
     </div>
   </section>
@@ -640,12 +806,12 @@
       <div class="edu reveal">
         <h3>AWS Certified Solutions Architect – Associate</h3>
         <span class="dates">2025</span>
-        <p>Current certification covering AWS architecture and services.</p>
+        <p>Architecture, security and cost trade-offs across core AWS services.</p>
         <div class="tags"><code>Amazon Web Services</code></div>
       </div>
 
       <div class="contact-strip reveal">
-        <p class="sec-sub">Want the details, or just want to talk shop?</p>
+        <p class="sec-sub">Happy to go deeper on any of this.</p>
         <div class="cta-row">
           <a class="btn btn-grad" href="contact.html">Get in touch →</a>
           <a class="btn btn-ghost" href="images/Jonathan Reyes Resume.pdf" download data-goatcounter-click="resume-pdf-download">Download résumé PDF</a>
@@ -663,6 +829,7 @@
         <a href="https://www.linkedin.com/in/reyesjon">LinkedIn</a> ·
         <a href="https://github.com/jonnyeclectic">GitHub</a> ·
         <a href="resume.html">Résumé</a> ·
+        <a href="docs/">Library</a> ·
         <a href="https://jonnyeclectic.github.io/boost/">boost</a>
       </p>
     </div>
