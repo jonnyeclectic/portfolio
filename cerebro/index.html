@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cerebro — Architecture & Workflow — Jonathan Reyes</title>
 <meta name="description" content="Visual architecture and workflow documentation for Cerebro, a paper-first multi-asset quant trading bot on Nautilus Trader: data, backtest, risk, validation, paper, and live stages explained simply and technically.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='71' font-size='60' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='71' font-size='60' font-family='monospace' font-weight='bold' fill='%2340cbe3' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
 <script>document.documentElement.classList.add("js")</script>
 <link rel="stylesheet" href="assets/cerebro-docs.css">
 <script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
@@ -21,6 +21,7 @@
         async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
+<a class="skip" href="#top">Skip to content</a>
 
 <header class="site">
   <div class="wrap">
@@ -40,7 +41,7 @@
   </div>
 </header>
 
-<main class="wrap">
+<main class="wrap" id="top">
 
   <div class="page-head reveal">
     <span class="eyebrow">Cerebro · system documentation</span>
@@ -109,9 +110,9 @@ flowchart LR
   </figure>
 
   <div class="legend reveal">
-    <div class="item"><span class="sw" style="background:#22d3ee"></span> data &amp; catalog</div>
-    <div class="item"><span class="sw" style="background:#a855f7"></span> strategy / engine</div>
-    <div class="item"><span class="sw" style="background:#f472d0"></span> execution / market</div>
+    <div class="item"><span class="sw" style="background:#40cbe3"></span> data &amp; catalog</div>
+    <div class="item"><span class="sw" style="background:#cc9eff"></span> strategy / engine</div>
+    <div class="item"><span class="sw" style="background:#f58fd7"></span> execution / market</div>
   </div>
 
   <h2 class="sec" id="bar-lifecycle">How a strategy actually runs</h2>
@@ -245,7 +246,7 @@ flowchart TD
 
   <h2 class="sec" id="stages">Explore each stage</h2>
   <div class="stage-grid">
-    <a class="cap stage-card reveal" href="data-and-universe.html" style="--ic-bg:rgba(34,211,238,.12);--ic-fg:#22d3ee">
+    <a class="cap stage-card reveal" href="data-and-universe.html" style="--ic-bg:rgba(34,211,238,.12);--ic-fg:#40cbe3">
       <div class="step">Stage 0</div>
       <div class="ic">DB</div>
       <h3>Data &amp; Universe</h3>
@@ -275,7 +276,7 @@ flowchart TD
       <h3>IBKR Paper</h3>
       <p>The live TradingNode, IBKR/Databento wiring, monitoring, and operational safety.</p>
     </a>
-    <a class="cap stage-card reveal" href="live-gate4.html" style="--ic-bg:rgba(244,114,208,.14);--ic-fg:#f472d0">
+    <a class="cap stage-card reveal" href="live-gate4.html" style="--ic-bg:rgba(244,114,208,.14);--ic-fg:#f58fd7">
       <div class="step">Gate 4</div>
       <div class="ic">LV</div>
       <h3>Review &amp; Live</h3>
