@@ -168,8 +168,12 @@
   .mailto-hero {
     display: block; margin-top: 14px;
     font-family: var(--mono); font-weight: 700;
-    font-size: clamp(1.375rem, .9rem + 1.6vw, 2.1rem); line-height: 1.08;
-    letter-spacing: -.03em; text-decoration: none; overflow-wrap: anywhere;
+    /* Sized to fit the rail on one line at desktop. `overflow-wrap: anywhere`
+       used to let it break wherever it ran out of room, which at 1280 split it
+       as "…protonmail.c / om". The only break opportunity now is the <wbr>
+       after the @, so a narrow rail wraps the way an address is normally read. */
+    font-size: clamp(1.25rem, .95rem + 1.05vw, 1.75rem); line-height: 1.12;
+    letter-spacing: -.03em; text-decoration: none;
     background: var(--grad);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
@@ -510,7 +514,7 @@
     <!-- ---------------- right: the rail ---------------- -->
     <aside class="contact-rail">
       <p class="rail-eyebrow">Email</p>
-      <a class="mailto-hero" href="mailto:jreyes.me@protonmail.com">jreyes.me<span class="at">@</span>protonmail.com</a>
+      <a class="mailto-hero" href="mailto:jreyes.me@protonmail.com">jreyes.me<span class="at">@</span><wbr>protonmail.com</a>
       <p class="rail-note">Best for anything longer than a sentence.</p>
       <button class="copy" type="button" data-copy="jreyes.me@protonmail.com">
         <svg class="cp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
