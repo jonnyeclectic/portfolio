@@ -355,3 +355,16 @@ footer.site .links a:hover { color: var(--text); }
 .legend { display: flex; flex-wrap: wrap; gap: 12px 20px; margin: 16px 0; }
 .legend .item { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--text-2); }
 .legend .sw { width: 22px; height: 12px; border-radius: 4px; }
+
+/* ---------- cross-document view transitions (matches the main site) ---------- */
+@view-transition { navigation: auto; }
+header.site { view-transition-name: site-header; }
+::view-transition-old(site-header),
+::view-transition-new(site-header) { animation-duration: 0s; }
+@keyframes vt-out { to   { opacity: 0; transform: translateY(-6px); } }
+@keyframes vt-in  { from { opacity: 0; transform: translateY(8px);  } }
+::view-transition-old(root) { animation: vt-out .16s cubic-bezier(.4,0,1,1) both; }
+::view-transition-new(root) { animation: vt-in  .24s cubic-bezier(0,0,.2,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 1ms; }
+}
