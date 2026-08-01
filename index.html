@@ -410,9 +410,9 @@
       production LLM systems in regulated financial services, on 11 years of
       distributed-systems and platform work. Right now that means a document-intelligence
       pipeline on <b>Python, a self-hosted vision-language model (Llama) and S3</b>,
-      which I moved off AWS Textract and Bedrock when phone-camera submissions started
+      rebuilt from AWS Textract through Bedrock once phone-camera submissions started
       defeating OCR. I also run <b>production MCP integrations</b> across Jira,
-      Confluence and GitHub, and set test strategy for four engineering teams. Off the
+      Confluence and GitHub, and set test strategy across four engineering teams. Off the
       clock I build <b>boost</b>, an open-source CLI whose retrieval engine is gated in
       CI on recall@k, MRR and nDCG@k.
     </p>
@@ -440,16 +440,15 @@
         <div class="cap reveal" style="--ic-bg: rgba(74,222,128,.1); --ic-fg: #86efac;">
           <div class="ic">◈</div>
           <h3>Document intelligence, from pilot to production</h3>
-          <p>I built this pipeline as a solo pilot and scaled it with a team once it
-            proved out. It turns unstructured documents into structured findings.</p>
+          <p>A pipeline that turns unstructured documents into structured findings.</p>
           <ul class="bullets">
             <li>A fifth of submissions arrived as phone-camera photos, not PDFs, and
               OCR failed on them.</li>
             <li>I re-architected the LLM solution from <b>AWS Textract</b> through
               <b>AWS Bedrock</b> to a <b>self-hosted vision-language model
               (Llama)</b>.</li>
-            <li>It reads images against the same extraction schemas, at the accuracy
-              analysts relied on.</li>
+            <li>The VLM reads images against the same extraction schemas, holding the
+              accuracy analysts already relied on.</li>
           </ul>
           <div class="tags"><code>Python</code><code>VLM (Llama)</code><code>S3</code><code>AWS Bedrock</code></div>
         </div>
@@ -478,8 +477,7 @@
               <b>AWS Batch</b> jobs over S3 file drops.</li>
             <li>Companion state machines verify downstream delivery and alarm when a
               file never arrives.</li>
-            <li>Instrumented with <b>OpenTelemetry</b>. I am the engineer paged when it
-              breaks.</li>
+            <li>Instrumented with <b>OpenTelemetry</b>, and on my pager.</li>
           </ul>
           <div class="tags"><code>EventBridge</code><code>Step Functions</code><code>AWS Batch</code><code>S3</code><code>OpenTelemetry</code><code>on-call</code><code>incident response</code></div>
         </div>
@@ -501,8 +499,8 @@
           <h3>Golden sets against a production pipeline</h3>
           <p>The document-intelligence pipeline's golden sets are built from
             analyst-provided reports, so every model or schema change is scored before
-            it ships. A wrong extraction still comes back confident and well-formed, so
-            nothing fails on its own. The same reviews cover the data: <b>PCI, NPI and
+            it ships. A wrong extraction still comes back confident and well-formed.
+            The same reviews cover the data: <b>PCI, NPI and
             model-risk</b>, including tokenization and masking.</p>
           <div class="tags"><code>golden-set evals</code><code>extraction schema tuning</code><code>prompt tuning</code><code>model risk</code><code>PCI</code><code>NPI</code><code>tokenization &amp; masking</code></div>
         </div>
@@ -616,8 +614,8 @@
     <div class="wrap">
       <span class="eyebrow">Experience</span>
       <h2 class="sec-title">Eleven years across two companies</h2>
-      <p class="sec-sub">Same problem twice: distributing versioned artifacts engineers
-        depend on. First binaries for an enterprise, now the skills agents run on.</p>
+      <p class="sec-sub">Eleven years of distribution and governance for the things
+        engineers depend on, first binaries and now agent skills.</p>
 
       <div class="xp">
         <div class="company reveal">
@@ -627,11 +625,11 @@
         <div class="role reveal">
           <h4>Lead Software Engineer</h4>
           <span class="dates">Feb 2023 – Present · Remote</span>
-          <p>I lead architecture and delivery for a document-intelligence pipeline on
-            <b>Python, a self-hosted vision-language model (Llama) and S3</b>, built as
-            a solo pilot and scaled with a team once it proved out.</p>
+          <p>Lead architecture and delivery for a document-intelligence pipeline built on
+            <b>Python, a self-hosted vision-language model (Llama) and S3</b>. I started
+            it alone and grew it into a team effort.</p>
           <ul class="bullets">
-            <li>Re-architected the LLM solution from <b>AWS Textract</b> through <b>AWS
+            <li>Re-architected its LLM solution from <b>AWS Textract</b> through <b>AWS
               Bedrock</b> to self-hosted inference when image-based submissions defeated
               OCR, tuning extraction schemas, prompts and <b>golden-set evaluations in
               production</b>.</li>
@@ -644,7 +642,7 @@
             <li>Support <b>PCI, NPI and model-risk reviews</b>, including tokenization
               and masking.</li>
             <li>Own production operations: on-call, incident triage, root-cause
-              investigation, and observability on <b>OpenTelemetry, CloudWatch, New
+              investigation and observability on <b>OpenTelemetry, CloudWatch, New
               Relic, Splunk, PagerDuty and Prometheus</b>.</li>
             <li>Serve as <b>Testing Champion for the Sales organization</b>, defining
               test strategy adopted across four engineering teams.</li>
@@ -672,8 +670,8 @@
             promotion in production pipelines using <b>AWS Lambda and DynamoDB</b>,
             which removed a manual release step for engineering teams across the
             enterprise. Also delivered performance-analytics microservices and metrics
-            pipelines feeding <b>machine learning models</b>. boost solves the same
-            problem for agents: a registry, a promotion path and a lockfile.</p>
+            pipelines feeding <b>machine learning models</b>. It is the problem boost now
+            solves for agents: a registry, a promotion path and a lockfile.</p>
           <div class="chips"><code>JFrog Artifactory</code><code>AWS Lambda</code><code>DynamoDB</code><code>Terraform</code></div>
         </div>
 
@@ -723,33 +721,33 @@
         <div class="cap reveal" style="--ic-bg: rgba(34,211,238,.12); --ic-fg: #22d3ee;">
           <div class="ic">◎</div>
           <h3>Evaluation &amp; retrieval quality</h3>
-          <p>Five metrics, absolute floors and a seeded bootstrap that all have to agree
-            before a merge lands.</p>
+          <p>Five metrics, absolute floors and a seeded bootstrap, all of which have to
+            agree before a merge lands.</p>
           <div class="tags"><code>golden-set evaluation</code><code>recall@k</code><code>MRR</code><code>nDCG@k</code><code>ragas</code><code>ranx</code><code>BM25 retrieval</code><code>retrieval-augmented generation (RAG)</code><code>CI eval gates</code></div>
         </div>
         <div class="cap reveal" style="--ic-bg: rgba(236,72,153,.12); --ic-fg: #f9a8d4;">
           <div class="ic">⌁</div>
           <h3>Agent tooling</h3>
-          <p>The protocol layer agents call, plus the scanners that vet what they
+          <p>The protocol layer that agents call, and the scanners vetting what they
             execute.</p>
-          <div class="tags"><code>MCP</code><code>JSON-RPC over stdio</code><code>prompt-injection scanning</code><code>secret scanning</code><code>Claude Code</code><code>Windsurf</code><code>LLM re-ranking</code></div>
+          <div class="tags"><code>MCP</code><code>JSON-RPC over stdio</code><code>prompt-injection scanning</code><code>secret scanning</code><code>Claude Code</code><code>Windsurf</code><code>Cursor</code><code>LLM re-ranking</code></div>
         </div>
         <div class="cap reveal" style="--ic-bg: rgba(125,211,252,.12); --ic-fg: #bae6fd;">
           <div class="ic">◉</div>
           <h3>Observability &amp; operations</h3>
-          <p>Instrumented and alarmed. I carry the pager.</p>
+          <p>Where I look first when something breaks at 3am.</p>
           <div class="tags"><code>OpenTelemetry</code><code>CloudWatch</code><code>New Relic</code><code>Prometheus</code><code>Splunk</code><code>PagerDuty</code><code>on-call</code><code>incident response</code></div>
         </div>
         <div class="cap reveal" style="--ic-bg: rgba(96,165,250,.12); --ic-fg: #93c5fd;">
           <div class="ic">☁</div>
           <h3>Cloud &amp; distributed systems</h3>
-          <p>AWS since 2019, on eleven years of distributed systems.</p>
+          <p>Eleven years of distributed systems, on AWS since 2019.</p>
           <div class="tags"><code>AWS ECS</code><code>Lambda</code><code>Step Functions</code><code>EventBridge</code><code>API Gateway</code><code>DynamoDB</code><code>Aurora</code><code>IAM</code><code>SQS</code><code>Kafka</code><code>Docker</code><code>Terraform</code><code>Linux</code></div>
         </div>
         <div class="cap reveal" style="--ic-bg: rgba(74,222,128,.1); --ic-fg: #86efac;">
           <div class="ic">⇄</div>
           <h3>Languages, APIs &amp; data</h3>
-          <p>External contracts and the data behind them.</p>
+          <p>External-facing contracts and the data behind them.</p>
           <div class="tags"><code>Java</code><code>Spring Boot</code><code>Python</code><code>SQL</code><code>PostgreSQL</code><code>Oracle</code><code>REST API design &amp; versioning</code><code>microservices</code><code>Bash</code></div>
         </div>
       </div>
@@ -761,11 +759,10 @@
     <div class="wrap">
       <span class="eyebrow">Library</span>
       <h2 class="sec-title">Technical guides I write</h2>
-      <p class="sec-sub">Guides I write for myself and the engineers I work with, on the
-        parts of an LLM system that are easy to get wrong. The worked examples in them
-        are reference designs, not descriptions of systems I run. Project-specific
-        walkthroughs live with their projects: the boost visual guide and the Cerebro
-        architecture docs.</p>
+      <p class="sec-sub">Written for myself first, then for the engineers I work with.
+        Worked examples are reference designs unless a guide says otherwise. Walkthroughs
+        of my own projects live with those projects: the boost visual guide and the
+        Cerebro architecture docs.</p>
 
       <a class="edu reveal" href="docs/pgvector-guide.html">
         <h3>pgvector, explained twice — vector search in PostgreSQL</h3>
@@ -777,8 +774,7 @@
           <li>HNSW versus IVFFlat.</li>
           <li>The operator-class mismatch that degrades to a sequential scan.</li>
           <li>Over-fetch-and-fuse ranking.</li>
-          <li>recall@k, MRR and nDCG golden-set gates that catch recall loss before a
-            user does.</li>
+          <li>recall@k, MRR and nDCG golden-set gates.</li>
         </ul>
         <div class="tags"><code>pgvector</code><code>PostgreSQL</code><code>HNSW</code><code>retrieval</code><code>evals</code></div>
       </a>
@@ -811,7 +807,7 @@
       </div>
 
       <div class="contact-strip reveal">
-        <p class="sec-sub">Happy to go deeper on any of this.</p>
+        <p class="sec-sub">If you want the detail behind any of this, ask me.</p>
         <div class="cta-row">
           <a class="btn btn-grad" href="contact.html">Get in touch →</a>
           <a class="btn btn-ghost" href="images/Jonathan Reyes Resume.pdf" download data-goatcounter-click="resume-pdf-download">Download résumé PDF</a>
