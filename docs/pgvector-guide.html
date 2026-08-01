@@ -6,104 +6,75 @@
 <title>pgvector, explained twice — a working reference | Jonathan Reyes</title>
 <meta name="description" content="What pgvector is and how to run it: embeddings as a schema contract, HNSW versus IVFFlat, hybrid over-fetch-and-fuse ranking, and the golden-set gates that keep an approximate index honest. A working reference guide.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3Ejr%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../style/portfolio.css">
 <style>
-  :root {
-    --bg: #07080f;
-    --surface-1: #0f121d;   /* resting card   */
-    --surface-2: #181b28;   /* hover / raised */
-    --surface-3: #202533;   /* popover        */
-    --line-soft: #1d202a;
-    --line: #272b37;
-    --line-hi: #474c5d;
-    --text: #d6d9e3;
-    --text-2: #9298b0;
-    --text-3: #858da8;
-    --amber: #40cbe3;   /* legacy alias — same as --cyan */
-    --orange: #38bdf8;
-    --pink: #f58fd7;
-    --violet: #cc9eff;
-    --blue: #38bdf8;
-    --sky: #7dd3fc;
-    --green: #4ade80;
-    --yellow: #facc15;
-    --term-bg: #0d1024;
-    --term-bar: #171a33;
-    --cyan: #40cbe3;
-    --grad: linear-gradient(96deg, #40cbe3 0%, #cc9eff 52%, #f58fd7 100%);
-    --grad: linear-gradient(96deg in oklch, var(--cyan) 0%, var(--violet) 52%, var(--pink) 100%);
-    --ease: cubic-bezier(.2,.7,.2,1);
-    --step-hero: clamp(2.75rem, 1.60rem + 4.72vw, 5.375rem);
-    --step-title: clamp(1.875rem, 1.33rem + 2.25vw, 3.125rem);
-    --step-stat: clamp(1.75rem, 1.37rem + 1.57vw, 2.625rem);
-    --step-body: clamp(1rem, .97rem + .14vw, 1.0625rem);
-    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  }
-
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+
   body {
     margin: 0; background: var(--bg); color: var(--text);
     font-family: var(--sans); line-height: 1.65;
     -webkit-font-smoothing: antialiased;
   }
-  body::before {
-    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background:
-      radial-gradient(700px 420px at 12% -6%, rgba(64,203,227,.10), transparent 60%),
-      radial-gradient(620px 420px at 92% 4%, rgba(204,158,255,.10), transparent 62%),
-      radial-gradient(800px 500px at 50% 108%, rgba(245,143,215,.06), transparent 60%);
-  }
+
   a { color: var(--cyan); text-decoration: none; }
-  ::selection { background: rgba(64,203,227,.28); color: var(--text); }
-  /* white ring + offset: the old cyan ring was 1:1 against the cyan CTA edge */
-  :focus-visible { outline: 3px solid #e9ebf5; outline-offset: 2px; border-radius: 6px; }
-  .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  .skip {
-    position: absolute; left: 24px; top: -60px; z-index: 100;
-    background: var(--surface-2); border: 1px solid var(--line-hi); border-radius: 10px;
-    padding: 10px 18px; font-size: 14px; text-decoration: none; color: var(--text);
-    transition: top .18s var(--ease);
-  }
-  .skip:focus-visible { top: 12px; }
+
   a:hover { text-decoration: underline; }
 
   /* ---------- nav ---------- */
+
   header.top {
     position: sticky; top: 0; z-index: 50;
     background: rgba(7,8,15,.78); backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--line-soft);
   }
+
   .top-in {
     max-width: 1240px; margin: 0 auto; padding: 13px 24px;
     display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
   }
+
   .brand { font-family: var(--mono); font-weight: 700; letter-spacing: .04em; color: var(--text); }
+
   .brand span { color: var(--cyan); }
+
   .top nav { margin-left: auto; display: flex; gap: 18px; flex-wrap: wrap; }
+
   .top nav a { color: var(--text-2); font-size: 13.5px; }
+
   .top nav a:hover { color: var(--text); text-decoration: none; }
 
   /* ---------- layout ---------- */
+
   main { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 0 24px 100px; }
+
   section { padding-top: 62px; }
+
   h1, h2, h3 { line-height: 1.2; margin: 0 0 12px; }
+
   h1 { font-size: clamp(30px, 5vw, 46px); letter-spacing: -.02em; }
+
   h2 { font-size: clamp(22px, 3.2vw, 30px); letter-spacing: -.015em; }
+
   h3 { font-size: 17px; letter-spacing: -.01em; }
+
   .eyebrow {
     font-family: var(--mono); font-size: 11.5px; letter-spacing: .18em;
     text-transform: uppercase; color: var(--cyan); margin-bottom: 10px;
   }
+
   .lede { color: var(--text-2); font-size: 17px; max-width: 74ch; }
+
   .grad {
     background: var(--grad); -webkit-background-clip: text; background-clip: text;
     color: transparent;
   }
 
   /* ---------- hero ---------- */
+
   .hero { padding: 66px 0 8px; }
+
   .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
+
   .chip {
     font-family: var(--mono); font-size: 11.5px; color: var(--text-2);
     border: 1px solid var(--line); background: var(--surface-1);
@@ -111,29 +82,45 @@
   }
 
   /* ---------- side-by-side ---------- */
+
   .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 22px; }
+
   .card {
     border: 1px solid var(--line); background: var(--surface-1);
     border-radius: 16px; padding: 20px 22px; position: relative; overflow: hidden;
   }
+
   .card::before {
     content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
   }
+
   .card.simple::before { background: linear-gradient(180deg, var(--cyan), rgba(64,203,227,0)); }
+
   .card.tech::before   { background: linear-gradient(180deg, var(--violet), rgba(204,158,255,0)); }
+
   .card h3 { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+
   .badge {
     font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em;
     text-transform: uppercase; padding: 3px 9px; border-radius: 999px;
   }
+
   .simple .badge { color: #062b31; background: var(--cyan); }
+
   .tech .badge   { color: #1b0733; background: var(--violet); }
+
   .card p { margin: 0 0 10px; color: var(--text-2); font-size: 15px; }
+
   .card p:last-child { margin-bottom: 0; }
+
   .card strong { color: var(--text); font-weight: 600; }
+
   .card ul { margin: 0; padding-left: 18px; color: var(--text-2); font-size: 15px; }
+
   .card li { margin-bottom: 6px; }
+
   .card li:last-child { margin-bottom: 0; }
+
   code.i {
     font-family: var(--mono); font-size: .88em; color: var(--sky);
     background: rgba(56,189,248,.09); border: 1px solid rgba(56,189,248,.16);
@@ -141,71 +128,106 @@
   }
 
   /* ---------- code blocks ---------- */
+
   .code {
     margin-top: 18px; border: 1px solid var(--line); border-radius: 14px;
     background: var(--term-bg); overflow: hidden;
   }
+
   .code-bar {
     display: flex; align-items: center; gap: 8px;
     background: var(--term-bar); border-bottom: 1px solid var(--line-soft);
     padding: 8px 14px; font-family: var(--mono); font-size: 11.5px; color: var(--text-3);
   }
+
   .code-bar .dot { width: 9px; height: 9px; border-radius: 50%; background: #2c3157; }
+
   .code-bar .name { margin-left: 6px; color: var(--text-2); }
+
   .code-bar .lang { margin-left: auto; color: var(--cyan); letter-spacing: .1em; text-transform: uppercase; font-size: 10px; }
+
   pre {
     margin: 0; padding: 16px 18px; overflow-x: auto;
     font-family: var(--mono); font-size: 13px; line-height: 1.72; color: #cfd4ea;
   }
+
   .k { color: var(--violet); }     /* keyword */
+
   .s { color: var(--green); }      /* string */
+
   .c { color: var(--text-3); font-style: italic; }  /* comment */
+
   .n { color: var(--yellow); }     /* number / literal */
+
   .f { color: var(--sky); }        /* function / type */
+
   .o { color: var(--pink); }       /* operator */
 
   /* ---------- figures ---------- */
+
   figure { margin: 26px 0 0; }
+
   .diagram {
     border: 1px solid var(--line); background: var(--surface-1);
     border-radius: 16px; padding: 18px; overflow-x: auto;
   }
+
   .diagram svg { display: block; width: 100%; height: auto; min-width: 560px; }
+
   figcaption {
     color: var(--text-3); font-size: 13px; margin-top: 10px;
     font-family: var(--mono);
   }
+
   .svg-label { font-family: var(--mono); font-size: 11px; fill: var(--text-2); }
+
   .svg-title { font-family: var(--mono); font-size: 12.5px; fill: var(--text); font-weight: 600; }
+
   .svg-mut { font-family: var(--mono); font-size: 10px; fill: var(--text-3); }
+
   .svg-box { fill: rgba(255,255,255,.035); stroke: var(--line-hi); stroke-width: 1; }
+
   .svg-flow { stroke: var(--line-hi); stroke-width: 1.4; fill: none; }
 
   /* ---------- tables ---------- */
+
   .tablewrap { overflow-x: auto; margin-top: 20px; border: 1px solid var(--line); border-radius: 14px; }
+
   table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+
   th, td { text-align: left; padding: 11px 15px; border-bottom: 1px solid var(--line-soft); }
+
   th { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); background: rgba(255,255,255,.025); }
+
   td { color: var(--text-2); }
+
   td:first-child { color: var(--text); font-family: var(--mono); font-size: 12.5px; }
+
   tr:last-child td { border-bottom: none; }
 
   /* ---------- callouts ---------- */
+
   .note {
     margin-top: 20px; border-left: 2px solid var(--yellow);
     background: rgba(250,204,21,.05); border-radius: 0 12px 12px 0;
     padding: 14px 18px; color: var(--text-2); font-size: 14.5px;
   }
+
   .note b { color: var(--yellow); font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: 5px; }
+
   .note.ok { border-color: var(--green); background: rgba(74,222,128,.05); }
+
   .note.ok b { color: var(--green); }
 
   /* ---------- misc ---------- */
+
   .rule { height: 1px; background: var(--line-soft); margin-top: 56px; }
+
   footer {
     border-top: 1px solid var(--line-soft); margin-top: 70px; padding: 28px 24px 44px;
     color: var(--text-3); font-size: 13.5px; text-align: center; position: relative; z-index: 1;
   }
+
   .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 22px; }
 
   @media (max-width: 860px) {
@@ -213,7 +235,8 @@
     main { padding: 0 16px 70px; }
     .top-in { padding: 12px 16px; }
   }
-@media print {
+
+  @media print {
   body { background: #fff !important; color: #111 !important; }
   body::before, body::after { display: none !important; }
   header, .toc, nav { position: static !important; background: none !important; }
@@ -221,20 +244,14 @@
   .eyebrow, .grad { background: none !important; -webkit-text-fill-color: #111 !important; color: #111 !important; }
   pre, code, .code, figure { background: #f6f6f6 !important; color: #111 !important; border-color: #ccc !important; }
   figure, pre, table { break-inside: avoid; }
-}
-  /* ---------- cross-document view transitions ---------- */
-  @view-transition { navigation: auto; }
-  header { view-transition-name: site-header; }
-  ::view-transition-old(site-header), ::view-transition-new(site-header) { animation-duration: 0s; }
-  @keyframes vt-out { to   { opacity: 0; transform: translateY(-6px); } }
-  @keyframes vt-in  { from { opacity: 0; transform: translateY(8px);  } }
-  ::view-transition-old(root) { animation: vt-out .16s cubic-bezier(.4,0,1,1) both; }
-  ::view-transition-new(root) { animation: vt-in  .24s cubic-bezier(0,0,.2,1) both; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 1ms; }
   }
 
   /* forced-colors strips box-shadow and background-clip, so restore edges and text */
+
   @media (forced-colors: active) {
     .grad, .eyebrow, .stat b, .logo b, footer .brand b {
       background: none !important; -webkit-text-fill-color: currentColor !important;
@@ -243,6 +260,39 @@
     .cap, .stat, .edu, .card, .window, .doc { border: 1px solid CanvasText; }
     :focus-visible { outline: 3px solid Highlight; }
   }
+
+  /* ---------- in-page contents ----------
+
+  These eight links used to live in the sticky header alongside the site
+
+  nav, which made an eleven-item bar out of two different kinds of link. */
+
+  .jump {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    margin-top: 34px; padding-top: 26px;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .jump .lab {
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--text-3);
+    margin-right: 6px;
+  }
+
+  .jump a {
+    display: flex; align-items: center; min-height: 36px;
+    padding: 6px 13px; border-radius: 999px;
+    font-size: 13.5px; color: var(--text-2); text-decoration: none;
+    border: 1px solid var(--line); background: var(--surface-1);
+    transition: color .18s var(--ease), background .18s var(--ease),
+                border-color .18s var(--ease);
+  }
+
+  @media (hover: hover) {
+    .jump a:hover { color: var(--text); background: var(--surface-2); border-color: var(--line-hi); }
+  }
+
+  @media (max-width: 620px) { .jump a { min-height: 40px; } }
 </style>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -261,17 +311,12 @@
 <header class="top">
   <div class="top-in">
     <a class="brand" href="../index.html">j<span>reyes</span></a>
-    <nav>
-      <a href="#what">What it is</a>
-      <a href="#embeddings">Embeddings</a>
-      <a href="#schema">Schema</a>
-      <a href="#index">Indexes</a>
-      <a href="#boost">Design: skill search</a>
-      <a href="#rag">Example: RAG</a>
-      <a href="#eval">Evaluation</a>
-      <a href="#ops">Operating it</a>
-      <a href="index.html">← Library</a>
-      <a href="../index.html">Portfolio</a>
+    <nav aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a aria-current="page" href="index.html">Library</a>
+      <a href="https://jonnyeclectic.github.io/boost/">boost&nbsp;↗</a>
+      <a href="../cerebro/">Cerebro</a>
+      <a href="../resume.html">Résumé</a>
       <a href="../contact.html">Contact</a>
     </nav>
   </div>
@@ -280,7 +325,7 @@
 <main id="top">
 
   <!-- ================= HERO ================= -->
-  <section class="hero" id="top">
+  <section class="hero" id="intro">
     <div class="eyebrow">Postgres extension · vector search</div>
     <h1>pgvector, <span class="grad">explained twice</span></h1>
     <p class="lede">
@@ -302,6 +347,18 @@
       <span class="chip">Python</span>
       <span class="chip">Java / Spring Boot</span>
     </div>
+
+    <nav class="jump" aria-label="Sections in this guide">
+      <span class="lab" aria-hidden="true">Contents</span>
+      <a href="#what">What it is</a>
+      <a href="#embeddings">Embeddings</a>
+      <a href="#schema">Schema</a>
+      <a href="#index">Indexes</a>
+      <a href="#boost">Design: skill search</a>
+      <a href="#rag">Example: RAG</a>
+      <a href="#eval">Evaluation</a>
+      <a href="#ops">Operating it</a>
+    </nav>
   </section>
 
   <!-- ================= WHAT ================= -->
