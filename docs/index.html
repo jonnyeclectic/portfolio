@@ -18,7 +18,7 @@
     --line-hi: rgba(255,255,255,.22);
     --text: #e9ebf5;
     --text-2: #9298b0;
-    --text-3: #676d86;
+    --text-3: #767d97;
     --amber: #22d3ee;   /* primary accent → cyan */
     --orange: #38bdf8;  /* cyan-blue */
     --pink: #f472d0;
@@ -94,8 +94,18 @@
   .nav ul {
     display: flex; gap: 4px; list-style: none; margin-left: auto;
     overflow-x: auto; scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
   .nav ul::-webkit-scrollbar { display: none; }
+  /* fade the right edge so an overflowing nav reads as scrollable */
+  @media (max-width: 860px) {
+    .nav { gap: 12px; }
+    .nav ul {
+      -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 28px), transparent 100%);
+              mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 28px), transparent 100%);
+    }
+    .logo span { display: none; }
+  }
   .nav ul a {
     display: block; padding: 8px 12px; border-radius: 8px;
     font-size: 14px; color: var(--text-2); text-decoration: none; white-space: nowrap;
@@ -121,7 +131,24 @@
   .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
   .js .reveal.in { opacity: 1; transform: none; }
   @media print {
+    body { background: #fff !important; color: #111 !important; }
+    body::before, body::after { display: none !important; }
+    header { position: static !important; background: none !important; border: 0; }
     .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+    /* gradient-clipped text renders as nothing on paper */
+    .eyebrow, .stat b, .grad, .logo b, footer .brand b {
+      background: none !important; -webkit-text-fill-color: #111 !important; color: #111 !important;
+    }
+    a { color: #111 !important; text-decoration: underline; }
+    .cap, .stat, .edu, .window, .card {
+      background: #fff !important; border-color: #bbb !important;
+      box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+    }
+    .cap p, .role p, .edu p, .sec-sub, .lede, .bullets li, footer .meta, footer .links,
+    .company .loc, .role .dates, .edu .dates { color: #222 !important; }
+    .tags code, .chips code { background: #f2f2f2 !important; color: #222 !important; border-color: #ccc !important; }
+    .btn { border: 1px solid #666 !important; background: none !important; color: #111 !important; box-shadow: none !important; }
+    section { padding: 24px 0 !important; }
   }
 
   /* ---------- hero ---------- */
