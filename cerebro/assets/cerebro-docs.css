@@ -16,7 +16,7 @@
   --line-hi: rgba(255, 255, 255, .22);
   --text: #e9ebf5;
   --text-2: #9298b0;
-  --text-3: #676d86;
+  --text-3: #767d97;
   --cyan: #22d3ee;
   --violet: #a855f7;
   --pink: #f472d0;
@@ -330,12 +330,22 @@ table.data td code { font-size: .86em; }
 /* --------------------------------------------------- reveal + footer ------- */
 .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
 .js .reveal.in { opacity: 1; transform: none; }
-@media print { .reveal { opacity: 1 !important; transform: none !important; } body::before, body::after { display: none; } }
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  body::before, body::after { display: none !important; }
+  header, .nav { position: static !important; background: none !important; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+  a { color: #111 !important; }
+  .eyebrow, .grad { background: none !important; -webkit-text-fill-color: #111 !important; color: #111 !important; }
+  pre, code, .code { background: #f6f6f6 !important; color: #111 !important; border-color: #ccc !important; }
+  pre, figure, table { break-inside: avoid; }
+}
 
 footer.site {
   border-top: 1px solid var(--line-soft); margin-top: 40px; padding: 34px 0;
   color: var(--text-2); font-size: 14px;
 }
+footer.site .meta { margin-top: 8px; color: var(--text-3); font-size: 13px; }
 footer.site .brand b { color: var(--cyan); font-family: var(--mono); }
 footer.site .links { margin-top: 8px; }
 footer.site .links a { color: var(--text-2); text-decoration: none; }

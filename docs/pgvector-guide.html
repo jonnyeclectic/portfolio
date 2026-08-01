@@ -16,7 +16,7 @@
     --line-hi: rgba(255,255,255,.22);
     --text: #e9ebf5;
     --text-2: #9298b0;
-    --text-3: #676d86;
+    --text-3: #767d97;
     --amber: #22d3ee;
     --orange: #38bdf8;
     --pink: #f472d0;
@@ -195,6 +195,15 @@
     main { padding: 0 16px 70px; }
     .top-in { padding: 12px 16px; }
   }
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  body::before, body::after { display: none !important; }
+  header, .toc, nav { position: static !important; background: none !important; }
+  a { color: #111 !important; }
+  .eyebrow, .grad { background: none !important; -webkit-text-fill-color: #111 !important; color: #111 !important; }
+  pre, code, .code, figure { background: #f6f6f6 !important; color: #111 !important; border-color: #ccc !important; }
+  figure, pre, table { break-inside: avoid; }
+}
 </style>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -606,12 +615,12 @@
             <path d="M150 42 L110 262"/><path d="M270 42 L300 262"/>
             <path d="M30 150 L410 130"/>
           </g>
-          <circle cx="90"  cy="95"  r="3.5" fill="#676d86"/><circle cx="118" cy="112" r="3.5" fill="#676d86"/>
+          <circle cx="90"  cy="95"  r="3.5" fill="#767d97"/><circle cx="118" cy="112" r="3.5" fill="#767d97"/>
           <circle cx="200" cy="88"  r="3.5" fill="#22d3ee"/><circle cx="232" cy="104" r="3.5" fill="#22d3ee"/>
           <circle cx="215" cy="120" r="3.5" fill="#22d3ee"/><circle cx="188" cy="118" r="3.5" fill="#22d3ee"/>
-          <circle cx="340" cy="90"  r="3.5" fill="#676d86"/><circle cx="360" cy="110" r="3.5" fill="#676d86"/>
-          <circle cx="80"  cy="200" r="3.5" fill="#676d86"/><circle cx="150" cy="220" r="3.5" fill="#676d86"/>
-          <circle cx="250" cy="205" r="3.5" fill="#676d86"/><circle cx="345" cy="215" r="3.5" fill="#676d86"/>
+          <circle cx="340" cy="90"  r="3.5" fill="#767d97"/><circle cx="360" cy="110" r="3.5" fill="#767d97"/>
+          <circle cx="80"  cy="200" r="3.5" fill="#767d97"/><circle cx="150" cy="220" r="3.5" fill="#767d97"/>
+          <circle cx="250" cy="205" r="3.5" fill="#767d97"/><circle cx="345" cy="215" r="3.5" fill="#767d97"/>
           <rect x="176" y="72" width="80" height="66" rx="8" fill="rgba(34,211,238,.08)" stroke="rgba(34,211,238,.45)"/>
           <path d="M210 60 l0 -14" stroke="#facc15" stroke-width="1.4"/>
           <circle cx="210" cy="52" r="4" fill="#facc15"/>
