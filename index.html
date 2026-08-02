@@ -460,6 +460,8 @@
   page, not to the site, so they live with the page — under the hero rather
 
   than pinned above it, and only on pages that have sections to jump to. */
+  .window .tfail { color: #fb7185; font-weight: 700; }
+
 </style>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -691,20 +693,20 @@
         <div class="window reveal">
           <div class="bar"><div class="dots"><i></i><i></i><i></i></div>
             <div class="bar-title">zsh — boost evals</div></div>
-          <pre><span class="tp">$</span> <span class="tv">python</span> scripts/eval_gate.py <span class="tc">--run</span>
-  <span class="tdim">corpus</span>  57 entries · 36 queries · 107 graded judgments
+          <pre id="eval-out"><span class="tp">$</span> <span class="tv">python</span> scripts/eval_gate.py <span class="tc">--run</span>
+  <span class="tdim">corpus</span>  <span data-eval="corpus">57 entries · 36 queries · 107 graded judgments</span>
   <span class="tdim">arm</span>     bm25 (shipped)          catalog (reference)
 
-  recall@5    <span class="tok">0.507</span>  floor 0.45  <span class="tok">PASS</span>      <span class="tdim">0.403</span>
-  recall@10   <span class="tok">0.602</span>  floor 0.55  <span class="tok">PASS</span>      <span class="tdim">0.535</span>
-  MRR         <span class="tok">0.838</span>  floor 0.78  <span class="tok">PASS</span>      <span class="tdim">0.733</span>
-  nDCG@5      <span class="tok">0.692</span>  floor 0.64  <span class="tok">PASS</span>      <span class="tdim">0.550</span>
-  nDCG@10     <span class="tok">0.714</span>  floor 0.66  <span class="tok">PASS</span>      <span class="tdim">0.583</span>
+  recall@5    <span class="tok" data-eval="recall@5">0.507</span>  floor <span data-floor="recall@5">0.45</span>  <span class="tok" data-verdict="recall@5">PASS</span>      <span class="tdim">0.403</span>
+  recall@10   <span class="tok" data-eval="recall@10">0.602</span>  floor <span data-floor="recall@10">0.55</span>  <span class="tok" data-verdict="recall@10">PASS</span>      <span class="tdim">0.535</span>
+  MRR         <span class="tok" data-eval="MRR">0.838</span>  floor <span data-floor="MRR">0.78</span>  <span class="tok" data-verdict="MRR">PASS</span>      <span class="tdim">0.733</span>
+  nDCG@5      <span class="tok" data-eval="nDCG@5">0.692</span>  floor <span data-floor="nDCG@5">0.64</span>  <span class="tok" data-verdict="nDCG@5">PASS</span>      <span class="tdim">0.550</span>
+  nDCG@10     <span class="tok" data-eval="nDCG@10">0.714</span>  floor <span data-floor="nDCG@10">0.66</span>  <span class="tok" data-verdict="nDCG@10">PASS</span>      <span class="tdim">0.583</span>
 
   <span class="tdim">paired bootstrap · 10,000 resamples · no significant regression</span>
-  <span class="tok">GATE PASS</span>
+  <span class="tok" data-eval="gate">GATE PASS</span>
 
-<span class="cm"># hermetic run · internal baseline, committed at <a href="https://github.com/jonnyeclectic/boost/blob/main/evals/baseline.json">evals/baseline.json</a></span>
+<span class="cm"># <span data-eval="stamp">hermetic run · internal baseline, committed at <a href="https://github.com/jonnyeclectic/boost/blob/main/evals/baseline.json">evals/baseline.json</a></span></span>
 <span class="cm"># source · <a href="https://github.com/jonnyeclectic/boost">github.com/jonnyeclectic/boost</a></span></pre>
         </div>
       </div>
@@ -952,6 +954,81 @@ if (!reduce && "IntersectionObserver" in window) {
 } else {
   document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
 }
+// ---------- live eval numbers ----------
+// The terminal above is the one place this site shows a number someone else
+// could check. Hand-typed, it is true on the day it is written and quietly
+// wrong after that. boost publishes the same figures as a ~700-byte JSON on
+// every weekly eval run, so the block reads them and says when they were
+// measured.
+//
+// Progressive enhancement, deliberately: the committed markup already holds a
+// correct run, so with no JS, no network, or the page opened straight off disk
+// (where an absolute path does not resolve), the reader still sees real
+// numbers — just undated. Nothing here can empty the block.
+(function () {
+  const out = document.getElementById("eval-out");
+  if (!out || !window.fetch) return;
+
+  // Both sites are published under jonnyeclectic.github.io, so this is
+  // same-origin and needs no CORS. Skipped on file:// and anywhere else the
+  // origin is not that host, rather than firing a request that cannot work.
+  if (location.protocol !== "https:") return;
+
+  const url = new URL("/boost/docs/eval-latest.json", location.origin);
+
+  const fmt = (n) => (Math.round(n * 1000) / 1000).toFixed(3);
+  const set = (sel, text) => {
+    const el = out.querySelector(sel);
+    if (el) el.textContent = text;
+  };
+
+  fetch(url, { cache: "no-cache" })
+    .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+    .then((d) => {
+      // Refuse anything that is not the shape this code was written against.
+      // A half-understood payload would put wrong numbers on the page, which
+      // is worse than leaving the committed ones alone.
+      if (!d || d.schema !== 1 || !Array.isArray(d.metrics) || !d.metrics.length) return;
+
+      let allPass = true;
+      d.metrics.forEach((m) => {
+        if (typeof m.value !== "number") return;
+        set(`[data-eval="${CSS.escape(m.name)}"]`, fmt(m.value));
+        if (typeof m.floor === "number") {
+          set(`[data-floor="${CSS.escape(m.name)}"]`, String(m.floor));
+          const pass = m.value >= m.floor;
+          if (!pass) allPass = false;
+          const v = out.querySelector(`[data-verdict="${CSS.escape(m.name)}"]`);
+          if (v) {
+            v.textContent = pass ? "PASS" : "FAIL";
+            v.className = pass ? "tok" : "tfail";
+          }
+        }
+      });
+
+      const gate = out.querySelector('[data-eval="gate"]');
+      if (gate) {
+        gate.textContent = allPass ? "GATE PASS" : "GATE FAIL";
+        gate.className = allPass ? "tok" : "tfail";
+      }
+
+      const c = d.corpus || {};
+      if (c.entries && c.queries && c.judgments) {
+        set('[data-eval="corpus"]',
+            `${c.entries} entries · ${c.queries} queries · ${c.judgments} graded judgments`);
+      }
+
+      const stamp = out.querySelector('[data-eval="stamp"]');
+      const when = d.generated && new Date(d.generated);
+      if (stamp && when && !isNaN(when)) {
+        const day = when.toLocaleDateString(undefined,
+          { year: "numeric", month: "short", day: "numeric" });
+        stamp.textContent = `measured ${day}` + (d.commit ? ` · boost@${d.commit}` : "");
+      }
+    })
+    .catch(() => { /* committed numbers stand */ });
+})();
+
 </script>
 </body>
 </html>
