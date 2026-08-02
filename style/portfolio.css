@@ -1,0 +1,290 @@
+/* ============================================================================
+   portfolio — the shared floor
+   ----------------------------------------------------------------------------
+   Every live page linked this file's contents by copying them. Five copies of
+   one design system drift, and measurably had: of the 60 rules that appeared on
+   three or more pages, 29 differed in more than whitespace. Some of that was
+   deliberate. Most was a change made in one place and not the other four —
+   index.html had the retuned button shadows while resume.html still carried the
+   old single-glow version, and the reveal transition ran at 380ms on two pages
+   and 600ms on a third.
+
+   This is a *floor*, not an override. Each page links this sheet BEFORE its own
+   <style> block, so a page-local rule still wins at equal specificity. Anything
+   genuinely particular to one page — its hero rhythm, its own components —
+   stays in that page. What lives here is the frame every page shares.
+
+   No build step. It is a stylesheet, linked with a relative href, which works
+   opened straight off disk exactly like the inline blocks it replaces.
+   ========================================================================== */
+
+:root {
+  /* --- ground & ink ---
+     Surfaces are an opaque ladder, not translucent glass: on a dark ground the
+     eye reads depth as surface lightness, and a white-alpha panel over the
+     drifting aurora took its colour from whatever happened to be behind it. */
+  --bg:        #07080f;
+  --surface-1: #0f121d;   /* resting card   */
+  --surface-2: #181b28;   /* hover / raised */
+  --surface-3: #202533;   /* chip / popover */
+  --line-soft: #1d202a;
+  --line:      #272b37;
+  --line-hi:   #474c5d;
+  --text:      #d6d9e3;
+  --text-2:    #9298b0;
+  --text-3:    #858da8;   /* ≥4.5:1 on every surface, including --surface-2 */
+
+  /* --- the triad --- */
+  --cyan:      #40cbe3;
+  --violet:    #cc9eff;
+  --pink:      #f58fd7;
+  --amber:     #40cbe3;   /* legacy alias, same value as --cyan */
+
+  /* --- extended accents (used by the docs pages' diagrams) --- */
+  --blue:      #38bdf8;
+  --sky:       #7dd3fc;
+  --green:     #4ade80;
+  --yellow:    #facc15;
+
+  /* --- signature gradient ---
+     OKLCH holds lightness across the ramp; sRGB dips through a desaturated grey
+     between cyan and violet. The sRGB line stays as the fallback for engines
+     without <color-interpolation-method>. */
+  --grad: linear-gradient(96deg, #40cbe3 0%, #cc9eff 52%, #f58fd7 100%);
+  --grad: linear-gradient(96deg in oklch, var(--cyan) 0%, var(--violet) 52%, var(--pink) 100%);
+
+  /* --- terminal surfaces --- */
+  --term-bg:  #0d1024;
+  --term-bar: #171a33;
+
+  /* --- type --- */
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* --- motion & scale ---
+     The middle term of each clamp() is in rem so the size still responds to a
+     browser zoom or a raised default font size; a pure-vw clamp ignores both
+     (WCAG 1.4.4). Pages that want a different hero size override --step-hero. */
+  --ease:       cubic-bezier(.2,.7,.2,1);
+  --step-hero:  clamp(2.75rem, 1.60rem + 4.72vw, 5.375rem);
+  --step-title: clamp(1.875rem, 1.33rem + 2.25vw, 3.125rem);
+  --step-stat:  clamp(1.75rem, 1.37rem + 1.57vw, 2.625rem);
+  --step-body:  clamp(1rem, .97rem + .14vw, 1.0625rem);
+}
+
+/* ---------- reset ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: var(--step-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a    { color: inherit; }
+code { font-family: var(--mono); }
+
+/* ---------- selection, focus, and the keyboard entry point ---------- */
+::selection { background: rgba(64,203,227,.28); color: var(--text); }
+
+/* White, not accent-coloured. A cyan ring around the cyan .btn-grad reads as a
+   slightly fatter button rather than a focus state; white is hue-independent,
+   so one rule works on every surface and against every accent. */
+:focus-visible { outline: 3px solid #e9ebf5; outline-offset: 2px; border-radius: 6px; }
+
+/* Visually hidden but announced — for live regions and icon-only names. */
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Expects `<a class="skip" href="#top">` as the first child of <body>, and an
+   element carrying that id. */
+.skip {
+  position: absolute; left: 24px; top: -60px; z-index: 100;
+  background: var(--surface-2); border: 1px solid var(--line-hi); border-radius: 10px;
+  padding: 10px 18px; font-size: 14px; text-decoration: none; color: var(--text);
+  transition: top .18s var(--ease);
+}
+.skip:focus-visible { top: 12px; }
+
+/* ============================================================================
+   Atmosphere — two fixed, non-interactive layers behind everything (z-index 0).
+   Content needs a positioned wrapper; .wrap sets z-index: 1.
+   ========================================================================== */
+body::before {
+  content: "";
+  position: fixed; inset: -12vmax; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(42vmax 38vmax at 10%   4%, rgba(64,203,227,.22), transparent 62%),
+    radial-gradient(38vmax 34vmax at 92%  14%, rgba(204,158,255,.18), transparent 62%),
+    radial-gradient(34vmax 30vmax at 20%  48%, rgba(245,143,215,.10), transparent 64%),
+    radial-gradient(40vmax 34vmax at 88%  74%, rgba(64,203,227,.12), transparent 62%),
+    radial-gradient(30vmax 28vmax at 55% 104%, rgba(245,143,215,.13), transparent 64%);
+  /* No blur(): a radial-gradient has no edge to soften, so the filter was
+     re-rasterising the viewport on every frame of a 42s animation for nothing. */
+  filter: saturate(130%);
+  animation: aurora-drift 42s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Film grain, not a tech grid. A grid draws hard lines through card edges and
+   headline counters; grain reads as texture, and breaks up the banding a wide
+   dark gradient shows on 8-bit panels. */
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: .26; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+@keyframes aurora-drift {
+  0%,100% { transform: translate3d(0,0,0) scale(1); }
+  50%     { transform: translate3d(2.5vmax,-2vmax,0) scale(1.06); }
+}
+
+/* ---------- content column ---------- */
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* ============================================================================
+   Site chrome — nav · logo · footer
+   ========================================================================== */
+header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(7,8,15,.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.nav  { display: flex; align-items: center; gap: 24px; height: 64px; }
+.logo { display: flex; align-items: baseline; gap: 10px; text-decoration: none; }
+.logo b    { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--cyan); letter-spacing: -.02em; }
+.logo span { font-size: 10.5px; letter-spacing: .18em; color: var(--text-2); text-transform: uppercase; }
+
+/* One row that scrolls rather than a stack of rows: on a phone, wrapping a
+   nav this long turns the sticky header into several rows of prose-sized
+   targets. Tap targets are raised to 40px below. */
+.nav ul {
+  display: flex; gap: 4px; list-style: none; margin-left: auto;
+  overflow-x: auto; scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.nav ul::-webkit-scrollbar { display: none; }
+.nav ul a {
+  display: block; padding: 8px 12px; border-radius: 8px;
+  font-size: 14px; color: var(--text-2); text-decoration: none; white-space: nowrap;
+}
+.nav ul a:hover  { color: var(--text); background: var(--surface-1); }
+.nav ul a.cta    { color: var(--text); font-weight: 600; }
+.nav ul a[aria-current="page"] { color: var(--text); }
+
+/* ============================================================================
+   Buttons — two shadows, not one: a tight dark contact shadow seats the button
+   on the page, and the coloured bloom sits behind it. A coloured glow alone
+   leaves the button floating with nothing under it.
+   ========================================================================== */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 15.5px; font-weight: 650; text-decoration: none;
+  padding: 14px 26px; border-radius: 12px; border: 1px solid transparent;
+  transition: transform .15s var(--ease), box-shadow .15s var(--ease),
+              background .15s var(--ease), border-color .15s var(--ease);
+}
+.btn-grad {
+  color: #05141a;
+  background: linear-gradient(96deg, var(--cyan), var(--violet));
+  box-shadow: 0 1px 2px rgba(4,5,10,.60), 0 2px 6px rgba(4,5,10,.40),
+              0 10px 34px -8px rgba(64,203,227,.28);
+}
+.btn-grad:hover {
+  box-shadow: 0 1px 2px rgba(4,5,10,.60), 0 3px 10px rgba(4,5,10,.45),
+              0 14px 44px -10px rgba(64,203,227,.40);
+}
+.btn-ghost       { color: var(--text); border-color: var(--line); background: var(--surface-1); }
+.btn-ghost:hover { border-color: var(--line-hi); background: var(--surface-2); }
+
+/* Guarded on (hover: hover): on a touch screen :hover latches after a tap and
+   the element stays lifted until you touch something else. */
+@media (hover: hover) {
+  .btn:hover { transform: translateY(-1px); }
+}
+
+/* ============================================================================
+   Reveal on scroll — add class="reveal"; the page script flips .in on entry.
+   Short and small on purpose: a 600ms/16px reveal is long enough that a reader
+   who scrolls at speed outruns it and reads text mid-fade.
+   ========================================================================== */
+.reveal { opacity: 1; }                       /* visible by default (no-JS safe) */
+.js .reveal {
+  opacity: 0; transform: translateY(10px);
+  transition: opacity .38s var(--ease), transform .38s var(--ease);
+}
+.js .reveal.in { opacity: 1; transform: none; }
+
+/* ---------- footer ---------- */
+footer { margin-top: 130px; border-top: 1px solid var(--line-soft); padding: 44px 0 60px; text-align: center; }
+footer .brand   { font-size: 15px; color: var(--text-2); }
+footer .brand b { font-family: var(--mono); color: var(--cyan); }
+footer .meta    { margin-top: 10px; font-size: 13.5px; color: var(--text-3); }
+footer .links   { margin-top: 14px; font-size: 13.5px; color: var(--text-3); }
+footer .links a       { color: var(--text-2); text-decoration: none; }
+footer .links a:hover { color: var(--text); }
+
+/* ---------- small screens ---------- */
+@media (max-width: 860px) {
+  /* 40px tap targets (WCAG 2.5.5), and the bar bleeds past .wrap's gutter so
+     the scroll reads as continuing off-screen rather than being clipped. */
+  .nav ul a { min-height: 40px; display: flex; align-items: center; }
+  .skip { left: 16px; }
+}
+
+/* ============================================================================
+   Cross-document view transitions
+
+   These are separate documents sharing one header. Without this, following a
+   nav link white-flashes and rebuilds an identical bar. The header is held
+   still by name while the body cross-fades, so the frame reads as continuous.
+   Ignored by engines that do not support it.
+   ========================================================================== */
+@view-transition { navigation: auto; }
+header { view-transition-name: site-header; }
+::view-transition-old(site-header), ::view-transition-new(site-header) { animation-duration: 0s; }
+@keyframes vt-out { to   { opacity: 0; transform: translateY(-6px); } }
+@keyframes vt-in  { from { opacity: 0; transform: translateY(8px);  } }
+::view-transition-old(root) { animation: vt-out .16s cubic-bezier(.4,0,1,1) both; }
+::view-transition-new(root) { animation: vt-in  .24s cubic-bezier(0,0,.2,1) both; }
+
+/* ============================================================================
+   Accessibility and print
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  body::before { animation: none !important; }
+  .reveal, .js .reveal {
+    transition: none !important; transform: none !important; opacity: 1 !important;
+  }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 1ms; }
+}
+
+/* Forced colors replaces the palette wholesale and drops box-shadow, so
+   anything whose shape came from a shadow or from background-clip:text
+   disappears: gradient headings render as invisible transparent text. */
+@media (forced-colors: active) {
+  .grad, .grad-text, .eyebrow, .stat b, .logo b, footer .brand b {
+    background: none !important;
+    -webkit-text-fill-color: currentColor !important;
+    color: CanvasText !important;
+    forced-color-adjust: none;
+  }
+  :focus-visible { outline: 3px solid Highlight; }
+}
+
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  body::before, body::after, .skip { display: none !important; }
+  .reveal, .js .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  a { color: #111 !important; text-decoration: underline; }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "portfolio-visual-check",
+  "private": true,
+  "description": "Headless-Chrome sweeps for the live pages: layout regression (visual_check.mjs), axe-core WCAG (a11y_check.mjs), and reviewable screenshots (shots.mjs)",
+  "type": "module",
+  "dependencies": {
+    "puppeteer-core": "25.4.0",
+    "axe-core": "4.12.1"
+  }
+}
