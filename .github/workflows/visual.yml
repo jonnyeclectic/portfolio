@@ -1,0 +1,70 @@
+name: visual
+
+# Layout and accessibility sweeps over the live pages, in headless Chrome.
+#
+# This site is hand-written static HTML with no build step, so nothing else
+# reads it before a visitor does. These two sweeps are the whole gate:
+#
+#   visual_check.mjs   every page at five widths — no horizontal overflow, the
+#                      stylesheet actually applied, exactly one <h1>, a skip
+#                      link whose target exists
+#   a11y_check.mjs     axe-core, WCAG 2.1 A + AA — contrast as RENDERED, ARIA
+#                      validity against the computed tree, landmarks
+#
+# Both run against the checked-out working tree over file://, so a PR's own
+# HTML and CSS are what get checked. Nothing is deployed first.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "**.html"
+      - "style/**"
+      - "cerebro/assets/**"
+      - "tests/visual/**"
+      - ".github/workflows/visual.yml"
+  pull_request:
+    paths:
+      - "**.html"
+      - "style/**"
+      - "cerebro/assets/**"
+      - "tests/visual/**"
+      - ".github/workflows/visual.yml"
+
+permissions: {}
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: harden runner (egress audit)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+      # `npm ci` from the committed lockfile: package.json pins the two direct
+      # deps exactly, but their transitive tree would resolve fresh every run.
+      - name: install harness deps (hash-pinned)
+        working-directory: tests/visual
+        run: npm ci --no-audit --no-fund
+      - name: layout sweep (system Chrome)
+        # ubuntu-latest ships google-chrome stable at /usr/bin.
+        run: node tests/visual/visual_check.mjs
+      - name: axe-core sweep (WCAG 2.1 A/AA)
+        # `always()` so a layout failure does not hide an accessibility one.
+        if: always()
+        run: node tests/visual/a11y_check.mjs
+      - name: upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: visual-sweep-screenshots
+          path: tests/visual/out/
