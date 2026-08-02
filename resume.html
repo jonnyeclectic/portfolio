@@ -252,7 +252,9 @@
 
   .jump {
     display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-    margin-top: 56px; padding-top: 26px;
+    /* .head and .sheet are an 880px column centred in .wrap; the row has to
+       share it or it sits 96px left of everything and its rule overhangs. */
+    max-width: 880px; margin: 56px auto 0; padding-top: 26px;
     border-top: 1px solid var(--line-soft);
   }
 
