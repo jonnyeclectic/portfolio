@@ -48,14 +48,24 @@
   --red: #fb7185;
   --term-bg: #0d1024;
   --term-bar: #171a33;
+  /* One value only — a second --grad: declaration is not a fallback; see the
+     note in style/portfolio.css. */
   --grad: linear-gradient(96deg, #40cbe3 0%, #cc9eff 52%, #f58fd7 100%);
-  --grad: linear-gradient(96deg in oklch, var(--cyan) 0%, var(--violet) 52%, var(--pink) 100%);
   --ease: cubic-bezier(.2,.7,.2,1);
   --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --radius: 16px;
   --radius-lg: 18px;
   --maxw: 1120px;
+}
+
+/* OKLCH holds lightness across the ramp; sRGB dips through a desaturated grey
+   between cyan and violet. Only engines that can actually interpolate there
+   get the upgrade. */
+@supports (background: linear-gradient(in oklch, red, blue)) {
+  :root {
+    --grad: linear-gradient(96deg in oklch, var(--cyan) 0%, var(--violet) 52%, var(--pink) 100%);
+  }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
