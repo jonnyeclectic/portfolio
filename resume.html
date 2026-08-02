@@ -335,7 +335,7 @@
             <li>Lead architecture, technical direction, and delivery for a <b>high-throughput platform orchestrating communications with external dealership partners</b>, built on AWS microservices (ECS, API Gateway, SQS, Kafka, Docker, PostgreSQL, Oracle).</li>
             <li>Led a <b>zero-loss migration of a highly stateful distributed system</b> between AWS accounts — coupled Spring Boot streams spanning Oracle, PostgreSQL, SQS, and Kafka — traffic-splitting live workloads under tight SLAs without dropping or duplicating a request.</li>
             <li>Built a <b>document-intelligence pipeline</b> using AWS Textract that extracts structured findings from unstructured partner documents, replacing manual review for analyst teams.</li>
-            <li>Support <b>PCI, NPI, and model-risk reviews</b> — classifying sensitive data and remediating via tokenization and masking; re-architected the platform's LLM solution after data classification surfaced highly confidential information, evolving from Textract to <b>AWS Bedrock</b> and then to a self-hosted vision-language model (Llama) while tuning extraction schemas, prompts, and golden-set evaluations in production.</li>
+            <li>Support <b>PCI, NPI, and model-risk reviews</b> — classifying sensitive data and remediating via tokenization and masking; re-architected the platform's LLM solution after data classification surfaced highly confidential information, evolving from Textract to <b>AWS Bedrock</b> and then to a vision-language model (Llama) while tuning extraction schemas, prompts, and golden-set evaluations in production.</li>
             <li>Designed <b>event-driven processing pipelines</b> in which EventBridge rules trigger Step Functions orchestrating AWS Batch jobs over S3 file drops, with companion state machines verifying downstream delivery and raising alarms.</li>
             <li>Practice <b>AI-assisted engineering</b> daily (Claude Code, Windsurf) with <b>MCP integrations</b> across Jira, Confluence, and GitHub; integrate agent tooling into development workflows and set team conventions for its use.</li>
             <li>Prototyped a <b>LangChain-based RAG developer-enablement tool</b> at an internal hackathon — retrieval over large JSON corpora — that drew adoption requests from engineering managers across teams.</li>
@@ -425,10 +425,10 @@
             <li>Designed the lock-file and audit model that treats agent skills as
               versioned, verifiable dependencies rather than copied files; indexes
               10,000+ publicly available skills.</li>
-            <li>Built the project's <b>LLM evaluation harness</b>: golden-set retrieval
-              evals (recall@k, MRR, nDCG@k) and statistical-significance testing between
-              retrieval engines, enforced as CI gates, with ragas faithfulness scoring as
-              a scheduled monitor.</li>
+            <li>Maintain an <b>LLM evaluation harness</b> covering recall@k, MRR,
+              nDCG@k, and statistical-significance testing, with evaluation requirements
+              enforced through <b>CI gates</b>. Ragas faithfulness scoring runs in a
+              weekly GitHub action to alert on generation-quality drift.</li>
             <li>Python 3.9+, one-line pip install (published on PyPI as <code>boost-skill-cli</code>).</li>
           </ul>
         </div>
