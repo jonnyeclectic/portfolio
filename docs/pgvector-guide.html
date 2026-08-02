@@ -6,116 +6,121 @@
 <title>pgvector, explained twice — a working reference | Jonathan Reyes</title>
 <meta name="description" content="What pgvector is and how to run it: embeddings as a schema contract, HNSW versus IVFFlat, hybrid over-fetch-and-fuse ranking, and the golden-set gates that keep an approximate index honest. A working reference guide.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3Ejr%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../style/portfolio.css">
 <style>
-  :root {
-    --bg: #07080f;
-    --panel: rgba(255,255,255,.035);
-    --panel-solid: #0f1120;
-    --line: rgba(255,255,255,.09);
-    --line-soft: rgba(255,255,255,.05);
-    --line-hi: rgba(255,255,255,.22);
-    --text: #e9ebf5;
-    --text-2: #9298b0;
-    --text-3: #767d97;
-    --amber: #22d3ee;
-    --orange: #38bdf8;
-    --pink: #f472d0;
-    --violet: #a855f7;
-    --blue: #38bdf8;
-    --sky: #7dd3fc;
-    --green: #4ade80;
-    --yellow: #facc15;
-    --term-bg: #0d1024;
-    --term-bar: #171a33;
-    --cyan: #22d3ee;
-    --grad: linear-gradient(96deg, #22d3ee 0%, #a855f7 52%, #f472d0 100%);
-    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  }
-
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+
   body {
     margin: 0; background: var(--bg); color: var(--text);
     font-family: var(--sans); line-height: 1.65;
     -webkit-font-smoothing: antialiased;
   }
-  body::before {
-    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background:
-      radial-gradient(700px 420px at 12% -6%, rgba(34,211,238,.10), transparent 60%),
-      radial-gradient(620px 420px at 92% 4%, rgba(168,85,247,.10), transparent 62%),
-      radial-gradient(800px 500px at 50% 108%, rgba(244,114,208,.06), transparent 60%);
-  }
+
   a { color: var(--cyan); text-decoration: none; }
+
   a:hover { text-decoration: underline; }
 
   /* ---------- nav ---------- */
+
   header.top {
     position: sticky; top: 0; z-index: 50;
     background: rgba(7,8,15,.78); backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--line-soft);
   }
+
   .top-in {
     max-width: 1240px; margin: 0 auto; padding: 13px 24px;
     display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
   }
+
   .brand { font-family: var(--mono); font-weight: 700; letter-spacing: .04em; color: var(--text); }
+
   .brand span { color: var(--cyan); }
+
   .top nav { margin-left: auto; display: flex; gap: 18px; flex-wrap: wrap; }
+
   .top nav a { color: var(--text-2); font-size: 13.5px; }
+
   .top nav a:hover { color: var(--text); text-decoration: none; }
 
   /* ---------- layout ---------- */
+
   main { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 0 24px 100px; }
+
   section { padding-top: 62px; }
+
   h1, h2, h3 { line-height: 1.2; margin: 0 0 12px; }
+
   h1 { font-size: clamp(30px, 5vw, 46px); letter-spacing: -.02em; }
+
   h2 { font-size: clamp(22px, 3.2vw, 30px); letter-spacing: -.015em; }
+
   h3 { font-size: 17px; letter-spacing: -.01em; }
+
   .eyebrow {
     font-family: var(--mono); font-size: 11.5px; letter-spacing: .18em;
     text-transform: uppercase; color: var(--cyan); margin-bottom: 10px;
   }
+
   .lede { color: var(--text-2); font-size: 17px; max-width: 74ch; }
+
   .grad {
     background: var(--grad); -webkit-background-clip: text; background-clip: text;
     color: transparent;
   }
 
   /* ---------- hero ---------- */
+
   .hero { padding: 66px 0 8px; }
+
   .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
+
   .chip {
     font-family: var(--mono); font-size: 11.5px; color: var(--text-2);
-    border: 1px solid var(--line); background: var(--panel);
+    border: 1px solid var(--line); background: var(--surface-1);
     padding: 5px 11px; border-radius: 999px;
   }
 
   /* ---------- side-by-side ---------- */
+
   .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 22px; }
+
   .card {
-    border: 1px solid var(--line); background: var(--panel);
+    border: 1px solid var(--line); background: var(--surface-1);
     border-radius: 16px; padding: 20px 22px; position: relative; overflow: hidden;
   }
+
   .card::before {
     content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
   }
-  .card.simple::before { background: linear-gradient(180deg, var(--cyan), rgba(34,211,238,0)); }
-  .card.tech::before   { background: linear-gradient(180deg, var(--violet), rgba(168,85,247,0)); }
+
+  .card.simple::before { background: linear-gradient(180deg, var(--cyan), rgba(64,203,227,0)); }
+
+  .card.tech::before   { background: linear-gradient(180deg, var(--violet), rgba(204,158,255,0)); }
+
   .card h3 { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+
   .badge {
     font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em;
     text-transform: uppercase; padding: 3px 9px; border-radius: 999px;
   }
+
   .simple .badge { color: #062b31; background: var(--cyan); }
+
   .tech .badge   { color: #1b0733; background: var(--violet); }
+
   .card p { margin: 0 0 10px; color: var(--text-2); font-size: 15px; }
+
   .card p:last-child { margin-bottom: 0; }
+
   .card strong { color: var(--text); font-weight: 600; }
+
   .card ul { margin: 0; padding-left: 18px; color: var(--text-2); font-size: 15px; }
+
   .card li { margin-bottom: 6px; }
+
   .card li:last-child { margin-bottom: 0; }
+
   code.i {
     font-family: var(--mono); font-size: .88em; color: var(--sky);
     background: rgba(56,189,248,.09); border: 1px solid rgba(56,189,248,.16);
@@ -123,71 +128,106 @@
   }
 
   /* ---------- code blocks ---------- */
+
   .code {
     margin-top: 18px; border: 1px solid var(--line); border-radius: 14px;
     background: var(--term-bg); overflow: hidden;
   }
+
   .code-bar {
     display: flex; align-items: center; gap: 8px;
     background: var(--term-bar); border-bottom: 1px solid var(--line-soft);
     padding: 8px 14px; font-family: var(--mono); font-size: 11.5px; color: var(--text-3);
   }
+
   .code-bar .dot { width: 9px; height: 9px; border-radius: 50%; background: #2c3157; }
+
   .code-bar .name { margin-left: 6px; color: var(--text-2); }
+
   .code-bar .lang { margin-left: auto; color: var(--cyan); letter-spacing: .1em; text-transform: uppercase; font-size: 10px; }
+
   pre {
     margin: 0; padding: 16px 18px; overflow-x: auto;
     font-family: var(--mono); font-size: 13px; line-height: 1.72; color: #cfd4ea;
   }
+
   .k { color: var(--violet); }     /* keyword */
+
   .s { color: var(--green); }      /* string */
+
   .c { color: var(--text-3); font-style: italic; }  /* comment */
+
   .n { color: var(--yellow); }     /* number / literal */
+
   .f { color: var(--sky); }        /* function / type */
+
   .o { color: var(--pink); }       /* operator */
 
   /* ---------- figures ---------- */
+
   figure { margin: 26px 0 0; }
+
   .diagram {
-    border: 1px solid var(--line); background: var(--panel-solid);
+    border: 1px solid var(--line); background: var(--surface-1);
     border-radius: 16px; padding: 18px; overflow-x: auto;
   }
+
   .diagram svg { display: block; width: 100%; height: auto; min-width: 560px; }
+
   figcaption {
     color: var(--text-3); font-size: 13px; margin-top: 10px;
     font-family: var(--mono);
   }
+
   .svg-label { font-family: var(--mono); font-size: 11px; fill: var(--text-2); }
+
   .svg-title { font-family: var(--mono); font-size: 12.5px; fill: var(--text); font-weight: 600; }
+
   .svg-mut { font-family: var(--mono); font-size: 10px; fill: var(--text-3); }
+
   .svg-box { fill: rgba(255,255,255,.035); stroke: var(--line-hi); stroke-width: 1; }
+
   .svg-flow { stroke: var(--line-hi); stroke-width: 1.4; fill: none; }
 
   /* ---------- tables ---------- */
+
   .tablewrap { overflow-x: auto; margin-top: 20px; border: 1px solid var(--line); border-radius: 14px; }
+
   table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+
   th, td { text-align: left; padding: 11px 15px; border-bottom: 1px solid var(--line-soft); }
+
   th { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); background: rgba(255,255,255,.025); }
+
   td { color: var(--text-2); }
+
   td:first-child { color: var(--text); font-family: var(--mono); font-size: 12.5px; }
+
   tr:last-child td { border-bottom: none; }
 
   /* ---------- callouts ---------- */
+
   .note {
     margin-top: 20px; border-left: 2px solid var(--yellow);
     background: rgba(250,204,21,.05); border-radius: 0 12px 12px 0;
     padding: 14px 18px; color: var(--text-2); font-size: 14.5px;
   }
+
   .note b { color: var(--yellow); font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: 5px; }
+
   .note.ok { border-color: var(--green); background: rgba(74,222,128,.05); }
+
   .note.ok b { color: var(--green); }
 
   /* ---------- misc ---------- */
+
   .rule { height: 1px; background: var(--line-soft); margin-top: 56px; }
+
   footer {
     border-top: 1px solid var(--line-soft); margin-top: 70px; padding: 28px 24px 44px;
     color: var(--text-3); font-size: 13.5px; text-align: center; position: relative; z-index: 1;
   }
+
   .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 22px; }
 
   @media (max-width: 860px) {
@@ -195,7 +235,8 @@
     main { padding: 0 16px 70px; }
     .top-in { padding: 12px 16px; }
   }
-@media print {
+
+  @media print {
   body { background: #fff !important; color: #111 !important; }
   body::before, body::after { display: none !important; }
   header, .toc, nav { position: static !important; background: none !important; }
@@ -203,7 +244,55 @@
   .eyebrow, .grad { background: none !important; -webkit-text-fill-color: #111 !important; color: #111 !important; }
   pre, code, .code, figure { background: #f6f6f6 !important; color: #111 !important; border-color: #ccc !important; }
   figure, pre, table { break-inside: avoid; }
-}
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 1ms; }
+  }
+
+  /* forced-colors strips box-shadow and background-clip, so restore edges and text */
+
+  @media (forced-colors: active) {
+    .grad, .eyebrow, .stat b, .logo b, footer .brand b {
+      background: none !important; -webkit-text-fill-color: currentColor !important;
+      color: CanvasText !important; forced-color-adjust: none;
+    }
+    .cap, .stat, .edu, .card, .window, .doc { border: 1px solid CanvasText; }
+    :focus-visible { outline: 3px solid Highlight; }
+  }
+
+  /* ---------- in-page contents ----------
+
+  These eight links used to live in the sticky header alongside the site
+
+  nav, which made an eleven-item bar out of two different kinds of link. */
+
+  .jump {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    margin-top: 34px; padding-top: 26px;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .jump .lab {
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--text-3);
+    margin-right: 6px;
+  }
+
+  .jump a {
+    display: flex; align-items: center; min-height: 36px;
+    padding: 6px 13px; border-radius: 999px;
+    font-size: 13.5px; color: var(--text-2); text-decoration: none;
+    border: 1px solid var(--line); background: var(--surface-1);
+    transition: color .18s var(--ease), background .18s var(--ease),
+                border-color .18s var(--ease);
+  }
+
+  @media (hover: hover) {
+    .jump a:hover { color: var(--text); background: var(--surface-2); border-color: var(--line-hi); }
+  }
+
+  @media (max-width: 620px) { .jump a { min-height: 40px; } }
 </style>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -217,29 +306,26 @@
 </head>
 <body>
 
+<a class="skip" href="#top">Skip to content</a>
+
 <header class="top">
   <div class="top-in">
     <a class="brand" href="../index.html">j<span>reyes</span></a>
-    <nav>
-      <a href="#what">What it is</a>
-      <a href="#embeddings">Embeddings</a>
-      <a href="#schema">Schema</a>
-      <a href="#index">Indexes</a>
-      <a href="#boost">Design: skill search</a>
-      <a href="#rag">Example: RAG</a>
-      <a href="#eval">Evaluation</a>
-      <a href="#ops">Operating it</a>
-      <a href="index.html">← Library</a>
-      <a href="../index.html">Portfolio</a>
+    <nav aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a aria-current="page" href="index.html">Library</a>
+      <a href="https://jonnyeclectic.github.io/boost/">boost&nbsp;↗</a>
+      <a href="../cerebro/">Cerebro</a>
+      <a href="../resume.html">Résumé</a>
       <a href="../contact.html">Contact</a>
     </nav>
   </div>
 </header>
 
-<main>
+<main id="top">
 
   <!-- ================= HERO ================= -->
-  <section class="hero" id="top">
+  <section class="hero" id="intro">
     <div class="eyebrow">Postgres extension · vector search</div>
     <h1>pgvector, <span class="grad">explained twice</span></h1>
     <p class="lede">
@@ -261,6 +347,18 @@
       <span class="chip">Python</span>
       <span class="chip">Java / Spring Boot</span>
     </div>
+
+    <nav class="jump" aria-label="Sections in this guide">
+      <span class="lab" aria-hidden="true">Contents</span>
+      <a href="#what">What it is</a>
+      <a href="#embeddings">Embeddings</a>
+      <a href="#schema">Schema</a>
+      <a href="#index">Indexes</a>
+      <a href="#boost">Design: skill search</a>
+      <a href="#rag">Example: RAG</a>
+      <a href="#eval">Evaluation</a>
+      <a href="#ops">Operating it</a>
+    </nav>
   </section>
 
   <!-- ================= WHAT ================= -->
@@ -329,7 +427,7 @@
           <rect class="svg-box" x="272" y="44" width="150" height="34" rx="8"/>
           <text class="svg-label" x="286" y="66">token overlap</text>
           <path class="svg-flow" d="M432 61 H484" marker-end="url(#arrow)"/>
-          <rect x="494" y="40" width="330" height="42" rx="8" fill="rgba(244,114,208,.07)" stroke="rgba(244,114,208,.35)"/>
+          <rect x="494" y="40" width="330" height="42" rx="8" fill="rgba(245,143,215,.07)" stroke="rgba(245,143,215,.35)"/>
           <text class="svg-label" x="508" y="58" fill="#f472d0">"maintenance agreement" → 0 rows</text>
           <text class="svg-mut" x="508" y="73">no shared token, no match</text>
 
@@ -417,7 +515,7 @@
           <text class="svg-mut" x="42" y="44">embedding space (2-D projection of 1024-D)</text>
 
           <!-- cluster A: contract docs -->
-          <circle cx="150" cy="110" r="62" fill="rgba(34,211,238,.07)" stroke="rgba(34,211,238,.3)" stroke-dasharray="3 3"/>
+          <circle cx="150" cy="110" r="62" fill="rgba(64,203,227,.07)" stroke="rgba(64,203,227,.3)" stroke-dasharray="3 3"/>
           <circle cx="128" cy="96"  r="4.5" fill="#22d3ee"/>
           <circle cx="163" cy="105" r="4.5" fill="#22d3ee"/>
           <circle cx="142" cy="132" r="4.5" fill="#22d3ee"/>
@@ -425,7 +523,7 @@
           <text class="svg-label" x="104" y="192" fill="#22d3ee">contract documents</text>
 
           <!-- cluster B: infra -->
-          <circle cx="400" cy="180" r="58" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.3)" stroke-dasharray="3 3"/>
+          <circle cx="400" cy="180" r="58" fill="rgba(204,158,255,.07)" stroke="rgba(204,158,255,.3)" stroke-dasharray="3 3"/>
           <circle cx="382" cy="166" r="4.5" fill="#a855f7"/>
           <circle cx="416" cy="174" r="4.5" fill="#a855f7"/>
           <circle cx="396" cy="200" r="4.5" fill="#a855f7"/>
@@ -441,7 +539,7 @@
           <text class="svg-title" x="570" y="46">"maintenance agreement"</text>
           <rect class="svg-box" x="570" y="58" width="300" height="30" rx="8"/>
           <text class="svg-mut" x="582" y="78">↓ embedding model (external)</text>
-          <rect x="570" y="98" width="300" height="34" rx="8" fill="rgba(34,211,238,.06)" stroke="rgba(34,211,238,.28)"/>
+          <rect x="570" y="98" width="300" height="34" rx="8" fill="rgba(64,203,227,.06)" stroke="rgba(64,203,227,.28)"/>
           <text class="svg-label" x="582" y="119">[ 0.021, -0.114, 0.307, … ]  ← 1024 floats</text>
           <text class="svg-mut" x="570" y="158">stored as: vector(1024)</text>
           <text class="svg-mut" x="570" y="178">on disk: ~4 bytes × 1024 ≈ 4 KB / row</text>
@@ -621,7 +719,7 @@
           <circle cx="340" cy="90"  r="3.5" fill="#767d97"/><circle cx="360" cy="110" r="3.5" fill="#767d97"/>
           <circle cx="80"  cy="200" r="3.5" fill="#767d97"/><circle cx="150" cy="220" r="3.5" fill="#767d97"/>
           <circle cx="250" cy="205" r="3.5" fill="#767d97"/><circle cx="345" cy="215" r="3.5" fill="#767d97"/>
-          <rect x="176" y="72" width="80" height="66" rx="8" fill="rgba(34,211,238,.08)" stroke="rgba(34,211,238,.45)"/>
+          <rect x="176" y="72" width="80" height="66" rx="8" fill="rgba(64,203,227,.08)" stroke="rgba(64,203,227,.45)"/>
           <path d="M210 60 l0 -14" stroke="#facc15" stroke-width="1.4"/>
           <circle cx="210" cy="52" r="4" fill="#facc15"/>
           <text class="svg-mut" x="228" y="52" fill="#facc15">query</text>
@@ -633,7 +731,7 @@
 
           <text class="svg-mut" x="482" y="70">layer 2 (long hops)</text>
           <circle cx="620" cy="82" r="4" fill="#a855f7"/><circle cx="790" cy="82" r="4" fill="#a855f7"/>
-          <line x1="620" y1="82" x2="790" y2="82" stroke="rgba(168,85,247,.5)"/>
+          <line x1="620" y1="82" x2="790" y2="82" stroke="rgba(204,158,255,.5)"/>
 
           <text class="svg-mut" x="482" y="140">layer 1</text>
           <circle cx="580" cy="150" r="4" fill="#38bdf8"/><circle cx="660" cy="142" r="4" fill="#38bdf8"/>
@@ -646,7 +744,7 @@
             <circle cx="682" cy="216" r="3.5"/><circle cx="722" cy="228" r="3.5"/><circle cx="768" cy="218" r="3.5"/>
             <circle cx="812" cy="226" r="3.5"/><circle cx="848" cy="216" r="3.5"/>
           </g>
-          <g stroke="rgba(34,211,238,.4)">
+          <g stroke="rgba(64,203,227,.4)">
             <line x1="552" y1="222" x2="596" y2="214"/><line x1="596" y1="214" x2="638" y2="226"/>
             <line x1="638" y1="226" x2="682" y2="216"/><line x1="682" y1="216" x2="722" y2="228"/>
             <line x1="722" y1="228" x2="768" y2="218"/><line x1="768" y1="218" x2="812" y2="226"/>
@@ -719,12 +817,12 @@
           <text class="svg-mut" x="260" y="78">~1k chars · 150 overlap</text>
 
           <path class="svg-flow" d="M406 64 H456" marker-end="url(#a2)"/>
-          <rect x="466" y="40" width="150" height="48" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.4)"/>
+          <rect x="466" y="40" width="150" height="48" rx="10" fill="rgba(204,158,255,.07)" stroke="rgba(204,158,255,.4)"/>
           <text class="svg-label" x="480" y="62" fill="#a855f7">embedding model</text>
           <text class="svg-mut" x="480" y="78">1024-d, unit-normed</text>
 
           <path class="svg-flow" d="M626 64 H676" marker-end="url(#a2)"/>
-          <rect x="686" y="34" width="188" height="60" rx="10" fill="rgba(34,211,238,.07)" stroke="rgba(34,211,238,.45)"/>
+          <rect x="686" y="34" width="188" height="60" rx="10" fill="rgba(64,203,227,.07)" stroke="rgba(64,203,227,.45)"/>
           <text class="svg-label" x="700" y="56" fill="#22d3ee">PostgreSQL + pgvector</text>
           <text class="svg-mut" x="700" y="72">skill_embedding</text>
           <text class="svg-mut" x="700" y="86">HNSW · vector_cosine_ops</text>
@@ -738,12 +836,12 @@
           <text class="svg-mut" x="40" y="204">"keep PRs from going stale"</text>
 
           <path class="svg-flow" d="M212 192 H258" marker-end="url(#a2)"/>
-          <rect x="268" y="166" width="150" height="52" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.4)"/>
+          <rect x="268" y="166" width="150" height="52" rx="10" fill="rgba(204,158,255,.07)" stroke="rgba(204,158,255,.4)"/>
           <text class="svg-label" x="282" y="188" fill="#a855f7">same model</text>
           <text class="svg-mut" x="282" y="204">← non-negotiable</text>
 
           <path class="svg-flow" d="M428 192 H474" marker-end="url(#a2)"/>
-          <rect x="484" y="160" width="176" height="64" rx="10" fill="rgba(34,211,238,.07)" stroke="rgba(34,211,238,.45)"/>
+          <rect x="484" y="160" width="176" height="64" rx="10" fill="rgba(64,203,227,.07)" stroke="rgba(64,203,227,.45)"/>
           <text class="svg-label" x="498" y="182" fill="#22d3ee">ORDER BY &lt;=&gt; LIMIT 50</text>
           <text class="svg-mut" x="498" y="198">+ WHERE registry = ANY(...)</text>
           <text class="svg-mut" x="498" y="214">ef_search = 100</text>
@@ -954,14 +1052,14 @@ LIMIT  %(top_k)s;
           <text class="svg-mut" x="422" y="72">structure-aware</text>
 
           <path class="svg-flow" d="M550 60 H590" marker-end="url(#a3)"/>
-          <rect x="600" y="34" width="132" height="52" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.4)"/>
+          <rect x="600" y="34" width="132" height="52" rx="10" fill="rgba(204,158,255,.07)" stroke="rgba(204,158,255,.4)"/>
           <text class="svg-label" x="614" y="56" fill="#a855f7">embed</text>
           <text class="svg-mut" x="614" y="72">batched</text>
 
           <path class="svg-flow" d="M742 60 V60 H772 V116" marker-end="url(#a3)"/>
 
           <!-- store -->
-          <rect x="612" y="126" width="264" height="70" rx="12" fill="rgba(34,211,238,.07)" stroke="rgba(34,211,238,.45)"/>
+          <rect x="612" y="126" width="264" height="70" rx="12" fill="rgba(64,203,227,.07)" stroke="rgba(64,203,227,.45)"/>
           <text class="svg-label" x="628" y="148" fill="#22d3ee">PostgreSQL + pgvector</text>
           <text class="svg-mut" x="628" y="164">doc_chunk(doc_id, page, bbox,</text>
           <text class="svg-mut" x="628" y="178">        content, embedding vector(1024))</text>
@@ -972,11 +1070,11 @@ LIMIT  %(top_k)s;
           <text class="svg-label" x="38" y="172">reviewer question</text>
           <text class="svg-mut" x="38" y="188">"what's the renewal term?"</text>
           <path class="svg-flow" d="M184 174 H228" marker-end="url(#a3)"/>
-          <rect x="238" y="150" width="140" height="48" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.4)"/>
+          <rect x="238" y="150" width="140" height="48" rx="10" fill="rgba(204,158,255,.07)" stroke="rgba(204,158,255,.4)"/>
           <text class="svg-label" x="252" y="174" fill="#a855f7">embed query</text>
           <text class="svg-mut" x="252" y="190">same model</text>
           <path class="svg-flow" d="M388 174 H430" marker-end="url(#a3)"/>
-          <rect x="440" y="144" width="150" height="60" rx="10" fill="rgba(34,211,238,.06)" stroke="rgba(34,211,238,.35)"/>
+          <rect x="440" y="144" width="150" height="60" rx="10" fill="rgba(64,203,227,.06)" stroke="rgba(64,203,227,.35)"/>
           <text class="svg-label" x="454" y="166" fill="#22d3ee">top-k retrieve</text>
           <text class="svg-mut" x="454" y="182">WHERE doc_id = $1</text>
           <text class="svg-mut" x="454" y="196">ORDER BY &lt;=&gt; LIMIT 6</text>
@@ -984,7 +1082,7 @@ LIMIT  %(top_k)s;
 
           <!-- generate -->
           <path class="svg-flow" d="M744 200 V238 H520" marker-end="url(#a3)"/>
-          <rect x="330" y="222" width="180" height="56" rx="10" fill="rgba(244,114,208,.07)" stroke="rgba(244,114,208,.4)"/>
+          <rect x="330" y="222" width="180" height="56" rx="10" fill="rgba(245,143,215,.07)" stroke="rgba(245,143,215,.4)"/>
           <text class="svg-label" x="344" y="244" fill="#f472d0">LLM (Bedrock / self-hosted)</text>
           <text class="svg-mut" x="344" y="260">6 chunks, not 200 pages</text>
 

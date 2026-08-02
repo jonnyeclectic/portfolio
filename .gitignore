@@ -2,3 +2,9 @@
 .DS_Store
 lumen-practice.md
 lumen-study-guide.html
+
+# tests/visual — headless-Chrome sweeps (see tests/visual/README.md)
+node_modules/
+tests/visual/out/
+tests/visual/shots/
+tests/visual/.chrome-profile-*

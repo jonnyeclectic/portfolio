@@ -7,40 +7,14 @@
 <meta name="description" content="Technical reference guides on production LLM systems: retrieval, evaluation, and the parts that are easy to get wrong.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3Ejr%3C/text%3E%3C/svg%3E">
 <script>document.documentElement.classList.add("js")</script>
+<link rel="stylesheet" href="../style/portfolio.css">
 <style>
-  :root {
-    /* ---- Aurora reskin: neon-tech living glass ---- */
-    --bg: #07080f;
-    --panel: rgba(255,255,255,.035);
-    --panel-solid: #0f1120;
-    --line: rgba(255,255,255,.09);
-    --line-soft: rgba(255,255,255,.05);
-    --line-hi: rgba(255,255,255,.22);
-    --text: #e9ebf5;
-    --text-2: #9298b0;
-    --text-3: #767d97;
-    --amber: #22d3ee;   /* primary accent → cyan */
-    --orange: #38bdf8;  /* cyan-blue */
-    --pink: #f472d0;
-    --violet: #a855f7;
-    --blue: #38bdf8;
-    --sky: #7dd3fc;
-    --green: #4ade80;
-    --yellow: #facc15;
-    --term-bg: #0d1024;
-    --term-bar: #171a33;
-    --cyan: #22d3ee;
-    --grad: linear-gradient(96deg, #22d3ee 0%, #a855f7 52%, #f472d0 100%);
-    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; scroll-padding-top: 84px; }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .reveal { transition: none !important; transform: none !important; opacity: 1 !important; }
     body::before { animation: none !important; }
   }
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -49,55 +23,11 @@
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
-  body::before {
-    content: "";
-    position: fixed; inset: -25vmax; z-index: 0; pointer-events: none;
-    background:
-      radial-gradient(38vmax 38vmax at 12% 6%,  rgba(34,211,238,.20), transparent 60%),
-      radial-gradient(34vmax 34vmax at 90% 16%, rgba(168,85,247,.18), transparent 60%),
-      radial-gradient(30vmax 30vmax at 62% 104%, rgba(244,114,208,.14), transparent 62%);
-    filter: blur(34px) saturate(135%);
-    animation: aurora-drift 42s ease-in-out infinite;
-    will-change: transform;
-  }
-  body::after {
-    content: "";
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background-image:
-      linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
-    background-size: 46px 46px;
-    -webkit-mask-image: radial-gradient(1200px 800px at 30% 0%, #000 0%, rgba(0,0,0,.3) 60%, rgba(0,0,0,.1) 100%);
-            mask-image: radial-gradient(1200px 800px at 30% 0%, #000 0%, rgba(0,0,0,.3) 60%, rgba(0,0,0,.1) 100%);
-  }
-  @keyframes aurora-drift {
-    0%,100% { transform: translate3d(0,0,0) scale(1); }
-    50%     { transform: translate3d(2.5vmax,-2vmax,0) scale(1.08); }
-  }
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
-  a { color: inherit; }
-  code { font-family: var(--mono); }
-  :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: 4px; }
 
-  /* ---------- nav ---------- */
-  header {
-    position: sticky; top: 0; z-index: 50;
-    background: rgba(7,8,15,.82);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--line-soft);
-  }
-  .nav { display: flex; align-items: center; gap: 24px; height: 64px; }
-  .logo { display: flex; align-items: baseline; gap: 10px; text-decoration: none; }
-  .logo b { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--amber); letter-spacing: -.02em; }
   .logo span { font-size: 10.5px; letter-spacing: .24em; color: var(--text-2); text-transform: uppercase; }
-  .nav ul {
-    display: flex; gap: 4px; list-style: none; margin-left: auto;
-    overflow-x: auto; scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-  .nav ul::-webkit-scrollbar { display: none; }
+
   /* fade the right edge so an overflowing nav reads as scrollable */
+
   @media (max-width: 860px) {
     .nav { gap: 12px; }
     .nav ul {
@@ -106,30 +36,28 @@
     }
     .logo span { display: none; }
   }
-  .nav ul a {
-    display: block; padding: 8px 12px; border-radius: 8px;
-    font-size: 14px; color: var(--text-2); text-decoration: none; white-space: nowrap;
-  }
-  .nav ul a:hover { color: var(--text); background: var(--panel); }
-  .nav ul a.cta { color: var(--text); font-weight: 600; }
 
   /* ---------- shared section chrome ---------- */
+
   .eyebrow {
     font-family: var(--mono); font-size: 12px; font-weight: 700;
     letter-spacing: .24em; text-transform: uppercase;
-    background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+    color: var(--text-3);
     display: block; text-align: center; margin-bottom: 18px;
   }
+
   .sec-title {
     font-size: clamp(30px, 4.5vw, 50px); font-weight: 800; letter-spacing: -.025em;
     line-height: 1.1; text-align: center; text-wrap: balance;
   }
+
   .sec-sub {
     max-width: 640px; margin: 18px auto 0; text-align: center;
     color: var(--text-2); font-size: 17.5px; text-wrap: balance;
   }
+
   .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
-  .js .reveal.in { opacity: 1; transform: none; }
+
   @media print {
     body { background: #fff !important; color: #111 !important; }
     body::before, body::after { display: none !important; }
@@ -152,104 +80,126 @@
   }
 
   /* ---------- hero ---------- */
+
   .hero { padding: 96px 0 30px; }
+
   .badge {
     display: inline-flex; align-items: center; gap: 8px;
     font-family: var(--mono); font-size: 12.5px; color: #c9e9f5;
-    border: 1px solid rgba(34,211,238,.4); border-radius: 999px;
+    border: 1px solid rgba(64,203,227,.4); border-radius: 999px;
     padding: 7px 16px; margin-bottom: 30px;
-    background: rgba(34,211,238,.07);
+    background: rgba(64,203,227,.07);
     backdrop-filter: blur(10px);
   }
+
   .badge::before {
     content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan);
     box-shadow: 0 0 10px var(--cyan);
-    animation: badge-breathe 3.4s ease-in-out infinite;
   }
-  @keyframes badge-breathe { 0%,100% { opacity: .45; transform: scale(.82); } 50% { opacity: 1; transform: scale(1.15); } }
+
   .hero h1 {
     font-size: clamp(44px, 7.2vw, 86px); font-weight: 800;
     letter-spacing: -.035em; line-height: 1.02; max-width: 900px; text-wrap: balance;
   }
+
   .hero h1 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  .hero h1 .grad::selection { -webkit-text-fill-color: var(--text); color: var(--text); background: rgba(64,203,227,.28); }
+
   .hero p.lede { max-width: 700px; margin-top: 30px; font-size: 19px; color: var(--text-2); }
+
   .hero p.lede b { color: var(--text); font-weight: 650; }
 
   /* ---------- buttons ---------- */
+
   .btn {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 15.5px; font-weight: 650; text-decoration: none;
     padding: 14px 26px; border-radius: 12px; border: 1px solid transparent;
     transition: transform .15s ease, box-shadow .15s ease;
   }
+
   .btn:hover { transform: translateY(-1px); }
+
   .btn-grad {
     color: #05141a;
     background: linear-gradient(96deg, var(--cyan), var(--violet));
-    box-shadow: 0 8px 30px rgba(34,211,238,.32);
+    box-shadow: 0 8px 30px rgba(64,203,227,.32);
   }
-  .btn-grad:hover { box-shadow: 0 12px 40px rgba(168,85,247,.5); }
-  .btn-ghost { color: var(--text); border-color: var(--line); background: var(--panel); }
+
+  .btn-grad:hover { box-shadow: 0 12px 40px rgba(204,158,255,.5); }
+
   .btn-ghost:hover { border-color: rgba(255,255,255,.2); }
+
   .cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 38px; }
 
   /* ---------- library items ---------- */
+
   .edu {
     max-width: 760px; margin: 56px auto 0;
-    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    background: var(--surface-1); border: 1px solid var(--line); border-radius: 18px;
     padding: 34px 34px 30px;
   }
+
   .edu h3 { font-size: 21px; font-weight: 750; letter-spacing: -.01em; }
+
   .edu .dates { font-family: var(--mono); font-size: 12.5px; color: var(--text-2); margin-top: 4px; display: block; }
+
   .edu p { font-size: 15px; color: var(--text-2); margin-top: 12px; }
+
   .edu .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
+
   .edu .tags code {
     font-size: 12px; color: #d5d5e2; background: rgba(255,255,255,.06);
     border: 1px solid var(--line-soft); border-radius: 7px; padding: 3px 9px;
   }
+
   a.edu { display: block; text-decoration: none; }
+
   .xp-cta { text-align: center; margin-top: 44px; }
 
-  /* ---------- footer ---------- */
-  footer { margin-top: 130px; border-top: 1px solid var(--line-soft); padding: 44px 0 60px; text-align: center; }
-  footer .brand { font-size: 15px; color: var(--text-2); }
-  footer .brand b { font-family: var(--mono); color: var(--amber); }
-  footer .meta { margin-top: 10px; font-size: 13.5px; color: var(--text-3); }
-  footer .links { margin-top: 14px; font-size: 13.5px; color: var(--text-3); }
-  footer .links a { color: var(--text-2); text-decoration: none; }
-  footer .links a:hover { color: var(--text); }
+  /* ---------- surfaces: opaque ladder, lit from above ---------- */
 
-  /* ---------- Aurora living-glass cards: glass + cursor glow ---------- */
   .edu {
-    position: relative; overflow: hidden;
-    backdrop-filter: blur(14px) saturate(130%);
-    -webkit-backdrop-filter: blur(14px) saturate(130%);
-    transition: transform .3s cubic-bezier(.2,.7,.2,1), border-color .3s ease,
-                background .3s ease, box-shadow .35s ease;
+    position: relative;
+    background: var(--surface-1);
+    box-shadow: inset 0 1px 0 0 rgba(255,255,255,.06),
+                inset 0 -1px 0 0 rgba(0,0,0,.30);
+    transition: transform .28s var(--ease), border-color .28s var(--ease),
+                background .28s var(--ease), box-shadow .3s var(--ease);
   }
-  .edu > * { position: relative; z-index: 1; }
-  .edu::before {
-    content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit;
-    pointer-events: none; opacity: 0; transition: opacity .35s ease;
-    background: radial-gradient(320px circle at var(--mx,50%) var(--my,50%),
-                rgba(34,211,238,.16), rgba(168,85,247,.10) 42%, transparent 70%);
+
+  @media (hover: hover) {
+    .edu:hover {
+      transform: translateY(-2px);
+      background: var(--surface-2);
+      border-color: var(--line-hi);
+      box-shadow: 0 1px 2px rgba(4,5,10,.5), 0 8px 24px -12px rgba(4,5,10,.7);
+    }
   }
-  .edu:hover {
-    transform: translateY(-4px);
-    border-color: var(--line-hi);
-    background: rgba(255,255,255,.06);
-    box-shadow: 0 22px 60px -22px rgba(168,85,247,.5),
-                inset 0 0 0 1px rgba(34,211,238,.12);
-  }
-  .edu:hover::before { opacity: 1; }
+
   @media (prefers-reduced-motion: reduce) {
     .edu { transition: border-color .3s ease, box-shadow .3s ease; }
     .edu:hover { transform: none; }
-    .badge::before { animation: none !important; }
   }
 
   @media (max-width: 620px) {
     .hero { padding: 84px 0 10px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 1ms; }
+  }
+
+  /* forced-colors strips box-shadow and background-clip, so restore edges and text */
+
+  @media (forced-colors: active) {
+    .grad, .eyebrow, .stat b, .logo b, footer .brand b {
+      background: none !important; -webkit-text-fill-color: currentColor !important;
+      color: CanvasText !important; forced-color-adjust: none;
+    }
+    .cap, .stat, .edu, .card, .window, .doc { border: 1px solid CanvasText; }
+    :focus-visible { outline: 3px solid Highlight; }
   }
 </style>
 <script type="text/javascript">
@@ -264,17 +214,16 @@
 </head>
 <body>
 
+<a class="skip" href="#top">Skip to content</a>
+
 <header>
   <div class="wrap nav">
     <a class="logo" href="../index.html"><b>jreyes</b><span>Software Engineer</span></a>
     <ul>
       <li><a href="../index.html">Home</a></li>
-      <li><a href="../index.html#ai">AI Systems</a></li>
-      <li><a href="../index.html#evals">Evaluation</a></li>
-      <li><a href="../index.html#experience">Experience</a></li>
-      <li><a href="index.html">Library</a></li>
+      <li><a aria-current="page" href="../docs/">Library</a></li>
       <li><a href="https://jonnyeclectic.github.io/boost/">boost&nbsp;↗</a></li>
-      <li><a href="../cerebro/">Cerebro&nbsp;↗</a></li>
+      <li><a href="../cerebro/">Cerebro</a></li>
       <li><a href="../resume.html">Résumé</a></li>
       <li><a class="cta" href="../contact.html">Contact</a></li>
     </ul>
@@ -333,7 +282,9 @@
     </div>
   </div>
 
-  <footer>
+</main>
+
+<footer>
     <div class="wrap">
       <p class="brand"><b>jreyes</b> · Jonathan Reyes · Lead Software Engineer</p>
       <p class="meta">Fort Worth, TX · © 2026 Jonathan Reyes. All rights reserved.</p>
@@ -346,8 +297,7 @@
         <a href="https://jonnyeclectic.github.io/boost/">boost</a>
       </p>
     </div>
-  </footer>
-</main>
+</footer>
 
 <script>
 // ---------- scroll reveal ----------
@@ -358,19 +308,13 @@ if (!reduce && "IntersectionObserver" in window) {
       if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
     });
   }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
-  document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+  document.querySelectorAll(".reveal").forEach((el) => {
+    if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add("in");
+    else io.observe(el);
+  });
 } else {
   document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
 }
-
-// ---------- cursor-following glow on glass cards ----------
-document.querySelectorAll(".edu").forEach((el) => {
-  el.addEventListener("pointermove", (e) => {
-    const r = el.getBoundingClientRect();
-    el.style.setProperty("--mx", (e.clientX - r.left) + "px");
-    el.style.setProperty("--my", (e.clientY - r.top) + "px");
-  });
-});
 </script>
 </body>
 </html>
