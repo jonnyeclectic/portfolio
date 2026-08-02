@@ -189,12 +189,13 @@
 
   /* ---------- experience timeline ---------- */
 
-  .xp { max-width: var(--col-wide); margin: var(--s-7) auto 0; }
+  .xp { max-width: 812px; margin: var(--s-7) auto 0; }
 
   .company {
     display: flex; flex-wrap: wrap; align-items: baseline;
-    gap: var(--s-2) var(--s-4); margin: var(--s-7) 0 var(--s-4);
+    gap: var(--s-2) var(--s-4); margin: var(--s-9) 0 var(--s-5);
   }
+  .company:first-of-type { margin-top: var(--s-7); }
 
   .company:first-child { margin-top: 0; }
 
@@ -220,7 +221,7 @@
   @media (min-width: 900px) {
     .role {
       display: grid;
-      grid-template-columns: 168px minmax(0, 1fr);
+      grid-template-columns: 176px minmax(0, 1fr);
       column-gap: var(--s-6);
       align-items: baseline;
     }
@@ -244,6 +245,14 @@
   .role .dates {
     display: block; font-family: var(--mono); font-size: 12.5px;
     color: var(--text-3); margin-top: var(--s-1);
+  }
+
+  /* The work location, on its own line rather than wrapping out of the middle
+     of the date range. One step down in contrast: it is the least important
+     thing in the rail. */
+  .role .dates i {
+    display: block; font-style: normal; color: var(--text-3); opacity: .72;
+    margin-top: 2px;
   }
 
   .role p { font-size: 15px; color: var(--text-2); margin-top: var(--s-3); max-width: var(--measure); text-wrap: pretty; }
@@ -422,11 +431,11 @@
   }
 
   @media (max-width: 620px) {
-    section { padding: 84px 0 10px; }
+    section { padding: var(--s-8) 0 var(--s-3); }
     .caps { grid-template-columns: 1fr; }
-    .stats { gap: 10px; }
-    .stat { padding: 18px 10px; }
-    .company .span { margin-left: 0; }
+    .stats { gap: var(--s-3); }
+    .stat { padding: var(--s-5) var(--s-3); }
+    .company .span { margin-left: 0; border: 0; padding: 0; color: var(--text-3); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -715,7 +724,7 @@
         </div>
         <div class="role reveal">
           <h4>Lead Software Engineer</h4>
-          <span class="dates">Feb 2023 – Present · Remote</span>
+          <span class="dates">Feb 2023 – Present<i>Remote</i></span>
           <p>Lead architecture and delivery for a document-intelligence pipeline built on
             <b>Python, a self-hosted vision-language model (Llama) and S3</b>. I started
             it alone and grew it into a team effort.</p>
@@ -745,7 +754,7 @@
         </div>
         <div class="role reveal">
           <h4>Principal Associate Software Engineer · Prequalified Applications</h4>
-          <span class="dates">June 2021 – Feb 2023 · Remote</span>
+          <span class="dates">June 2021 – Feb 2023<i>Remote</i></span>
           <p>Architected and operated <b>external-facing services powering auto loan
             prequalification</b> for public applicants, owning the API contracts, data
             models, AWS deployment and production support. Partnered with product and
