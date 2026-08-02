@@ -30,7 +30,7 @@ files, only a data-URI SVG favicon):
 - `index.html` — the single-page portfolio (hero, highlights, experience, skills,
   education, footer). Section nav links (`#work`, `#experience`, etc.) are in-page
   anchors, not separate pages.
-- `resume.html` — résumé page, same design system.
+- `resume.html` — resume page, same design system.
 - `contact.html` — contact page (mailto/social links, no form backend).
 
 All three share one hand-rolled design system defined inline in each file's
