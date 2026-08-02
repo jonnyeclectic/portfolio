@@ -54,7 +54,7 @@
 
   <div class="explain reveal">
     <div class="col plain">
-      <h4>In plain terms</h4>
+      <h2 class="col-h">In plain terms</h2>
       <p>Cerebro is a robot that tests trading ideas honestly and only lets the survivors touch real money.</p>
       <p>It gathers price history, tries a strategy on the past, then re-tests it on data it never
         "saw" while being tuned. If it still works, it trades a pretend account for a few weeks. Only
@@ -62,7 +62,7 @@
       <p>Every step has a safety officer that can halt trading if losses get too deep.</p>
     </div>
     <div class="col tech">
-      <h4>Technically</h4>
+      <h2 class="col-h">Technically</h2>
       <p>Python strategies run on the Rust-core <code>nautilus_trader</code> engine (CASH account,
         NETTING OMS). Bars flow from a <code>ParquetDataCatalog</code> into a <code>Strategy</code>,
         through a composed risk layer, to the engine's OMS and out via the IBKR adapter.</p>
@@ -185,12 +185,12 @@ flowchart LR
 
   <div class="explain reveal">
     <div class="col plain">
-      <h4>Why so many gates?</h4>
+      <h3 class="col-h">Why so many gates?</h3>
       <p>Most backtest numbers are lies — a strategy tuned on the past can look brilliant and still be
         worthless. Each gate is a different way of asking "is this real, or did we fool ourselves?"</p>
     </div>
     <div class="col tech">
-      <h4>What each gate defends against</h4>
+      <h3 class="col-h">What each gate defends against</h3>
       <p><strong>Gate 1</strong>: baseline quality + look-ahead. <strong>Gate 2</strong>: overfitting
         (OOS consistency, ±20% param perturbation, deflated Sharpe for N trials).
         <strong>Gate 3</strong>: model-vs-reality (fills, slippage, disconnects).

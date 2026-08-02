@@ -53,14 +53,14 @@
 
   <div class="explain reveal">
     <div class="col plain">
-      <h4>In plain terms</h4>
+      <h2 class="col-h">In plain terms</h2>
       <p>Play the strategy against the past, but pretend you're a realistic, slightly unlucky trader:
         your orders fill on the <em>next</em> bar, always a tick worse, and you pay fees every time.</p>
       <p>Then grade the result on real portfolio value — cash plus what your holdings are worth — and
         only pass strategies that clear every bar of the report card.</p>
     </div>
     <div class="col tech">
-      <h4>Technically</h4>
+      <h2 class="col-h">Technically</h2>
       <p><code>backtest.py</code> builds a <code>BacktestEngine</code> on an <code>XNAS</code> venue
         (<code>CASH</code> account, <code>NETTING</code> OMS, $1M start). A <code>LatencyModel</code> defers
         fills one bar; a <code>FillModel</code> charges one adverse tick. Performance comes from

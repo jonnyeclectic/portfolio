@@ -46,12 +46,16 @@
   --green:     #4ade80;
   --yellow:    #facc15;
 
-  /* --- signature gradient ---
-     OKLCH holds lightness across the ramp; sRGB dips through a desaturated grey
-     between cyan and violet. The sRGB line stays as the fallback for engines
-     without <color-interpolation-method>. */
+  /* --- signature gradient --- */
+  /* One value only. A second `--grad:` declaration below the sRGB one does NOT
+     act as a fallback: custom properties are stored as an unparsed token
+     stream, so the OKLCH line always wins regardless of support, and on an
+     engine without <color-interpolation-method> `background: var(--grad)` then
+     becomes invalid at computed-value time and resolves to nothing. On the
+     hero, which is background-clip:text over color:transparent, that is an
+     invisible headline rather than a duller gradient. @supports asks the
+     question properly. */
   --grad: linear-gradient(96deg, #40cbe3 0%, #cc9eff 52%, #f58fd7 100%);
-  --grad: linear-gradient(96deg in oklch, var(--cyan) 0%, var(--violet) 52%, var(--pink) 100%);
 
   /* --- terminal surfaces --- */
   --term-bg:  #0d1024;
@@ -70,6 +74,15 @@
   --step-title: clamp(1.875rem, 1.33rem + 2.25vw, 3.125rem);
   --step-stat:  clamp(1.75rem, 1.37rem + 1.57vw, 2.625rem);
   --step-body:  clamp(1rem, .97rem + .14vw, 1.0625rem);
+}
+
+/* OKLCH holds lightness across the ramp; sRGB dips through a desaturated grey
+   between cyan and violet. Only engines that can actually interpolate there
+   get the upgrade. */
+@supports (background: linear-gradient(in oklch, red, blue)) {
+  :root {
+    --grad: linear-gradient(96deg in oklch, var(--cyan) 0%, var(--violet) 52%, var(--pink) 100%);
+  }
 }
 
 /* ---------- reset ---------- */
