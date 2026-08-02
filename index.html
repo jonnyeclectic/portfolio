@@ -32,7 +32,7 @@
 
   /* ---------- shared section chrome ---------- */
 
-  section { padding: 110px 0 20px; }
+  section { padding: var(--s-9) 0 var(--s-5); }
 
   .eyebrow {
     font-family: var(--mono); font-size: 12px; font-weight: 700;
@@ -146,10 +146,11 @@
 
   /* ---------- highlight cards ---------- */
 
-  .caps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 64px; }
+  .caps { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); margin-top: var(--s-8); }
 
   .cap {
-    background: var(--surface-1); border: 1px solid var(--line); border-radius: 18px; padding: 30px 26px;
+    background: var(--surface-1); border: 1px solid var(--line); border-radius: 18px;
+    padding: var(--s-6) var(--s-5);
     display: flex; flex-direction: column;
   }
 
@@ -176,13 +177,24 @@
     border: 1px solid var(--line-soft); border-radius: 7px; padding: 3px 9px;
   }
 
-  .cap .more { margin-top: auto; padding-top: 16px; font-size: 13.5px; font-weight: 650; color: var(--amber); }
+  .cap > :last-child { margin-top: auto; }
+
+  .cap .more { padding-top: var(--s-4); font-size: 13.5px; font-weight: 650; color: var(--cyan); }
+
+  /* A tag row pinned to the bottom needs air above it or it collides with the
+
+  prose it is separating from. */
+
+  .cap .tags:last-child { padding-top: var(--s-4); }
 
   /* ---------- experience timeline ---------- */
 
-  .xp { max-width: 880px; margin: 56px auto 0; }
+  .xp { max-width: var(--col-wide); margin: var(--s-7) auto 0; }
 
-  .company { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 52px 0 14px; }
+  .company {
+    display: flex; flex-wrap: wrap; align-items: baseline;
+    gap: var(--s-2) var(--s-4); margin: var(--s-7) 0 var(--s-4);
+  }
 
   .company:first-child { margin-top: 0; }
 
@@ -192,12 +204,31 @@
 
   .company .span {
     margin-left: auto; font-family: var(--mono); font-size: 12.5px; color: var(--text-2);
-    border: 1px solid var(--line); border-radius: 999px; padding: 5px 13px; white-space: nowrap;
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: var(--s-1) var(--s-3); white-space: nowrap;
   }
 
   .role {
-    position: relative; margin-left: 7px; padding: 6px 0 26px 32px;
+    position: relative; margin-left: var(--s-2); padding: var(--s-2) 0 var(--s-6) var(--s-6);
     border-left: 1px solid var(--line);
+  }
+
+  /* The meta rail. Below 900px there is not enough width for two columns, so
+
+  the dates fall back under the title where they started. */
+
+  @media (min-width: 900px) {
+    .role {
+      display: grid;
+      grid-template-columns: 168px minmax(0, 1fr);
+      column-gap: var(--s-6);
+      align-items: baseline;
+    }
+    .role > * { grid-column: 2; }
+    .role .dates {
+      grid-column: 1; grid-row: 1;
+      margin-top: 0; text-align: right; line-height: 1.5;
+    }
   }
 
   .role:last-of-type { padding-bottom: 8px; }
@@ -210,13 +241,16 @@
 
   .role h4 { font-size: 18px; font-weight: 750; letter-spacing: -.01em; }
 
-  .role .dates { display: block; font-family: var(--mono); font-size: 12.5px; color: var(--text-2); margin-top: 3px; }
+  .role .dates {
+    display: block; font-family: var(--mono); font-size: 12.5px;
+    color: var(--text-3); margin-top: var(--s-1);
+  }
 
-  .role p { font-size: 15px; color: var(--text-2); margin-top: 10px; max-width: 68ch; text-wrap: pretty; }
+  .role p { font-size: 15px; color: var(--text-2); margin-top: var(--s-3); max-width: var(--measure); text-wrap: pretty; }
 
   .role p b { color: var(--text); font-weight: 650; }
 
-  .role .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+  .role .chips { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-4); max-width: var(--measure); }
 
   .role .chips code {
     font-size: 12px; color: #d5d5e2; background: rgba(255,255,255,.06);
@@ -227,7 +261,7 @@
 
   /* ---------- featured project ---------- */
 
-  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; margin-top: 64px; }
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-7); align-items: center; margin-top: var(--s-8); }
 
   .feature-copy p { color: var(--text-2); margin-bottom: 22px; font-size: 17.5px; max-width: 66ch; text-wrap: pretty; }
 
@@ -300,7 +334,7 @@
 
   .cap .bullets { font-size: 14.5px; color: var(--text-2); }
 
-  .role .bullets { font-size: 15px; color: var(--text-2); max-width: 68ch; }
+  .role .bullets { font-size: 15px; color: var(--text-2); max-width: var(--measure); }
 
   .edu .bullets { font-size: 15px; color: var(--text-2); }
 
@@ -333,7 +367,7 @@
 
   /* ---------- contact strip ---------- */
 
-  .contact-strip { text-align: center; margin-top: 56px; }
+  .contact-strip { text-align: center; margin-top: var(--s-7); }
 
   .contact-strip .cta-row { justify-content: center; }
 
@@ -417,35 +451,6 @@
   page, not to the site, so they live with the page — under the hero rather
 
   than pinned above it, and only on pages that have sections to jump to. */
-
-  .jump {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-    margin-top: 56px; padding-top: 26px;
-    border-top: 1px solid var(--line-soft);
-  }
-
-  .jump .lab {
-    font-family: var(--mono); font-size: 11px; font-weight: 700;
-    letter-spacing: .16em; text-transform: uppercase; color: var(--text-3);
-    margin-right: 6px;
-  }
-
-  .jump a {
-    display: flex; align-items: center; min-height: 36px;
-    padding: 6px 13px; border-radius: 999px;
-    font-size: 13.5px; color: var(--text-2); text-decoration: none;
-    border: 1px solid var(--line); background: var(--surface-1);
-    transition: color .18s var(--ease), background .18s var(--ease),
-                border-color .18s var(--ease);
-  }
-
-  @media (hover: hover) {
-    .jump a:hover { color: var(--text); background: var(--surface-2); border-color: var(--line-hi); }
-  }
-
-  /* 40px targets on touch (WCAG 2.5.5) */
-
-  @media (max-width: 620px) { .jump a { min-height: 40px; } }
 </style>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
