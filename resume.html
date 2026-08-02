@@ -112,7 +112,7 @@
 
   .role .role-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
 
-  .role h4 { font-size: 18px; font-weight: 750; letter-spacing: -.01em; }
+  .role h3, .role h4 { font-size: 18px; font-weight: 750; letter-spacing: -.01em; }
 
   .role .dates { margin-left: auto; font-family: var(--mono); font-size: 12.5px; color: var(--text-2); white-space: nowrap; }
 
@@ -156,7 +156,7 @@
 
   .edu .role-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
 
-  .edu h4 { font-size: 18px; font-weight: 750; }
+  .edu h3 { font-size: 18px; font-weight: 750; }
 
   .edu .dates { margin-left: auto; font-family: var(--mono); font-size: 12.5px; color: var(--text-2); }
 
@@ -221,6 +221,9 @@
     .tech .row .k { padding: 12px 22px 8px; }
     .tech .row .v { padding-top: 0; }
     .role .dates, .edu .dates { margin-left: 0; }
+    /* The dates sit on their own line here, so nowrap has nothing left to
+       protect and a long one is simply 17px of horizontal scroll. */
+    .role .dates { white-space: normal; }
     .company .span { margin-left: 0; }
   }
 
@@ -249,7 +252,9 @@
 
   .jump {
     display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-    margin-top: 56px; padding-top: 26px;
+    /* .head and .sheet are an 880px column centred in .wrap; the row has to
+       share it or it sits 96px left of everything and its rule overhangs. */
+    max-width: 880px; margin: 56px auto 0; padding-top: 26px;
     border-top: 1px solid var(--line-soft);
   }
 
@@ -335,13 +340,13 @@
 
       <!-- ================= SUMMARY ================= -->
       <div class="block reveal" id="summary">
-        <span class="eyebrow">Summary</span>
+        <h2 class="eyebrow">Summary</h2>
         <p class="intro">Lead software engineer with <b>11 years building distributed systems, APIs, and developer platforms</b> in regulated financial services. At Capital One, leads architecture for a high-throughput platform orchestrating communications with external dealership partners, and previously ran the platform ecosystem around the company-wide JFrog Artifactory binary repository. Owned external-facing lending APIs end to end. Author and maintainer of <b>boost</b>, an independent open-source package manager for AI coding skills. Works primarily in <b>Java and Python on AWS</b>, with a record of setting standards that spread beyond team boundaries.</p>
       </div>
 
       <!-- ================= EXPERIENCE ================= -->
       <div class="block" id="experience">
-        <span class="eyebrow">Experience</span>
+        <h2 class="eyebrow">Experience</h2>
 
         <div class="company reveal">
           <h3>Capital One</h3><span class="loc">Plano, TX</span>
@@ -433,11 +438,11 @@
 
       <!-- ================= OPEN SOURCE ================= -->
       <div class="block" id="opensource">
-        <span class="eyebrow">Open Source</span>
+        <h2 class="eyebrow">Open Source</h2>
 
         <div class="role reveal">
           <div class="role-head">
-            <h4>boost — AI skills package manager</h4>
+            <h3>boost — AI skills package manager</h3>
             <span class="dates">Independent personal project · 2025 – Present</span>
           </div>
           <ul>
@@ -458,7 +463,7 @@
 
       <!-- ================= TECHNOLOGIES ================= -->
       <div class="block reveal" id="technologies">
-        <span class="eyebrow">Technologies</span>
+        <h2 class="eyebrow">Technologies</h2>
         <div class="tech">
           <div class="row">
             <div class="k">Languages &amp; Frameworks</div>
@@ -485,17 +490,17 @@
 
       <!-- ================= EDUCATION ================= -->
       <div class="block reveal" id="education">
-        <span class="eyebrow">Education &amp; Certification</span>
+        <h2 class="eyebrow">Education &amp; Certification</h2>
         <div class="edu">
           <div class="role-head">
-            <h4>BS, Computer Science — University of North Texas</h4>
+            <h3>BS, Computer Science — University of North Texas</h3>
             <span class="dates">2011 – 2015</span>
           </div>
           <p>Minor in Mathematics&ensp;|&ensp;Certificates: Technical Communication, Game Programming</p>
         </div>
         <div class="edu">
           <div class="role-head">
-            <h4>AWS Certified Solutions Architect – Associate</h4>
+            <h3>AWS Certified Solutions Architect – Associate</h3>
             <span class="dates">2025</span>
           </div>
         </div>

@@ -48,14 +48,24 @@
   --red: #fb7185;
   --term-bg: #0d1024;
   --term-bar: #171a33;
+  /* One value only — a second --grad: declaration is not a fallback; see the
+     note in style/portfolio.css. */
   --grad: linear-gradient(96deg, #40cbe3 0%, #cc9eff 52%, #f58fd7 100%);
-  --grad: linear-gradient(96deg in oklch, var(--cyan) 0%, var(--violet) 52%, var(--pink) 100%);
   --ease: cubic-bezier(.2,.7,.2,1);
   --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --radius: 16px;
   --radius-lg: 18px;
   --maxw: 1120px;
+}
+
+/* OKLCH holds lightness across the ramp; sRGB dips through a desaturated grey
+   between cyan and violet. Only engines that can actually interpolate there
+   get the upgrade. */
+@supports (background: linear-gradient(in oklch, red, blue)) {
+  :root {
+    --grad: linear-gradient(96deg in oklch, var(--cyan) 0%, var(--violet) 52%, var(--pink) 100%);
+  }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -201,14 +211,14 @@ p code, li code, td code, .body code {
   border: 1px solid var(--line); border-radius: var(--radius);
   background: var(--panel); padding: 20px 22px; backdrop-filter: blur(6px);
 }
-.explain .col h4 {
+.explain .col .col-h {
   font-family: var(--mono); font-size: 11.5px; font-weight: 700;
   letter-spacing: .2em; text-transform: uppercase; margin-bottom: 10px;
 }
 .explain .plain { border-top: 2px solid var(--cyan); }
-.explain .plain h4 { color: var(--cyan); }
+.explain .plain .col-h { color: var(--cyan); }
 .explain .tech { border-top: 2px solid var(--violet); }
-.explain .tech h4 { color: #c9a9f7; }
+.explain .tech .col-h { color: #c9a9f7; }
 .explain .col p { margin: 8px 0; font-size: 15.5px; }
 .explain .col p:first-of-type { margin-top: 0; }
 .explain .tech code {
@@ -330,6 +340,11 @@ table.data td code { font-size: .86em; }
 .refs li {
   border: 1px solid var(--line-soft); border-radius: 10px; background: var(--panel);
   padding: 11px 15px; font-size: 14.5px;
+  /* Paths and identifiers have no break opportunity — "/" and "_" are not
+     one — so on a phone these ran past the viewport. `anywhere` rather than
+     `break-word`: .refs is a grid, and only `anywhere` also shrinks the
+     min-content contribution that was sizing the track too wide. */
+  overflow-wrap: anywhere;
 }
 .refs a { color: var(--sky); text-decoration: none; font-family: var(--mono); font-size: 13.5px; }
 .refs a:hover { text-decoration: underline; }

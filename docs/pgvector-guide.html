@@ -16,9 +16,20 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  a { color: var(--cyan); text-decoration: none; }
+  /* Underlined in prose, not colour-only. --cyan against the --text-2 body
+     copy is 1.48:1, well under the 3:1 that WCAG 1.4.1 requires before colour
+     alone may carry the distinction — so a reader who cannot separate cyan
+     from grey has no way to tell a link from a word. The chrome (nav, contents
+     row, footer, cards) opts out: those are discrete targets in their own
+     boxes, not runs of text inside a paragraph, so there is no surrounding
+     prose to be confused with. */
+  a { color: var(--cyan); text-decoration: underline; text-underline-offset: .18em; }
+  a:hover { color: var(--text); }
 
-  a:hover { text-decoration: underline; }
+  /* .top covers both the brand and the nav; .jump is the contents row. The
+     footer is deliberately NOT here — its links sit in a run of text between
+     middots, which is exactly the case the rule above exists for. */
+  .top a, .jump a { text-decoration: none; }
 
   /* ---------- nav ---------- */
 
