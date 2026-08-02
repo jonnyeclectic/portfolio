@@ -53,14 +53,14 @@
 
   <div class="explain reveal">
     <div class="col plain">
-      <h4>In plain terms</h4>
+      <h2 class="col-h">In plain terms</h2>
       <p>It's easy to find a strategy that fit the past perfectly — and is worthless. So Cerebro repeatedly
         tunes on an early slice and tests on the <em>next</em>, unseen slice, walking forward through history.</p>
       <p>It also nudges the settings ±20% (a real edge shouldn't collapse) and penalizes results for every
         variation that was tried, because trying enough things guarantees a lucky winner.</p>
     </div>
     <div class="col tech">
-      <h4>Technically</h4>
+      <h2 class="col-h">Technically</h2>
       <p><code>walk_forward.py</code> generates rolling train/test windows (504/126, step 126) and runs each
         via a subprocess. <code>param_sensitivity.py</code> perturbs key params ±20% and writes a trial
         sidecar; <code>dsr.py</code> computes the Bailey &amp; López de Prado deflated Sharpe from N trials.</p>
@@ -128,12 +128,12 @@ flowchart TD
 
   <div class="explain reveal">
     <div class="col plain">
-      <h4>What "deflated Sharpe" means</h4>
+      <h3 class="col-h">What "deflated Sharpe" means</h3>
       <p>If you try 100 random strategies, the best one looks great by luck alone. The deflated Sharpe asks:
         "given how many we tried, is this one <em>really</em> better than noise?" — and demands 95% confidence.</p>
     </div>
     <div class="col tech">
-      <h4>How it's computed</h4>
+      <h3 class="col-h">How it's computed</h3>
       <p><code>dsr.deflated_sharpe_ratio(sharpe, t_obs, n_trials, trial_sharpes)</code> estimates the expected
         maximum Sharpe of <code>n_trials</code> noise strategies and returns the probability the observed
         Sharpe exceeds it. Threshold <code>0.95</code>, capped at <code>MAX_EFFECTIVE_TRIALS = 100</code>.</p>

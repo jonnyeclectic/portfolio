@@ -53,13 +53,13 @@
 
   <div class="explain reveal">
     <div class="col plain">
-      <h4>In plain terms</h4>
+      <h2 class="col-h">In plain terms</h2>
       <p>Now the robot trades a <em>pretend</em> account with real, live prices. This is where you find out
         whether the fills, timing, and connections behave like the backtest assumed — before any real money.</p>
       <p>A safety officer refuses to even start if anything about the setup points at a real-money account.</p>
     </div>
     <div class="col tech">
-      <h4>Technically</h4>
+      <h2 class="col-h">Technically</h2>
       <p><code>live.py</code> assembles a <code>TradingNode</code>: execution is <em>always</em> IBKR; data is
         IBKR or Databento. <code>validate_paper_mode()</code> cross-checks both the self-declared
         <code>TRADING_MODE</code> and the actual gateway port before the node builds. A

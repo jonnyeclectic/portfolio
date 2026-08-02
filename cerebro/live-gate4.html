@@ -53,13 +53,13 @@
 
   <div class="explain reveal">
     <div class="col plain">
-      <h4>In plain terms</h4>
+      <h2 class="col-h">In plain terms</h2>
       <p>Before risking real money, Cerebro compares the paper results to what the backtest promised. If they
         diverge in an important way, it flags it. A person must review and approve — the software cannot flip
         the switch itself.</p>
     </div>
     <div class="col tech">
-      <h4>Technically</h4>
+      <h2 class="col-h">Technically</h2>
       <p><code>gate_review.py</code> loads a paper-session record, runs a backtest baseline, and
         <code>compute_divergence()</code> compares Sharpe, drawdown, win-rate, slippage, and fill-rate. It
         writes a git-tracked, unchecked review doc to <code>docs/reviews/</code>. No code path approves live.</p>

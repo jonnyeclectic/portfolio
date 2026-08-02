@@ -53,14 +53,14 @@
 
   <div class="explain reveal">
     <div class="col plain">
-      <h4>In plain terms</h4>
+      <h2 class="col-h">In plain terms</h2>
       <p>Before testing any idea, Cerebro collects clean price history — including companies that were
         later delisted or acquired, so the test isn't rigged toward today's winners.</p>
       <p>It also records <em>who was in the index on each date</em>, so a backtest only ever "sees" the
         stocks that actually existed then. Then it double-checks the data for gaps and errors.</p>
     </div>
     <div class="col tech">
-      <h4>Technically</h4>
+      <h2 class="col-h">Technically</h2>
       <p><code>ingest.py</code> fetches daily bars (yfinance or Databento <code>DBEQ.BASIC</code>), writes
         an <code>Equity</code> + bar series per symbol into a <code>ParquetDataCatalog</code> at
         <code>data/catalog</code>. <code>PointInTimeUniverse</code> models membership as half-open
@@ -142,12 +142,12 @@ flowchart TD
 
   <div class="explain reveal">
     <div class="col plain">
-      <h4>Why this matters so much</h4>
+      <h3 class="col-h">Why this matters so much</h3>
       <p>If you only test on companies that still exist, your results look great for a stupid reason: you
         accidentally excluded every company that failed. That flattering illusion is <em>survivorship bias</em>.</p>
     </div>
     <div class="col tech">
-      <h4>How it's neutralized</h4>
+      <h3 class="col-h">How it's neutralized</h3>
       <p><code>Interval.contains()</code> is half-open <code>[start, end)</code>; <code>as_of(d)</code>
         returns exactly the live members. The gap between <code>members_over()</code> and the names actually
         priced is reported, not hidden — a large gap flags a still-biased evaluation.</p>

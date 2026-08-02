@@ -53,13 +53,13 @@
 
   <div class="explain reveal">
     <div class="col plain">
-      <h4>In plain terms</h4>
+      <h2 class="col-h">In plain terms</h2>
       <p>Even a good idea can blow up if you bet too big or too often. The risk layer decides <em>how much</em>
         to trade, refuses trades that would over-concentrate the book, and pulls a master switch that flattens
         everything if losses get too deep.</p>
     </div>
     <div class="col tech">
-      <h4>Technically</h4>
+      <h2 class="col-h">Technically</h2>
       <p>Each <code>Strategy</code> owns one <code>PositionSizer</code>, <code>RiskGatekeeper</code>, and
         <code>KillSwitch</code> (momentum also a <code>vol_target</code>). They are plain Python, unit-tested
         in isolation — there is no separate Nautilus "risk actor"; the layer is <em>composed</em> into the

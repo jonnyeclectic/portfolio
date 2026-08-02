@@ -211,14 +211,14 @@ p code, li code, td code, .body code {
   border: 1px solid var(--line); border-radius: var(--radius);
   background: var(--panel); padding: 20px 22px; backdrop-filter: blur(6px);
 }
-.explain .col h4 {
+.explain .col .col-h {
   font-family: var(--mono); font-size: 11.5px; font-weight: 700;
   letter-spacing: .2em; text-transform: uppercase; margin-bottom: 10px;
 }
 .explain .plain { border-top: 2px solid var(--cyan); }
-.explain .plain h4 { color: var(--cyan); }
+.explain .plain .col-h { color: var(--cyan); }
 .explain .tech { border-top: 2px solid var(--violet); }
-.explain .tech h4 { color: #c9a9f7; }
+.explain .tech .col-h { color: #c9a9f7; }
 .explain .col p { margin: 8px 0; font-size: 15.5px; }
 .explain .col p:first-of-type { margin-top: 0; }
 .explain .tech code {
