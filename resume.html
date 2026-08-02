@@ -221,6 +221,9 @@
     .tech .row .k { padding: 12px 22px 8px; }
     .tech .row .v { padding-top: 0; }
     .role .dates, .edu .dates { margin-left: 0; }
+    /* The dates sit on their own line here, so nowrap has nothing left to
+       protect and a long one is simply 17px of horizontal scroll. */
+    .role .dates { white-space: normal; }
     .company .span { margin-left: 0; }
   }
 

@@ -340,6 +340,11 @@ table.data td code { font-size: .86em; }
 .refs li {
   border: 1px solid var(--line-soft); border-radius: 10px; background: var(--panel);
   padding: 11px 15px; font-size: 14.5px;
+  /* Paths and identifiers have no break opportunity — "/" and "_" are not
+     one — so on a phone these ran past the viewport. `anywhere` rather than
+     `break-word`: .refs is a grid, and only `anywhere` also shrinks the
+     min-content contribution that was sizing the track too wide. */
+  overflow-wrap: anywhere;
 }
 .refs a { color: var(--sky); text-decoration: none; font-family: var(--mono); font-size: 13.5px; }
 .refs a:hover { text-decoration: underline; }
