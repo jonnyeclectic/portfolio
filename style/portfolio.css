@@ -65,7 +65,39 @@
   --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* --- motion & scale ---
+  /* --- space ---
+     One scale, ~1.5x, so every gap is a deliberate choice from a short list
+     rather than a number someone typed. An audit before this existed found 93
+     declarations off any scale — 5px, 7px, 13px, 17px, 26px, 34px, 74px — which
+     is what "looks slightly off but I can't say why" actually is.
+
+     The rule that matters more than the values: space BETWEEN groups must
+     exceed space WITHIN them, or the eye cannot tell where one thing ends. */
+  --s-1:   4px;
+  --s-2:   8px;
+  --s-3:  12px;
+  --s-4:  16px;
+  --s-5:  24px;
+  --s-6:  32px;
+  --s-7:  48px;
+  --s-8:  64px;
+  --s-9:  96px;
+  --s-10: 128px;
+
+  /* --- measure ---
+     Also one scale. Ten different max-widths were in play (58ch, 62ch, 66ch,
+     68ch, 620px, 760px, 860px, 880px, 900px, 960px), so no two sections shared
+     an edge and nothing lined up down the page.
+
+     --measure is the reading column: 65ch is the long-standing typographic
+     range for continuous prose (45-75). --col-wide is for a text column that
+     has to sit beside something else; --col-full is the page container. */
+  --measure:    65ch;
+  --measure-sm: 54ch;
+  --col-wide:   880px;
+  --col-full:  1120px;
+
+  /* --- motion ---
      The middle term of each clamp() is in rem so the size still responds to a
      browser zoom or a raised default font size; a pure-vw clamp ignores both
      (WCAG 1.4.4). Pages that want a different hero size override --step-hero. */
@@ -159,7 +191,7 @@ body::after {
 }
 
 /* ---------- content column ---------- */
-.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+.wrap { max-width: var(--col-full); margin: 0 auto; padding: 0 var(--s-5); position: relative; z-index: 1; }
 
 /* ============================================================================
    Site chrome — nav · logo · footer
@@ -236,6 +268,49 @@ header {
   transition: opacity .38s var(--ease), transform .38s var(--ease);
 }
 .js .reveal.in { opacity: 1; transform: none; }
+
+/* ============================================================================
+   Jump row — in-page section links
+
+   Lives here rather than in each page: four pages had their own copy and they
+   had already started to differ (one used 54px above the rule, one 34px, one
+   56px). Markup it expects:
+
+     <nav class="jump" aria-label="Sections on this page">
+       <span class="lab" aria-hidden="true">Jump to</span>
+       <a href="#section">Section</a>
+     </nav>
+
+   It belongs to the page, not the site, so it sits under the hero rather than
+   pinned above it, and only on pages that have sections to jump to.
+   ========================================================================== */
+.jump {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2);
+  margin-top: var(--s-7); padding-top: var(--s-5);
+  border-top: 1px solid var(--line-soft);
+}
+.jump .lab {
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--text-3);
+  margin-right: var(--s-1);
+}
+.jump a {
+  display: flex; align-items: center; min-height: 36px;
+  padding: var(--s-2) var(--s-3); border-radius: 999px;
+  font-size: 13.5px; color: var(--text-2); text-decoration: none;
+  border: 1px solid var(--line); background: var(--surface-1);
+  transition: color .18s var(--ease), background .18s var(--ease),
+              border-color .18s var(--ease);
+}
+@media (hover: hover) {
+  .jump a:hover { color: var(--text); background: var(--surface-2); border-color: var(--line-hi); }
+}
+@media (max-width: 620px) {
+  /* The label was sharing the first row and squeezing the first two pills onto
+     half a line each. Its own line costs one row and reads as a heading. */
+  .jump .lab { flex-basis: 100%; margin: 0 0 var(--s-1); }
+  .jump a { min-height: 40px; }   /* 2.5.5 target size on touch */
+}
 
 /* ---------- footer ---------- */
 footer { margin-top: 130px; border-top: 1px solid var(--line-soft); padding: 44px 0 60px; text-align: center; }

@@ -17,48 +17,46 @@
   }
 
   /* Underlined in prose, not colour-only. --cyan against the --text-2 body
-     copy is 1.48:1, well under the 3:1 that WCAG 1.4.1 requires before colour
-     alone may carry the distinction — so a reader who cannot separate cyan
-     from grey has no way to tell a link from a word. The chrome (nav, contents
-     row, footer, cards) opts out: those are discrete targets in their own
-     boxes, not runs of text inside a paragraph, so there is no surrounding
-     prose to be confused with. */
+
+  copy is 1.48:1, well under the 3:1 that WCAG 1.4.1 requires before colour
+
+  alone may carry the distinction — so a reader who cannot separate cyan
+
+  from grey has no way to tell a link from a word. The chrome (nav, contents
+
+  row, footer, cards) opts out: those are discrete targets in their own
+
+  boxes, not runs of text inside a paragraph, so there is no surrounding
+
+  prose to be confused with. */
+
   a { color: var(--cyan); text-decoration: underline; text-underline-offset: .18em; }
+
   a:hover { color: var(--text); }
 
   /* .top covers both the brand and the nav; .jump is the contents row. The
-     footer is deliberately NOT here — its links sit in a run of text between
-     middots, which is exactly the case the rule above exists for. */
-  .top a, .jump a { text-decoration: none; }
 
-  /* ---------- nav ---------- */
+  footer is deliberately NOT here — its links sit in a run of text between
 
-  header.top {
-    position: sticky; top: 0; z-index: 50;
-    background: rgba(7,8,15,.78); backdrop-filter: blur(14px);
-    border-bottom: 1px solid var(--line-soft);
-  }
+  middots, which is exactly the case the rule above exists for. */
 
-  .top-in {
-    max-width: 1240px; margin: 0 auto; padding: 13px 24px;
-    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
-  }
+  .nav a, .jump a { text-decoration: none; }
 
-  .brand { font-family: var(--mono); font-weight: 700; letter-spacing: .04em; color: var(--text); }
+  /* The nav, the sticky bar and the brand mark all come from
 
-  .brand span { color: var(--cyan); }
+  style/portfolio.css — this page used to carry its own copy at a different
 
-  .top nav { margin-left: auto; display: flex; gap: 18px; flex-wrap: wrap; }
-
-  .top nav a { color: var(--text-2); font-size: 13.5px; }
-
-  .top nav a:hover { color: var(--text); text-decoration: none; }
+  size, in a 1240px container, so it read as a different site. */
 
   /* ---------- layout ---------- */
 
-  main { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 0 24px 100px; }
+  main {
+    position: relative; z-index: 1;
+    max-width: var(--col-full); margin: 0 auto;
+    padding: 0 var(--s-5) var(--s-9);
+  }
 
-  section { padding-top: 62px; }
+  section { padding-top: var(--s-8); }
 
   h1, h2, h3 { line-height: 1.2; margin: 0 0 12px; }
 
@@ -243,8 +241,7 @@
 
   @media (max-width: 860px) {
     .duo, .grid3 { grid-template-columns: 1fr; }
-    main { padding: 0 16px 70px; }
-    .top-in { padding: 12px 16px; }
+    main { padding: 0 var(--s-4) var(--s-8); }
   }
 
   @media print {
@@ -277,33 +274,6 @@
   These eight links used to live in the sticky header alongside the site
 
   nav, which made an eleven-item bar out of two different kinds of link. */
-
-  .jump {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-    margin-top: 34px; padding-top: 26px;
-    border-top: 1px solid var(--line-soft);
-  }
-
-  .jump .lab {
-    font-family: var(--mono); font-size: 11px; font-weight: 700;
-    letter-spacing: .16em; text-transform: uppercase; color: var(--text-3);
-    margin-right: 6px;
-  }
-
-  .jump a {
-    display: flex; align-items: center; min-height: 36px;
-    padding: 6px 13px; border-radius: 999px;
-    font-size: 13.5px; color: var(--text-2); text-decoration: none;
-    border: 1px solid var(--line); background: var(--surface-1);
-    transition: color .18s var(--ease), background .18s var(--ease),
-                border-color .18s var(--ease);
-  }
-
-  @media (hover: hover) {
-    .jump a:hover { color: var(--text); background: var(--surface-2); border-color: var(--line-hi); }
-  }
-
-  @media (max-width: 620px) { .jump a { min-height: 40px; } }
 </style>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -319,17 +289,17 @@
 
 <a class="skip" href="#top">Skip to content</a>
 
-<header class="top">
-  <div class="top-in">
-    <a class="brand" href="../index.html">j<span>reyes</span></a>
-    <nav aria-label="Site">
-      <a href="../index.html">Home</a>
-      <a aria-current="page" href="index.html">Library</a>
-      <a href="https://jonnyeclectic.github.io/boost/">boost&nbsp;↗</a>
-      <a href="../cerebro/">Cerebro</a>
-      <a href="../resume.html">Résumé</a>
-      <a href="../contact.html">Contact</a>
-    </nav>
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="../index.html"><b>jreyes</b><span>Software Engineer</span></a>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a aria-current="page" href="index.html">Library</a></li>
+      <li><a href="https://jonnyeclectic.github.io/boost/">boost&nbsp;↗</a></li>
+      <li><a href="../cerebro/">Cerebro</a></li>
+      <li><a href="../resume.html">Résumé</a></li>
+      <li><a class="cta" href="../contact.html">Contact</a></li>
+    </ul>
   </div>
 </header>
 
