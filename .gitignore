@@ -8,3 +8,5 @@ node_modules/
 tests/visual/out/
 tests/visual/shots/
 tests/visual/.chrome-profile-*
+
+tests/visual/scroll-*/
