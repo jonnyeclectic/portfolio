@@ -92,3 +92,10 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 77 tests, fully offline — every one either exercises a pure function or
 substitutes a fake for `urlopen`. Nothing here touches the network, so the suite
 is safe to run against a spent rate-limit budget.
+
+`.github/workflows/tools.yml` runs exactly that on every push and PR touching
+`tools/**` or `tests/test_*.py`, under `-W error::ResourceWarning` so a leaked
+socket fails the build. It needs no `setup-python` and installs nothing — the
+suite is stdlib-only, so the runner's own `python3` is the whole toolchain.
+The other workflow, `visual.yml`, does not cover any of this: its path filters
+are HTML, CSS and `tests/visual/**`.

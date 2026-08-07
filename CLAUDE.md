@@ -20,7 +20,7 @@ python3 -m http.server 8000
 ```
 
 There is no linter or formatter configured for this repo. Two test suites exist,
-neither of them wired to a runner:
+each gated by its own GitHub Actions workflow, and both runnable by hand:
 
 ```
 python3 -m unittest discover -s tests -p 'test_*.py'   # tools/, offline, stdlib only
@@ -29,6 +29,18 @@ node tests/visual/visual_check.mjs                     # headless Chrome, see te
 
 The pages themselves have no unit tests — `tests/visual/` checks them as rendered,
 and the Python suite covers `tools/`.
+
+The two workflows are split by path and do not overlap, so check which one your
+change actually triggers before assuming it is covered:
+
+- `.github/workflows/visual.yml` — `**.html`, `style/**`, `cerebro/assets/**`,
+  `tests/visual/**`. Layout sweep plus axe-core WCAG 2.1 A/AA, and it uploads
+  scroll-through screenshots for review by eye.
+- `.github/workflows/tools.yml` — `tools/**`, `tests/test_*.py`. The Python
+  suite, no dependency install.
+
+A change to anything else — a redirect stub, `mobile/`, the legacy template
+assets — runs nothing at all.
 
 ## Live site vs. legacy cruft
 
