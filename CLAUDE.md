@@ -4,9 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Jonathan Reyes's personal portfolio site: static HTML/CSS/JS, no build tooling, no
-package manager, no test suite. There is nothing to `npm install` or compile — edit
-the HTML files directly.
+Jonathan Reyes's personal portfolio site: static HTML/CSS/JS, no build tooling and
+no package manager. There is nothing to compile — edit the HTML files directly.
+
+Two directories are developer tooling rather than site content, and neither is
+served to visitors: `tests/` and `tools/`.
 
 ## Working locally
 
@@ -17,7 +19,16 @@ relative links and the favicon data-URI, e.g.:
 python3 -m http.server 8000
 ```
 
-There is no linter, formatter, or test command configured for this repo.
+There is no linter or formatter configured for this repo. Two test suites exist,
+neither of them wired to a runner:
+
+```
+python3 -m unittest discover -s tests -p 'test_*.py'   # tools/, offline, stdlib only
+node tests/visual/visual_check.mjs                     # headless Chrome, see tests/visual/README.md
+```
+
+The pages themselves have no unit tests — `tests/visual/` checks them as rendered,
+and the Python suite covers `tools/`.
 
 ## Live site vs. legacy cruft
 
