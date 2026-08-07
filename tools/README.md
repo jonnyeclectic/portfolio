@@ -63,6 +63,25 @@ the API. Authenticate whenever comment detail matters.
 - **A feed that declares a DTD is refused.** `xml.etree` expands internal
   entities, which makes a hostile internal subset an amplification vector.
   Reddit's feeds never carry a DOCTYPE, so rejecting one costs nothing.
+- **A post id that is not a plain id is refused**, because it is interpolated
+  into a request path — a `?` in the argument would otherwise rewrite the query
+  string rather than name a post.
+- **Every request is checked against a two-host allow-list.** Nothing can reach
+  another host by construction; the check makes that an enforced invariant
+  rather than one you have to re-derive by reading the callers.
+
+### Snyk
+
+`snyk code test tools/` reports five findings, all reviewed and none actionable:
+
+- **Insecure Xml Parser (Python < 3.11)** — the rule's own title is the answer;
+  this runs on 3.14, and the DTD refusal above closes it on older runtimes too.
+- **SSRF ×4** — the taint is a CLI argument reaching `urlopen`, which is what a
+  Reddit fetcher does. Every URL is built from a constant base with urlencoded
+  params, and `_check_host` enforces it. Snyk does not model that as a
+  sanitizer, so the findings persist; making them disappear would mean
+  restructuring for the taint engine rather than for correctness.
+- **Path Traversal (Low)** — `-o` writes where the person running it says to.
 
 ## Tests
 
@@ -70,6 +89,6 @@ the API. Authenticate whenever comment detail matters.
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-71 tests, fully offline — every one either exercises a pure function or
+77 tests, fully offline — every one either exercises a pure function or
 substitutes a fake for `urlopen`. Nothing here touches the network, so the suite
 is safe to run against a spent rate-limit budget.

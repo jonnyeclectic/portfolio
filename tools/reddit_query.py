@@ -99,8 +99,24 @@ def _throttle():
     _last_call[0] = time.monotonic()
 
 
+ALLOWED_HOSTS = frozenset({"www.reddit.com", "oauth.reddit.com"})
+
+
+def _check_host(url):
+    """Enforce the invariant that every URL is built from one of the two bases.
+
+    Nothing here should ever be able to reach another host — user input only
+    becomes urlencoded query params or a validated post id — so this asserts
+    that rather than leaving it to be re-derived by reading the callers.
+    """
+    host = (urllib.parse.urlparse(url).hostname or "").lower()
+    if host not in ALLOWED_HOSTS:
+        raise SystemExit(f"refusing to request a non-Reddit host: {host!r}")
+
+
 def _request(url, headers, data=None, max_retries=6, parse="json"):
     """GET/POST with exponential backoff on 429 and 5xx, honoring Retry-After."""
+    _check_host(url)
     delay = 5.0
     last_err = None
     for attempt in range(max_retries):
@@ -414,14 +430,23 @@ def search(base, headers, query, subreddits=None, sort="relevance", time_filter=
 
 
 POST_ID_RE = re.compile(r"/comments/([a-z0-9]+)", re.I)
+BARE_ID_RE = re.compile(r"[a-z0-9]+\Z", re.I)
 
 
 def extract_post_id(ref):
-    """Accept a full URL, a permalink, or a bare id like 'abc123' / 't3_abc123'."""
+    """Accept a full URL, a permalink, or a bare id like 'abc123' / 't3_abc123'.
+
+    The result is interpolated straight into a request path, so anything that
+    is not a plain id is rejected rather than passed along — otherwise a '?' or
+    '#' in the argument silently rewrites the query string of the request.
+    """
     m = POST_ID_RE.search(ref)
     if m:
         return m.group(1)
-    return ref.strip().removeprefix("t3_").rstrip("/").split("/")[-1]
+    candidate = ref.strip().removeprefix("t3_").rstrip("/").split("/")[-1]
+    if not BARE_ID_RE.fullmatch(candidate):
+        raise SystemExit(f"not a usable Reddit post id or link: {ref!r}")
+    return candidate
 
 
 def _walk(children, depth, out, min_score, max_chars):

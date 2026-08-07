@@ -144,13 +144,34 @@ class RequestTest(unittest.TestCase):
             setattr(self, attr, patcher.start())
             self.addCleanup(patcher.stop)
 
+    def test_accepts_both_reddit_hosts(self):
+        for host in ("www.reddit.com", "oauth.reddit.com"):
+            with self.subTest(host=host):
+                rq._check_host(f"https://{host}/search?q=x")
+
+    def test_refuses_any_other_host(self):
+        for url in (
+            "https://evil.example/x",
+            "http://169.254.169.254/latest/meta-data/",
+            "https://reddit.com.evil.example/x",
+            "file:///etc/passwd",
+        ):
+            with self.subTest(url=url), self.assertRaises(SystemExit):
+                rq._check_host(url)
+
+    def test_a_refused_host_never_reaches_urlopen(self):
+        with mock.patch.object(rq.urllib.request, "urlopen") as urlopen:
+            with self.assertRaises(SystemExit):
+                rq._request("https://evil.example/x", {})
+        urlopen.assert_not_called()
+
     def test_always_requests_gzip(self):
         # Uncompressed Reddit JSON runs 200-300KB and was truncated in transit
         # every single time; asking for gzip is the fix, so it must not regress.
         body = gzipped(b'{"ok": true}')
         with mock.patch.object(rq.urllib.request, "urlopen") as urlopen:
             urlopen.return_value = response(body, {"Content-Encoding": "gzip"})
-            rq._request("https://example.test/x", {"User-Agent": "t"})
+            rq._request("https://www.reddit.com/x", {"User-Agent": "t"})
         sent = urlopen.call_args[0][0]
         self.assertEqual(sent.get_header("Accept-encoding"), "gzip")
 
@@ -159,13 +180,13 @@ class RequestTest(unittest.TestCase):
             urlopen.return_value = response(
                 gzipped(b'{"data": {"children": []}}'), {"Content-Encoding": "gzip"}
             )
-            out = rq._request("https://example.test/x", {})
+            out = rq._request("https://www.reddit.com/x", {})
         self.assertEqual(out, {"data": {"children": []}})
 
     def test_passes_through_an_uncompressed_response(self):
         with mock.patch.object(rq.urllib.request, "urlopen") as urlopen:
             urlopen.return_value = response(b'{"n": 1}')
-            self.assertEqual(rq._request("https://example.test/x", {}), {"n": 1})
+            self.assertEqual(rq._request("https://www.reddit.com/x", {}), {"n": 1})
 
     def test_retries_truncated_json_and_succeeds_on_a_later_attempt(self):
         good = gzipped(b'{"n": 2}')
@@ -174,7 +195,7 @@ class RequestTest(unittest.TestCase):
             response(good, {"Content-Encoding": "gzip"}),
         ]
         with mock.patch.object(rq.urllib.request, "urlopen", side_effect=attempts):
-            out = rq._request("https://example.test/x", {})
+            out = rq._request("https://www.reddit.com/x", {})
         self.assertEqual(out, {"n": 2})
         self.sleep.assert_called()
 
@@ -182,14 +203,14 @@ class RequestTest(unittest.TestCase):
         bad = [response(b'{"unterminated') for _ in range(3)]
         with mock.patch.object(rq.urllib.request, "urlopen", side_effect=bad):
             with self.assertRaises(SystemExit):
-                rq._request("https://example.test/x", {}, max_retries=3)
+                rq._request("https://www.reddit.com/x", {}, max_retries=3)
 
     def test_incomplete_read_keeps_the_partial_body_for_rss(self):
         # RSS is salvageable, so a short read must be returned rather than raised.
         raw = b"<feed><entry>one</entry><entry>tw"
         with mock.patch.object(rq.urllib.request, "urlopen") as urlopen:
             urlopen.return_value = response(raw, incomplete_after=len(raw))
-            out = rq._request("https://example.test/x", {}, parse="text")
+            out = rq._request("https://www.reddit.com/x", {}, parse="text")
         self.assertTrue(out.endswith("<entry>tw"))
 
     def test_sleeps_when_the_rate_limit_budget_is_spent(self):
@@ -200,12 +221,12 @@ class RequestTest(unittest.TestCase):
         }
         with mock.patch.object(rq.urllib.request, "urlopen") as urlopen:
             urlopen.return_value = response(gzipped(b"{}"), headers)
-            rq._request("https://example.test/x", {})
+            rq._request("https://www.reddit.com/x", {})
         self.assertIn(39.0, [call[0][0] for call in self.sleep.call_args_list])
 
     def http_error(self, code, reason, headers=None):
         err = rq.urllib.error.HTTPError(
-            "https://example.test/x", code, reason, headers or email.message.Message(), None
+            "https://www.reddit.com/x", code, reason, headers or email.message.Message(), None
         )
         self.addCleanup(err.close)
         return err
@@ -214,7 +235,7 @@ class RequestTest(unittest.TestCase):
         err = self.http_error(403, "Forbidden")
         with mock.patch.object(rq.urllib.request, "urlopen", side_effect=err):
             with self.assertRaises(SystemExit) as caught:
-                rq._request("https://example.test/x", {})
+                rq._request("https://www.reddit.com/x", {})
         self.assertIn("REDDIT_CLIENT_ID", str(caught.exception))
 
     def test_429_honors_retry_after_then_succeeds(self):
@@ -226,7 +247,7 @@ class RequestTest(unittest.TestCase):
             "urlopen",
             side_effect=[err, response(gzipped(b'{"n": 3}'), {"Content-Encoding": "gzip"})],
         ):
-            out = rq._request("https://example.test/x", {})
+            out = rq._request("https://www.reddit.com/x", {})
         self.assertEqual(out, {"n": 3})
         self.assertIn(8.0, [call[0][0] for call in self.sleep.call_args_list])
 
@@ -327,6 +348,22 @@ class PostIdTest(unittest.TestCase):
     def test_comment_permalink_still_resolves_to_the_post(self):
         link = "/r/x/comments/abc123/title/def456/"
         self.assertEqual(rq.extract_post_id(link), "abc123")
+
+    def test_rejects_anything_that_is_not_a_plain_id(self):
+        # The id goes straight into a request path, so a '?' or '#' would
+        # rewrite the query string rather than name a post.
+        for bad in ("abc?limit=1", "abc#frag", "abc 123", "", "a&b", "abc.rss"):
+            with self.subTest(ref=bad), self.assertRaises(SystemExit):
+                rq.extract_post_id(bad)
+
+    def test_traversal_collapses_to_the_last_segment(self):
+        self.assertEqual(rq.extract_post_id("../../etc"), "etc")
+
+    def test_a_rejected_id_never_reaches_the_network(self):
+        with mock.patch.object(rq, "_request") as req:
+            with self.assertRaises(SystemExit):
+                rq.get_thread(rq.OAUTH_BASE, {}, "abc?limit=1")
+        req.assert_not_called()
 
 
 class EntryFieldsTest(unittest.TestCase):
