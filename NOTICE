@@ -1,0 +1,41 @@
+# NOTICE
+
+This repository holds two bodies of work under two different licenses. The
+`LICENSE` file (GNU GPL v3) covers the first; it does not cover the second.
+
+## Covered by LICENSE (GPL-3.0)
+
+Jonathan Michael Reyes's own work, which is everything not listed in the next
+section. In particular:
+
+    index.html  resume.html  contact.html   the live site
+    style/                                  the shared stylesheet
+    cerebro/  docs/                         the architecture and guide pages
+    tools/  tests/                          developer tooling and test suites
+    .github/workflows/                      CI
+
+## NOT covered by LICENSE
+
+A purchased W3Layouts template, vendored into this repository during an earlier
+redesign and now consumed only by the legacy redirect stubs. It remains under
+its own terms, recorded in `license.txt` (Creative Commons Attribution 3.0
+Unported) and `w3layouts-License.txt`:
+
+    css/  js/  2images/                     template stylesheets and scripts
+    mobile/                                 a parallel copy of the template
+    coolclock.js  excanvas.js
+    moreskins.js  default.css               template libraries
+    2index.html  m.index.html
+    portfolio.html  samplepage.html
+    about.html                              redirect stubs built on it
+
+Third-party libraries inside those directories — Bootstrap, jQuery, Modernizr,
+mixitup, swipebox, responsiveslides and others — carry their own licenses, which
+are stated in their own file headers and are unaffected by either license here.
+
+## Why the split is spelled out
+
+CC-BY-3.0 is not one-way compatible with GPLv3 the way CC-BY-4.0 is, so a single
+repository-wide license would misstate the terms on one body of work or the
+other. Naming the boundary is clearer than leaving it to be inferred from
+directory names.
