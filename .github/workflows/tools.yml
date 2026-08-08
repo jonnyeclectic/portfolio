@@ -1,0 +1,54 @@
+name: tools
+
+# The Python suite over tools/, which visual.yml does not reach — its path
+# filters are all HTML, CSS and the visual harness, so every commit that
+# touches only tools/ or tests/test_*.py lands with nothing run against it.
+#
+# tools/reddit_query.py is a network client whose every real bug was in the
+# transport layer (silent gzip truncation, IncompleteRead, double-unescaped
+# entities). The suite is the record of those bugs, so it needs to run on its
+# own without being remembered.
+#
+# No setup-python step and no dependency install: the suite is stdlib-only and
+# fully offline, faking urlopen rather than reaching the network, so the
+# runner's preinstalled python3 is the whole toolchain. Anything >= 3.9 works
+# (str.removeprefix is the floor).
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "tools/**"
+      - "tests/test_*.py"
+      - ".github/workflows/tools.yml"
+  pull_request:
+    paths:
+      - "tools/**"
+      - "tests/test_*.py"
+      - ".github/workflows/tools.yml"
+
+permissions: {}
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: harden runner (egress audit)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: record the interpreter
+        # Printed so a version-specific failure is diagnosable from the log
+        # alone, rather than needing a rerun to find out what ran.
+        run: python3 -VV
+      - name: unit tests
+        # -W error::ResourceWarning turns a leaked socket or file handle into a
+        # failure. For a suite that fakes a network client, an unclosed response
+        # is exactly the kind of bug worth catching here.
+        run: python3 -W error::ResourceWarning -m unittest discover -s tests -p 'test_*.py' -v

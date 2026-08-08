@@ -10,3 +10,6 @@ tests/visual/shots/
 tests/visual/.chrome-profile-*
 
 tests/visual/scroll-*/
+
+# tools/ — Python bytecode caches
+__pycache__/
