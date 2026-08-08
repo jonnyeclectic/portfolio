@@ -314,7 +314,7 @@
       <!-- ================= SUMMARY ================= -->
       <div class="block reveal" id="summary">
         <h2 class="eyebrow">Summary</h2>
-        <p class="intro">Lead software engineer with <b>11 years building distributed systems, APIs, and developer platforms</b> in regulated financial services. At Capital One, leads architecture for a high-throughput platform orchestrating communications with external dealership partners, and previously ran the platform ecosystem around the company-wide JFrog Artifactory binary repository. Owned external-facing lending APIs end to end. Author and maintainer of <b>boost</b>, an independent open-source package manager for AI coding skills. Works primarily in <b>Java and Python on AWS</b>, with a record of setting standards that spread beyond team boundaries.</p>
+        <p class="intro">Lead software engineer with <b>11 years building distributed systems, APIs, and developer platforms</b> in regulated financial services. At Capital One, leads architecture for a high-throughput platform orchestrating communications with external dealership partners, and previously ran the platform ecosystem around the company-wide JFrog Artifactory binary repository. Leads both net-new architecture and changes to it through <b>Architecture Decision Records</b>, including AI systems. Author and maintainer of <b>boost</b>, an independent open-source package manager for AI coding skills. Works primarily in <b>Java and Python on AWS</b>, with a record of setting standards that spread beyond team boundaries.</p>
       </div>
 
       <!-- ================= EXPERIENCE ================= -->
@@ -334,17 +334,17 @@
           <ul>
             <li>Lead architecture, technical direction, and delivery for a <b>high-throughput platform orchestrating communications with external dealership partners</b>, built on AWS microservices (ECS, API Gateway, SQS, Kafka, Docker, PostgreSQL, Oracle).</li>
             <li>Led a <b>zero-loss migration of a highly stateful distributed system</b> between AWS accounts — coupled Spring Boot streams spanning Oracle, PostgreSQL, SQS, and Kafka — traffic-splitting live workloads under tight SLAs without dropping or duplicating a request.</li>
-            <li>Built a <b>document-intelligence pipeline</b> using AWS Textract that extracts structured findings from unstructured partner documents, replacing manual review for analyst teams.</li>
-            <li>Support <b>PCI, NPI, and model-risk reviews</b> — classifying sensitive data and remediating via tokenization and masking; re-architected the platform's LLM solution after data classification surfaced highly confidential information, evolving from Textract to <b>AWS Bedrock</b> and then to a vision-language model (Llama) while tuning extraction schemas, prompts, and golden-set evaluations in production.</li>
+            <li>Built a <b>document-intelligence pipeline</b> that extracts structured findings from unstructured partner documents, replacing manual review for analyst teams.</li>
+            <li>Support <b>PCI, NPI, and model-risk reviews</b> — classifying sensitive data and remediating via tokenization and masking; re-architected the platform's OCR solution after data classification surfaced highly confidential information, evolving from Textract through <b>AWS Bedrock</b> to a vision-language model (Llama) while tuning extraction schemas, prompts, and golden-set evaluations in production.</li>
             <li>Designed <b>event-driven processing pipelines</b> in which EventBridge rules trigger Step Functions orchestrating AWS Batch jobs over S3 file drops, with companion state machines verifying downstream delivery and raising alarms.</li>
             <li>Practice <b>AI-assisted engineering</b> daily (Claude Code, Windsurf) with <b>MCP integrations</b> across Jira, Confluence, and GitHub; integrate agent tooling into development workflows and set team conventions for its use.</li>
-            <li>Prototyped a <b>LangChain-based RAG developer-enablement tool</b> at an internal hackathon — retrieval over large JSON corpora — that drew adoption requests from engineering managers across teams.</li>
+            <li>Prototyped <b>several developer-enablement tools</b> at internal hackathons — including retrieval over large JSON corpora — that drew adoption requests from engineering managers across teams.</li>
             <li>Own production operations end to end: on-call rotations, incident triage,
               root-cause investigation, and continuous monitoring, alerting, and
               observability built on <b>OpenTelemetry, CloudWatch, New Relic, Splunk,
               PagerDuty, and Prometheus</b>.</li>
             <li>Serve as <b>Testing Champion for the Sales organization</b>, defining test
-              strategy and quality standards adopted across four engineering teams and
+              strategy and quality standards adopted across five engineering teams and
               reporting posture to leadership.</li>
             <li>Mentor engineers, serve as a <b>technical interviewer</b> for coding and
               system design, and lead cross-functional delivery from scoping through
@@ -421,7 +421,7 @@
           <ul>
             <li>Author and maintainer of an <b>open-source CLI with its own MCP server</b> that searches, installs,
               and governs AI coding skills across Claude Code, Windsurf, and Cursor —
-              72 commands spanning install, discovery, authoring, governance, and rollout.</li>
+              70+ commands spanning install, discovery, authoring, governance, and rollout.</li>
             <li>Designed the lock-file and audit model that treats agent skills as
               versioned, verifiable dependencies rather than copied files; indexes
               10,000+ publicly available skills.</li>
