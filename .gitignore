@@ -1,7 +1,20 @@
 # macOS
 .DS_Store
+
+# Interview prep — describes internal employer architecture in more detail than
+# the public pages do. Deliberately not published with the site.
 lumen-practice.md
 lumen-study-guide.html
+deck/
+
+# Job-application artifacts. Nothing in them is more sensitive than the live
+# pages already are, but this repo is the portfolio itself — a letter addressed
+# to one company does not belong in a tree other companies browse.
+make-cover-letter.py
+*.docx
+
+# Editor / assistant workspace state, not project content.
+.serena/
 
 # tests/visual — headless-Chrome sweeps (see tests/visual/README.md)
 node_modules/
