@@ -1,8 +1,18 @@
 name: tools
 
-# The Python suite over tools/, which visual.yml does not reach — its path
-# filters are all HTML, CSS and the visual harness, so every commit that
-# touches only tools/ or tests/test_*.py lands with nothing run against it.
+# The Python suite. Two things live in it, and they need different triggers.
+#
+# tools/ is what visual.yml does not reach — its path filters are all HTML, CSS
+# and the visual harness, so every commit touching only tools/ or
+# tests/test_*.py would otherwise land with nothing run against it.
+#
+# test_site_positioning.py runs the other way round: it reads the live pages,
+# so it has to fire on HTML edits too. That is why "**.html" is in the filter
+# below even though this workflow is nominally about tools/. Without it the
+# guard would sit green while the exact edit it exists to catch sailed past,
+# because visual.yml renders pages but never runs Python. The suite is
+# stdlib-only and finishes in well under a second, so the extra trigger is
+# close to free.
 #
 # tools/reddit_query.py is a network client whose every real bug was in the
 # transport layer (silent gzip truncation, IncompleteRead, double-unescaped
@@ -20,11 +30,13 @@ on:
     paths:
       - "tools/**"
       - "tests/test_*.py"
+      - "**.html"
       - ".github/workflows/tools.yml"
   pull_request:
     paths:
       - "tools/**"
       - "tests/test_*.py"
+      - "**.html"
       - ".github/workflows/tools.yml"
 
 permissions: {}
