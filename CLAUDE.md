@@ -27,20 +27,26 @@ python3 -m unittest discover -s tests -p 'test_*.py'   # tools/, offline, stdlib
 node tests/visual/visual_check.mjs                     # headless Chrome, see tests/visual/README.md
 ```
 
-The pages themselves have no unit tests — `tests/visual/` checks them as rendered,
-and the Python suite covers `tools/`.
+`tests/visual/` checks the pages as rendered. The Python suite covers `tools/`,
+plus one page-level guard: `tests/test_site_positioning.py` asserts the claims the
+site makes about Jonathan's title — see "Title vs. headline" below.
 
-The two workflows are split by path and do not overlap, so check which one your
-change actually triggers before assuming it is covered:
+The two workflows overlap only on `**.html`, which both now watch. Check which one
+your change actually triggers before assuming it is covered:
 
 - `.github/workflows/visual.yml` — `**.html`, `style/**`, `cerebro/assets/**`,
   `tests/visual/**`. Layout sweep plus axe-core WCAG 2.1 A/AA, and it uploads
   scroll-through screenshots for review by eye.
-- `.github/workflows/tools.yml` — `tools/**`, `tests/test_*.py`. The Python
-  suite, no dependency install.
+- `.github/workflows/tools.yml` — `tools/**`, `tests/test_*.py`, `**.html`. The
+  Python suite, no dependency install. It shares the `**.html` filter with
+  `visual.yml` because `test_site_positioning.py` reads the live pages.
 
-A change to anything else — a redirect stub, `mobile/`, the legacy template
-assets — runs nothing at all.
+Both `**.html` globs are repo-wide, so a redirect stub or a `mobile/` page does
+trigger them. What runs nothing at all is everything that is not HTML and not
+listed above: the legacy template assets (`css/`, `js/`, `2images/`, root
+`coolclock.js`/`excanvas.js`/`moreskins.js`/`default.css`), and `images/` —
+including `images/Jonathan Reyes Resume.pdf`, so a resume regen is gated by
+nothing and its consequences for the pages have to be checked by hand.
 
 ## Live site vs. legacy cruft
 
@@ -98,3 +104,27 @@ When asked to update site content or styling, assume the request is about
 - Recent history also shows a deliberate copy-tone pass ("mature copy tone and fix
   grammar/formatting") — keep new copy consistent with that tone rather than
   reintroducing casual phrasing.
+
+### Title vs. headline
+
+Two near-identical strings on this site mean different things, and conflating them
+is the easiest mistake to make here:
+
+- **"AI Lead Software Engineer"** is the *headline* — how Jonathan positions
+  himself. It belongs in the hero badge, the footer byline on every page, the
+  cerebro project byline, and meta descriptions.
+- **"Lead Software Engineer"**, plain, is the *employer job title* — what Capital
+  One actually calls the role. It belongs in the experience-timeline `<h4>` on
+  `index.html` and `resume.html`, and nowhere else.
+
+The resume PDF keeps them apart the same way: its header reads "AI LEAD SOFTWARE
+ENGINEER" while its experience entry reads "Lead Software Engineer | CAPITAL ONE".
+Prefixing the role heading with "AI", or writing "AI Lead Software Engineer ·
+Capital One", turns a self-description into a claim about what an employer
+conferred — on a page recruiters verify. A site-wide find-and-replace does exactly
+that and looks perfectly reasonable in a diff, which is why
+`tests/test_site_positioning.py` asserts both halves.
+
+The five redirect stubs still carry the old title in `<title>`. They are
+`noindex` + meta-refresh + canonical, so it reaches neither reader nor crawler;
+they are deliberately out of scope, and the test records that.
