@@ -335,7 +335,8 @@
             <li>Lead architecture, technical direction, and delivery for a <b>high-throughput platform orchestrating communications with external dealership partners</b>, built on AWS microservices (ECS, API Gateway, SQS, Kafka, Docker, PostgreSQL, Oracle).</li>
             <li>Led a <b>zero-loss migration of a highly stateful distributed system</b> between AWS accounts — coupled Spring Boot streams spanning Oracle, PostgreSQL, SQS, and Kafka — traffic-splitting live workloads under tight SLAs without dropping or duplicating a request.</li>
             <li>Built a <b>document-intelligence pipeline</b> that extracts structured findings from unstructured partner documents, replacing manual review for analyst teams.</li>
-            <li>Support <b>PCI, NPI, and model-risk reviews</b> — classifying sensitive data and remediating via tokenization and masking; re-architected the platform's OCR solution after data classification surfaced highly confidential information, evolving from Textract through <b>AWS Bedrock</b> to a vision-language model (Llama) while tuning extraction schemas, prompts, and golden-set evaluations in production.</li>
+            <li>Re-architected that pipeline's extraction path from <b>AWS Textract</b> through <b>AWS Bedrock</b> to a <b>vision-language model (Llama)</b> when image-based submissions defeated OCR, tuning extraction schemas, prompts, and <b>golden-set evaluations</b> in production.</li>
+            <li>Support <b>PCI, NPI, and model-risk reviews</b> — classifying sensitive data and remediating via tokenization and masking.</li>
             <li>Designed <b>event-driven processing pipelines</b> in which EventBridge rules trigger Step Functions orchestrating AWS Batch jobs over S3 file drops, with companion state machines verifying downstream delivery and raising alarms.</li>
             <li>Practice <b>AI-assisted engineering</b> daily (Claude Code, Windsurf) with <b>MCP integrations</b> across Jira, Confluence, and GitHub; integrate agent tooling into development workflows and set team conventions for its use.</li>
             <li>Prototyped <b>several developer-enablement tools</b> at internal hackathons — including retrieval over large JSON corpora — that drew adoption requests from engineering managers across teams.</li>
@@ -444,11 +445,11 @@
           </div>
           <div class="row">
             <div class="k">Cloud &amp; Infrastructure</div>
-            <div class="v"><code class="hot">AWS (ECS, Lambda, Step Functions, EventBridge, API Gateway, DynamoDB, Aurora, Textract, Bedrock)</code><code>IAM</code><code>Docker</code><code>Kubernetes</code><code>OpenShift</code><code>Terraform</code><code>Linux</code></div>
+            <div class="v"><code class="hot">AWS (ECS, Lambda, Step Functions, EventBridge, API Gateway, DynamoDB, Aurora, Textract, Bedrock)</code><code>IAM</code><code>Docker</code><code>OpenShift (Kubernetes)</code><code>Terraform</code><code>Linux</code></div>
           </div>
           <div class="row">
             <div class="k">AI &amp; Automation</div>
-            <div class="v"><code class="hot">AI-assisted engineering (Claude Code, Windsurf)</code><code class="hot">MCP integrations</code><code>prompt engineering</code><code>LLM evaluation (ragas, golden-set evals)</code><code>LangChain (RAG)</code><code>document intelligence</code></div>
+            <div class="v"><code class="hot">AI-assisted engineering (Claude Code, Windsurf)</code><code class="hot">MCP integrations</code><code>prompt engineering</code><code>LLM evaluation (ragas, golden-set evals)</code><code>retrieval (BM25, dense, hybrid)</code><code>document intelligence</code></div>
           </div>
           <div class="row">
             <div class="k">Platform &amp; Delivery</div>
