@@ -47,15 +47,8 @@ break it on purpose before trusting it.
 The two workflows overlap only on `**.html`, which both watch. Check which one
 your change actually triggers before assuming it is covered:
 
-- `.github/workflows/visual.yml` — `**.html`, `style/**`, `cerebro/assets/**`,
-  `tests/visual/**`. Layout sweep plus axe-core WCAG 2.1 A/AA, and it uploads
-  scroll-through screenshots for review by eye.
-- `.github/workflows/tools.yml` — `tools/**`, `tests/**.py`, `**.html`,
-  `images/**`. The Python suite, no dependency install. It shares the `**.html`
-  filter with `visual.yml` because both page-level guards read the live pages,
-  and it watches `images/**` because `test_site_claims.py` reads the resume PDF.
-  The test glob is `tests/**.py` rather than `tests/test_*.py` so that a change
-  to the `pdftext.py` helper cannot land untested.
+Read the `paths:` filters in `visual.yml` and `tools.yml` for the current
+lists — both files carry header comments explaining why each glob is there.
 
 Both `**.html` globs are repo-wide, so a redirect stub or a `mobile/` page does
 trigger them. What runs nothing at all is the legacy template assets (`css/`,
