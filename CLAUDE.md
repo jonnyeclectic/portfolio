@@ -146,12 +146,30 @@ already broken once each. Read it before rewording anything factual.
   contact page's role spec says the same thing to someone who already chose to
   land there.
 
-**The resume PDF lags the pages** and it is the artifact that gets forwarded.
-It is a Google Docs export, so correcting it means editing the source document
-and re-exporting — it cannot be patched from this repo. `KNOWN_PDF_LAG` in
-`test_site_claims.py` pins exactly which retired claims it still carries; the
-test fails both if a new one appears *and* once the PDF is regenerated, which
-is the prompt to empty the set and delete the test.
+**The resume PDF is in sync with the pages as of 2026-08-10, and it is the
+artifact that gets forwarded.** It is a Google Docs export, so correcting it
+means editing the source document and re-exporting — it cannot be patched from
+this repo. The canonical source is the Drive doc **"Resume Template"**
+(`1hbQtDY6D_s1B4l6JWsb4TGRdR_Kr9fvksp3kD6WZCws`); the other three resume docs
+in Drive are superseded and disagree with it.
+
+`test_site_claims.py` holds the PDF to the same standard as the pages: no
+retired claim, the same rebuild cause, no serving stack named, no partner
+named, and the title/headline split intact. It previously tolerated a fixed
+`KNOWN_PDF_LAG` set while the export trailed; that ratchet reached its stop and
+the exemption is gone.
+
+Two traps worth knowing before editing that document:
+
+- **It mixes straight and smart apostrophes** — `platform's` is straight while
+  `Capital One’s` is curly. A find-and-replace string spanning an apostrophe
+  will silently match nothing. Keep find-strings on one side of it.
+- **Substring containment makes the obvious title assertion vacuous.** "AI Lead
+  Software Engineer | CAPITAL ONE" *contains* "Lead Software Engineer | CAPITAL
+  ONE", so `assertIn` passes on exactly the mutation it appears to guard. The
+  PDF guard needs a separate negative assertion, and does have one — found by
+  mutation testing, after the identical trap had already made the LangChain
+  chip guard vacuous once.
 
 ### Title vs. headline
 

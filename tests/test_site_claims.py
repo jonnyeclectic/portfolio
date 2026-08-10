@@ -55,12 +55,10 @@ RETIRED_CLAIMS = {
     "langchain-skill": re.compile(r"\bLangChain\s*\(RAG\)", re.I),
 }
 
-# The resume PDF is exported from Google Docs by hand, so it lags the pages
-# whenever a claim changes. This pins exactly how far it lags: the test fails
-# if a *new* retired claim shows up in it, and it also fails once the PDF is
-# regenerated — at which point this set should shrink to empty and then be
-# deleted along with the test. It is a ratchet, not a permanent exemption.
-KNOWN_PDF_LAG = {"wrong-cause", "langchain-skill"}
+# The PDF used to lag the pages, and a KNOWN_PDF_LAG set pinned exactly how
+# far. It was regenerated from the Google Doc on 2026-08-10 and now carries
+# none of the retired wordings, so the ratchet has reached its stop and the
+# exemption is gone: the PDF is held to the same standard as the pages.
 
 _CHIP = re.compile(r"<code[^>]*>(.*?)</code>", re.S)
 
@@ -188,30 +186,67 @@ class ResumePdfIsGoverned(unittest.TestCase):
         self.assertIn("AI LEAD SOFTWARE ENGINEER", self.text.upper())
         self.assertIn("Lead Software Engineer | CAPITAL ONE", self.text)
 
+        # And the entry must not be the *inflated* form. That needs its own
+        # assertion because "AI Lead Software Engineer | CAPITAL ONE" contains
+        # "Lead Software Engineer | CAPITAL ONE" as a substring, so the
+        # assertIn above passes on precisely the mutation it looks like it is
+        # guarding. Mutation testing caught this; the identical containment
+        # trap had already made the LangChain chip guard vacuous once, which
+        # is the argument for breaking every one of these on purpose.
+        self.assertIsNone(
+            re.search(r"\bAI\s+Lead\s+Software\s+Engineer\s*\|\s*CAPITAL\s+ONE",
+                      self.text, re.I),
+            "the resume PDF's experience entry now claims Capital One "
+            "conferred the title 'AI Lead Software Engineer'. It did not — "
+            "that is the headline, and this is the one page recruiters "
+            "verify. Fix the Google Doc and re-export.")
+
     def test_no_partner_is_named(self):
         for name in PARTNER_NAMES:
             with self.subTest(partner=name):
                 self.assertNotIn(name, self.text)
 
-    def test_pdf_lag_behind_the_pages_is_exactly_the_known_set(self):
-        """Pins how far the hand-exported PDF trails the corrected pages.
+    def test_pdf_carries_no_retired_claim(self):
+        """The PDF is held to the same standard as the pages.
 
-        Fails two ways, both of them wanted. A retired claim appearing in a
-        fresh export fails immediately. And once the PDF is regenerated from
-        the Google Doc, the stale set shrinks and this fails too — which is
-        the prompt to empty `KNOWN_PDF_LAG` and delete this test.
+        This replaced a ratchet. While the export lagged, the test asserted
+        the lag was *exactly* a known set, so a new stale claim failed loudly
+        while the two known ones were tolerated. The 2026-08-10 regeneration
+        emptied that set, and tolerating nothing is simply the ratchet at its
+        stop — the assertion the whole mechanism existed to arrive at.
+
+        Worth stating plainly: the PDF is the artifact that leaves Jonathan's
+        control. A page can be corrected after the fact; a PDF someone
+        forwarded to a recruiter three weeks ago cannot.
         """
-        stale = {name for name, pattern in RETIRED_CLAIMS.items()
-                 if pattern.search(self.text)}
+        stale = sorted(name for name, pattern in RETIRED_CLAIMS.items()
+                       if pattern.search(self.text))
         self.assertEqual(
-            stale, KNOWN_PDF_LAG,
-            "the resume PDF's known lag has changed.\n"
-            f"  still stale: {sorted(stale) or '(none)'}\n"
-            f"  expected:    {sorted(KNOWN_PDF_LAG)}\n"
-            "If you just regenerated the PDF from the Google Doc: empty "
-            "KNOWN_PDF_LAG and delete this test, the ratchet has done its "
-            "job. If a retired claim came back, fix the source document — "
-            "the PDF is what gets forwarded.")
+            stale, [],
+            f"the resume PDF has regained retired claim(s): {stale}. Fix the "
+            "Google Doc and re-export — the PDF cannot be patched from this "
+            "repo, and it is what gets forwarded.")
+
+    def test_pdf_agrees_with_the_pages_on_why_the_pipeline_was_rebuilt(self):
+        # index.html and resume.html both have to say image submissions
+        # defeated OCR. The PDF is the third copy of that story, and the one a
+        # reader is most likely to be holding while looking at the other two.
+        self.assertRegex(
+            self.text, r"(image-based|phone-camera)\s+submissions",
+            "the resume PDF no longer gives image submissions as the cause of "
+            "the re-architecture, so it now contradicts both live pages.")
+
+    def test_pdf_does_not_name_a_serving_stack(self):
+        # "VLM" is a vision-language model; "vLLM" is a serving engine. An
+        # earlier draft of the source document said "self-hosted vLLM with
+        # Llama", which claims infrastructure that was never run and invites
+        # an interview question about a different subject entirely.
+        for stack in ("vLLM", "TGI", "Ollama", "SageMaker", "Triton"):
+            with self.subTest(stack=stack):
+                self.assertNotIn(
+                    stack, self.text,
+                    f"the resume PDF names a serving stack ({stack}). The "
+                    "approved phrasing is 'vision-language model (Llama)'.")
 
 
 if __name__ == "__main__":
