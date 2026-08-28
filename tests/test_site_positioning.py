@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
-"""Guards the one distinction the site makes about Jonathan's title.
+"""Guards the one title distinction the site makes.
 
 There are two different claims on these pages that read almost identically:
 
-  * the *headline* — how he positions himself, which is "AI Lead Software
-    Engineer". It appears in the hero badge, the footer byline on every page,
-    the cerebro project byline, and two meta descriptions.
-  * the *employer job title* — what Capital One actually calls the role, which
-    is "Lead Software Engineer", plain. It appears as the role heading in the
-    experience timeline on index.html and resume.html.
+  * the headline — the self-description, "AI Lead Software Engineer". It
+    appears in the hero badge, the footer byline on every page, the cerebro
+    project byline, and two meta descriptions.
+  * the job title — "Lead Software Engineer", plain. It appears as the role
+    heading in the experience timeline on index.html and resume.html.
 
-The resume PDF keeps them apart for a reason: the header reads "AI LEAD
-SOFTWARE ENGINEER" while the experience entry reads "Lead Software Engineer |
-CAPITAL ONE". Collapsing the two would turn a self-description into a claim
-about what an employer conferred, on a page recruiters check.
+The resume PDF keeps them apart: the header reads "AI LEAD SOFTWARE ENGINEER"
+while the experience entry reads "Lead Software Engineer | CAPITAL ONE".
+Collapsing the two would turn a self-description into a claim about what the
+employer conferred.
 
 A site-wide find-and-replace is the obvious way to break this, and it would
 look completely reasonable in a diff. Hence these tests.
@@ -162,7 +161,7 @@ class EmployerTitleIsNotInflated(unittest.TestCase):
         """Nothing may put the headline and the employer next to each other.
 
         "AI Lead Software Engineer · Capital One" reads as an assertion about
-        what Capital One calls him, which his own resume contradicts.
+        what Capital One calls the role, which the resume contradicts.
 
         Both orderings are checked, on tag-stripped text, because "Capital One
         — AI Lead Software Engineer" is the way a person actually writes a
