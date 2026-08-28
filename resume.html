@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Resume — Jonathan Reyes</title>
-<meta name="description" content="Resume of Jonathan Reyes — AI Lead Software Engineer. Distributed systems, APIs, and developer platforms in regulated environments at Capital One.">
+<meta name="description" content="Resume of Jonathan Reyes — AI Lead Software Engineer. Production LLM systems, evaluation, and platform architecture in regulated financial services.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080f'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='bold' fill='%2322d3ee' text-anchor='middle'%3Ejr%3C/text%3E%3C/svg%3E">
 <script>document.documentElement.classList.add("js")</script>
 <link rel="stylesheet" href="style/portfolio.css">
@@ -314,7 +314,7 @@
       <!-- ================= SUMMARY ================= -->
       <div class="block reveal" id="summary">
         <h2 class="eyebrow">Summary</h2>
-        <p class="intro">Lead software engineer with <b>11 years building distributed systems, APIs, and developer platforms</b> in regulated financial services. At Capital One, leads architecture for a high-throughput platform orchestrating communications with external dealership partners, and previously ran the platform ecosystem around the company-wide JFrog Artifactory binary repository. Leads both net-new architecture and changes to it through <b>Architecture Decision Records</b>, including AI systems. Author and maintainer of <b>boost</b>, an independent open-source package manager for AI coding skills. Works primarily in <b>Java and Python on AWS</b>, with a record of setting standards that spread beyond team boundaries.</p>
+        <p class="intro">Builds <b>production LLM systems</b> in regulated financial services, on <b>11 years of distributed-systems, API, and developer-platform work</b>. At Capital One, leads architecture for a document-intelligence pipeline — extraction schemas, prompts, and <b>golden-set evaluation</b> in production — and for a high-throughput platform orchestrating communications with external dealership partners; previously ran the platform ecosystem around the company-wide JFrog Artifactory binary repository. Leads both net-new architecture and changes to it through <b>Architecture Decision Records</b>, including AI systems. Author and maintainer of <b>boost</b>, an independent open-source package manager for AI coding skills. Works primarily in <b>Java and Python on AWS</b>, with a record of setting standards that spread beyond team boundaries.</p>
       </div>
 
       <!-- ================= EXPERIENCE ================= -->
@@ -335,7 +335,8 @@
             <li>Lead architecture, technical direction, and delivery for a <b>high-throughput platform orchestrating communications with external dealership partners</b>, built on AWS microservices (ECS, API Gateway, SQS, Kafka, Docker, PostgreSQL, Oracle).</li>
             <li>Led a <b>zero-loss migration of a highly stateful distributed system</b> between AWS accounts — coupled Spring Boot streams spanning Oracle, PostgreSQL, SQS, and Kafka — traffic-splitting live workloads under tight SLAs without dropping or duplicating a request.</li>
             <li>Built a <b>document-intelligence pipeline</b> that extracts structured findings from unstructured partner documents, replacing manual review for analyst teams.</li>
-            <li>Support <b>PCI, NPI, and model-risk reviews</b> — classifying sensitive data and remediating via tokenization and masking; re-architected the platform's OCR solution after data classification surfaced highly confidential information, evolving from Textract through <b>AWS Bedrock</b> to a vision-language model (Llama) while tuning extraction schemas, prompts, and golden-set evaluations in production.</li>
+            <li>Re-architected that pipeline's extraction path from <b>AWS Textract</b> through <b>AWS Bedrock</b> to a <b>vision-language model (Llama)</b> when image-based submissions defeated OCR, tuning extraction schemas, prompts, and <b>golden-set evaluations</b> in production.</li>
+            <li>Support <b>PCI, NPI, and model-risk reviews</b> — classifying sensitive data and remediating via tokenization and masking.</li>
             <li>Designed <b>event-driven processing pipelines</b> in which EventBridge rules trigger Step Functions orchestrating AWS Batch jobs over S3 file drops, with companion state machines verifying downstream delivery and raising alarms.</li>
             <li>Practice <b>AI-assisted engineering</b> daily (Claude Code, Windsurf) with <b>MCP integrations</b> across Jira, Confluence, and GitHub; integrate agent tooling into development workflows and set team conventions for its use.</li>
             <li>Prototyped <b>several developer-enablement tools</b> at internal hackathons — including retrieval over large JSON corpora — that drew adoption requests from engineering managers across teams.</li>
@@ -444,11 +445,11 @@
           </div>
           <div class="row">
             <div class="k">Cloud &amp; Infrastructure</div>
-            <div class="v"><code class="hot">AWS (ECS, Lambda, Step Functions, EventBridge, API Gateway, DynamoDB, Aurora, Textract, Bedrock)</code><code>IAM</code><code>Docker</code><code>Kubernetes</code><code>OpenShift</code><code>Terraform</code><code>Linux</code></div>
+            <div class="v"><code class="hot">AWS (ECS, Lambda, Step Functions, EventBridge, API Gateway, DynamoDB, Aurora, Textract, Bedrock)</code><code>IAM</code><code>Docker</code><code>OpenShift (Kubernetes)</code><code>Terraform</code><code>Linux</code></div>
           </div>
           <div class="row">
             <div class="k">AI &amp; Automation</div>
-            <div class="v"><code class="hot">AI-assisted engineering (Claude Code, Windsurf)</code><code class="hot">MCP integrations</code><code>prompt engineering</code><code>LLM evaluation (ragas, golden-set evals)</code><code>LangChain (RAG)</code><code>document intelligence</code></div>
+            <div class="v"><code class="hot">AI-assisted engineering (Claude Code, Windsurf)</code><code class="hot">MCP integrations</code><code>prompt engineering</code><code>LLM evaluation (ragas, golden-set evals)</code><code>retrieval (BM25, dense, hybrid)</code><code>document intelligence</code></div>
           </div>
           <div class="row">
             <div class="k">Platform &amp; Delivery</div>

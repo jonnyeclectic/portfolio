@@ -6,13 +6,23 @@ name: tools
 # and the visual harness, so every commit touching only tools/ or
 # tests/test_*.py would otherwise land with nothing run against it.
 #
-# test_site_positioning.py runs the other way round: it reads the live pages,
-# so it has to fire on HTML edits too. That is why "**.html" is in the filter
-# below even though this workflow is nominally about tools/. Without it the
-# guard would sit green while the exact edit it exists to catch sailed past,
-# because visual.yml renders pages but never runs Python. The suite is
-# stdlib-only and finishes in well under a second, so the extra trigger is
-# close to free.
+# test_site_positioning.py and test_site_claims.py run the other way round:
+# they read the live pages, so they have to fire on HTML edits too. That is why
+# "**.html" is in the filter below even though this workflow is nominally about
+# tools/. Without it the guards would sit green while the exact edits they
+# exist to catch sailed past, because visual.yml renders pages but never runs
+# Python. The suite is stdlib-only and finishes in well under a second, so the
+# extra triggers are close to free.
+#
+# "images/**" is here because test_site_claims.py now reads the resume PDF.
+# That file is the highest-distribution artifact in the repo — it is what gets
+# forwarded to recruiters and parsed by ATS software — and until it acquired a
+# test it was also the least governed: no workflow watched it, so a regenerated
+# resume could contradict every page on the site and CI would stay green.
+#
+# The test glob is "tests/**.py", not "tests/test_*.py": pdftext.py is a helper
+# rather than a test module, so the narrower pattern would let a change to the
+# PDF decoder itself land untested.
 #
 # tools/reddit_query.py is a network client whose every real bug was in the
 # transport layer (silent gzip truncation, IncompleteRead, double-unescaped
@@ -29,14 +39,16 @@ on:
     branches: [master]
     paths:
       - "tools/**"
-      - "tests/test_*.py"
+      - "tests/**.py"
       - "**.html"
+      - "images/**"
       - ".github/workflows/tools.yml"
   pull_request:
     paths:
       - "tools/**"
-      - "tests/test_*.py"
+      - "tests/**.py"
       - "**.html"
+      - "images/**"
       - ".github/workflows/tools.yml"
 
 permissions: {}

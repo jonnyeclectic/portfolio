@@ -544,14 +544,15 @@
           <h3>Document intelligence, from pilot to production</h3>
           <p>A pipeline that turns unstructured documents into structured findings.</p>
           <ul class="bullets">
-            <li>A fifth of submissions arrived as phone-camera photos, not PDFs, and
-              OCR failed on them.</li>
+            <li>A significant share of submissions arrived as phone-camera photos,
+              not PDFs, and OCR failed on them.</li>
             <li>I re-architected the OCR solution from <b>AWS Textract</b> through
               <b>AWS Bedrock</b> to a <b>vision-language model (Llama)</b>. Bedrock
               handled more of the submissions than OCR could, but not the hardest
               ones — the VLM reads the image itself.</li>
-            <li>The VLM reads images against the same extraction schemas, holding the
-              accuracy analysts already relied on.</li>
+            <li>The VLM reads images against the same extraction schemas. Every model,
+              prompt and schema change is scored against an analyst-adjudicated golden
+              set before it ships.</li>
           </ul>
           <div class="tags"><code>Python</code><code>VLM (Llama)</code><code>S3</code><code>AWS Bedrock</code></div>
         </div>
