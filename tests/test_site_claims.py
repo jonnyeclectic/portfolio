@@ -55,6 +55,45 @@ RETIRED_CLAIMS = {
     "langchain-skill": re.compile(r"\bLangChain\s*\(RAG\)", re.I),
 }
 
+# Employer-proprietary detail: throughput figures, internal org scope, and
+# internal business process. Every one of these was live on the `main` branch
+# until it was deleted on 2026-08-28 — in the HTML *and* in the resume PDF
+# tracked alongside it — so this is a regression guard with a real history,
+# not a hypothetical.
+#
+# The throughput rules deliberately require an explicit *rate* context rather
+# than banning a bare number. Jonathan's own open-source figures are his to
+# publish, and two of them live on these very pages: boost's "10,000-resample
+# paired bootstrap" and its index of "10,000+ publicly available skills". A
+# guard stricter than his own resume is a broken guard, and
+# `test_open_source_numbers_are_not_flagged` pins that distinction.
+PROPRIETARY_DETAIL = [
+    (re.compile(r"\d[\d,.]*\s*\+?\s*(?:requests?|apps?|applications?|events?"
+                r"|transactions?|calls?|messages?)\s*(?:/|\s+per\s+)"
+                r"\s*(?:hour|hr|min|minute|second|sec|day)", re.I),
+     "a proprietary throughput rate"),
+    (re.compile(r"(?:requests?|apps?|applications?|events?|transactions?|calls?"
+                r"|messages?)\s*(?:/|\s+per\s+)\s*(?:hour|hr|min|minute"
+                r"|second|sec)", re.I),
+     "a proprietary throughput rate"),
+    # The noun can also come *before* the number ("processing requests at
+    # 10,000+ per hour"), which the two rules above both miss — they anchor
+    # the unit to the noun. Found by the mutation test below, not by reading.
+    (re.compile(r"\d[\d,.]*\s*\+?\s*(?:per|/)\s*"
+                r"(?:hour|hr|min|minute|second|sec)", re.I),
+     "a proprietary throughput rate"),
+    (re.compile(r"\b10K\b(?=.{0,40}(?:hour|loan|app))", re.I | re.S),
+     "the 10K/hour hero figure"),
+    (re.compile(r"loan apps?\s*/", re.I),
+     "a throughput figure with the product unit attached"),
+    (re.compile(r"every technology organization at", re.I),
+     "internal infrastructure scope"),
+    (re.compile(r"all communications between", re.I),
+     "internal architecture scope — say 'with external dealership partners'"),
+    (re.compile(r"dealership marketing targets", re.I),
+     "an internal business process"),
+]
+
 # The PDF used to lag the pages, and a KNOWN_PDF_LAG set pinned exactly how
 # far. It was regenerated from the Google Doc on 2026-08-10 and now carries
 # none of the retired wordings, so the ratchet has reached its stop and the
@@ -174,6 +213,62 @@ class ProprietaryDetailStaysOut(unittest.TestCase):
                          if hit else "")
 
 
+    def test_no_page_carries_proprietary_throughput_or_internal_scope(self):
+        """The figures that were live on `main` until it was deleted.
+
+        "10,000+ requests/hour", "10K / Loan apps per hour", "all
+        communications between Capital One, its dealership partners and
+        internal messaging systems", "every technology organization at Capital
+        One", "dealership marketing targets" — none of these had ever been
+        asserted by a test, which is exactly why they survived on a public
+        branch for a month after being scrubbed from the live pages.
+        """
+        for page in LIVE_PAGES:
+            for pattern, why in PROPRIETARY_DETAIL:
+                with self.subTest(page=page, why=why):
+                    hit = pattern.search(read(page))
+                    self.assertIsNone(
+                        hit, f"{page} states {why}: "
+                             f"{hit.group(0)!r}" if hit else "")
+
+    def test_open_source_numbers_are_not_flagged(self):
+        """boost's own public figures must pass. They are Jonathan's to publish.
+
+        This is not decoration. The first draft of this guard banned a bare
+        "10,000" and flagged four true positives on this repo's own pages,
+        which would have made the suite stricter than the resume it protects.
+        """
+        for allowed in [
+            "a seeded <b>10,000-resample paired bootstrap</b>, so a regression",
+            "paired bootstrap · 10,000 resamples · no significant regression",
+            "indexes more than 10,000 publicly available skills",
+            "a 70+ command Python CLI with its own MCP server",
+        ]:
+            for pattern, why in PROPRIETARY_DETAIL:
+                with self.subTest(allowed=allowed[:40], why=why):
+                    self.assertIsNone(
+                        pattern.search(allowed),
+                        f"guard fires on Jonathan's own open-source figure "
+                        f"({why}): {allowed!r}")
+
+    def test_guard_catches_the_wordings_that_were_live_on_main(self):
+        """Break it on purpose. Verbatim strings from the deleted branch."""
+        for sample in [
+            "processing requests at 10,000+ per hour on AWS microservices",
+            "processing thousands of loan applications per hour",
+            "<b>10K</b><span>Loan apps / hour orchestrated</span>",
+            "orchestrating all communications between Capital One, its "
+            "dealership partners, and internal messaging systems",
+            "the binary repository consumed by every technology organization "
+            "at Capital One",
+            "findings that analysts use to set dealership marketing targets",
+        ]:
+            with self.subTest(sample=sample[:50]):
+                self.assertTrue(
+                    any(p.search(sample) for p, _ in PROPRIETARY_DETAIL),
+                    f"guard would not catch: {sample!r}")
+
+
 class ResumePdfIsGoverned(unittest.TestCase):
     """The PDF had no test at all before this, and no workflow watched it."""
 
@@ -235,6 +330,17 @@ class ResumePdfIsGoverned(unittest.TestCase):
             self.text, r"(image-based|phone-camera)\s+submissions",
             "the resume PDF no longer gives image submissions as the cause of "
             "the re-architecture, so it now contradicts both live pages.")
+
+    def test_pdf_carries_no_proprietary_throughput_or_internal_scope(self):
+        """The PDF tracked on `main` carried six of these while the HTML beside
+        it had already been scrubbed — it is binary, so every text-level guard
+        that existed simply did not look at it."""
+        for pattern, why in PROPRIETARY_DETAIL:
+            with self.subTest(why=why):
+                hit = pattern.search(self.text)
+                self.assertIsNone(
+                    hit, f"the resume PDF states {why}: {hit.group(0)!r}. Fix "
+                         "the Google Doc and re-export." if hit else "")
 
     def test_pdf_does_not_name_a_serving_stack(self):
         # "VLM" is a vision-language model; "vLLM" is a serving engine. An
