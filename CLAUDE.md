@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Jonathan Reyes's personal portfolio site: static HTML/CSS/JS, no build tooling and
+A personal portfolio site: static HTML/CSS/JS, no build tooling and
 no package manager. There is nothing to compile — edit the HTML files directly.
 
 Two directories are developer tooling rather than site content, and neither is
@@ -30,12 +30,12 @@ node tests/visual/visual_check.mjs                     # headless Chrome, see te
 `tests/visual/` checks the pages as rendered. The Python suite covers `tools/`,
 plus two page-level guards:
 
-- `tests/test_site_positioning.py` — the claims the site makes about Jonathan's
-  *title*. See "Title vs. headline" below.
-- `tests/test_site_claims.py` — the claims it makes about his *work*: retired
+- `tests/test_site_positioning.py` — the site's *title* claim. See "Title vs.
+  headline" below.
+- `tests/test_site_claims.py` — the claims it makes about the *work*: retired
   wordings that must not return, cross-page consistency, skill chips that outrun
-  the record, and the severance-risk scrubbing. See "Claims that are asserted,
-  not remembered" below. It reads the resume PDF via `tests/pdftext.py`.
+  the record, and withdrawn detail. See "Claims that are asserted, not
+  remembered" below. It reads the resume PDF via `tests/pdftext.py`.
 
 Both guards are mutation-tested, and that is not ceremony. The first version of
 the title guard matched raw HTML in one direction inside a 12-character window,
@@ -78,7 +78,7 @@ a shared component's markup/CSS in one page, replicate the same edit in the othe
 two; there is no shared stylesheet to edit once.
 
 - `experience.html` (root) **no longer exists.** It was once a standalone landing
-  page for *boost* (Jonathan's separate open-source AI-coding-skills package
+  page for *boost* (the separate open-source AI-coding-skills package
   manager) in the Aurora design system, but it was deleted when `index.html`'s nav
   switched to linking the live boost site directly
   (`https://jonnyeclectic.github.io/boost/`). The only `experience.html` left is
@@ -104,19 +104,16 @@ When asked to update site content or styling, assume the request is about
 
 ## Content conventions
 
-- Don't state specific proprietary metrics from employer work (e.g. exact
-  request/throughput numbers, transaction volumes) — history shows these were
-  deliberately generalized (`10,000+ requests/hour` → "a high-throughput...
-  platform", `10K Loan apps / hour orchestrated` → "Millions of events processed
-  monthly") after being flagged as proprietary. Prefer qualitative framing
-  ("high-throughput", "at scale") over precise figures for current-employer work.
+- Don't state specific metrics from employer work — exact request or throughput
+  rates, transaction volumes. These were generalised deliberately. Prefer
+  qualitative framing ("high-throughput", "at scale") over precise figures.
+  `test_site_claims.py` enforces this; read `RESTRICTED_DETAIL` there.
 - Recent history also shows a deliberate copy-tone pass ("mature copy tone and fix
   grammar/formatting") — keep new copy consistent with that tone rather than
   reintroducing casual phrasing.
-- Ratios about employer work are proprietary metrics too. "A fifth of submissions
-  arrived as phone-camera photos" states an internal input mix; "a significant
-  share" makes the identical point and discloses nothing. `test_site_claims.py`
-  checks for the shape, not just that one sentence.
+- Ratios count as metrics too: a stated input mix is an operational statistic,
+  and the qualitative form ("a significant share") makes the same point.
+  `test_site_claims.py` checks for the shape, not just one sentence.
 
 ### Claims that are asserted, not remembered
 
@@ -124,34 +121,27 @@ When asked to update site content or styling, assume the request is about
 already broken once each. Read it before rewording anything factual.
 
 - **The document-intelligence rebuild was driven by input format.** Image
-  submissions defeated OCR. It was *not* driven by a data-classification review
-  — that was a separate problem with a different consequence (file truncation
-  and temporary manual review). Beyond being the wrong cause, the retired
-  phrasing had a named bank employee publicly describing what a classification
-  review found inside a production system he owns. Keep the two accomplishments
-  in separate sentences; welding them with a semicolon is how they merged.
+  submissions defeated OCR. The other phrasing names a different cause
+  entirely, and the two belong in separate sentences — welding them with a
+  semicolon is how they merged last time.
 - **`index.html` and `resume.html` must tell the same story.** They are one
   click apart and a reader opens both. When they disagreed about why the
   pipeline was rebuilt, whichever one a reader believed, the other looked
   written to impress — strictly worse than a single wrong claim.
-- **A bare chip in a skills table reads as "I ship this."** LangChain was an
-  internal hackathon prototype and never shipped; Kubernetes is OpenShift at IBM
-  in 2017–2019, while the current platform runs on ECS. Neither may stand
-  unqualified. The nuance belongs in the `contact.html` FAQ, which draws the
-  distinction properly — and that FAQ is also where the *under*-claiming lives,
-  so check it against the boost source rather than trusting it.
-- **No public availability banner.** A "looking for roles" line, indexed, next
-  to a named employer and a component-level description of its production
-  platform, is the one item here whose cost is not measured in interviews. The
-  contact page's role spec says the same thing to someone who already chose to
-  land there.
+- **A bare chip in a skills table reads as a production claim.** Neither
+  LangChain nor Kubernetes may stand unqualified; the Kubernetes experience is
+  OpenShift, which the IBM role entry already dates. The nuance belongs in the
+  `contact.html` FAQ — which is also where the *under*-claiming lives, so check
+  it against the boost source rather than trusting it.
+- **No public availability banner.** An indexed "looking for roles" line is not
+  wanted. The contact page's role spec says the same thing to someone who
+  already chose to land there.
 
-**The resume PDF is in sync with the pages as of 2026-08-10, and it is the
-artifact that gets forwarded.** It is a Google Docs export, so correcting it
-means editing the source document and re-exporting — it cannot be patched from
-this repo. The canonical source is the Drive doc **"Resume Template"**
-(`1hbQtDY6D_s1B4l6JWsb4TGRdR_Kr9fvksp3kD6WZCws`); the other three resume docs
-in Drive are superseded and disagree with it.
+**The resume PDF is in sync with the pages as of 2026-08-10.** It is a Google
+Docs export, so correcting it means editing the source document and
+re-exporting — it cannot be patched from this repo. The canonical source is the
+Drive doc named "Resume Template"; the other resume docs there are superseded
+and disagree with it.
 
 `test_site_claims.py` holds the PDF to the same standard as the pages: no
 retired claim, the same rebuild cause, no serving stack named, no partner
@@ -176,18 +166,18 @@ Two traps worth knowing before editing that document:
 Two near-identical strings on this site mean different things, and conflating them
 is the easiest mistake to make here:
 
-- **"AI Lead Software Engineer"** is the *headline* — how Jonathan positions
-  himself. It belongs in the hero badge, the footer byline on every page, the
-  cerebro project byline, and meta descriptions.
-- **"Lead Software Engineer"**, plain, is the *employer job title* — what Capital
-  One actually calls the role. It belongs in the experience-timeline `<h4>` on
-  `index.html` and `resume.html`, and nowhere else.
+- **"AI Lead Software Engineer"** is the *headline* — the self-description. It
+  belongs in the hero badge, the footer byline on every page, the cerebro
+  project byline, and meta descriptions.
+- **"Lead Software Engineer"**, plain, is the *job title* — what Capital One
+  calls the role. It belongs in the experience-timeline `<h4>` on `index.html`
+  and `resume.html`, and nowhere else.
 
 The resume PDF keeps them apart the same way: its header reads "AI LEAD SOFTWARE
 ENGINEER" while its experience entry reads "Lead Software Engineer | CAPITAL ONE".
 Prefixing the role heading with "AI", or writing "AI Lead Software Engineer ·
-Capital One", turns a self-description into a claim about what an employer
-conferred — on a page recruiters verify. A site-wide find-and-replace does exactly
+Capital One", turns a self-description into a claim about what the employer
+conferred. A site-wide find-and-replace does exactly
 that and looks perfectly reasonable in a diff, which is why
 `tests/test_site_positioning.py` asserts both halves.
 

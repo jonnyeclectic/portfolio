@@ -15,10 +15,9 @@ name: tools
 # extra triggers are close to free.
 #
 # "images/**" is here because test_site_claims.py now reads the resume PDF.
-# That file is the highest-distribution artifact in the repo — it is what gets
-# forwarded to recruiters and parsed by ATS software — and until it acquired a
-# test it was also the least governed: no workflow watched it, so a regenerated
-# resume could contradict every page on the site and CI would stay green.
+# Until it acquired a test that file was the least governed thing in the repo:
+# no workflow watched it, so a regenerated resume could contradict every page
+# on the site and CI would stay green.
 #
 # The test glob is "tests/**.py", not "tests/test_*.py": pdftext.py is a helper
 # rather than a test module, so the narrower pattern would let a change to the

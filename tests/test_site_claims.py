@@ -1,31 +1,23 @@
 #!/usr/bin/env python3
-"""Guards what the site *claims*, as opposed to how it is worded.
+"""Guards what the site claims, as opposed to how it is worded.
 
 `test_site_positioning.py` checks one string against another. These tests
-check something harder to see in a diff: whether the pages assert things that
-are not true, that overreach the record, or that quietly contradict each other.
+check something harder to see in a diff: whether the pages assert more than
+the record supports, or quietly contradict each other.
 
-Three classes of defect are covered, all of them found in a real review rather
-than imagined:
+Three classes of defect are covered:
 
-  * **A retired claim coming back.** The document-intelligence re-architecture
-    was driven by input format — image submissions defeated OCR. An earlier
-    draft attributed it to a data-classification review instead. That is both
-    the wrong cause and a far more sensitive statement to publish under a named
-    employer, so the phrasing is banned outright rather than left to memory.
-  * **Two pages telling different stories.** index.html and resume.html are one
-    click apart and a reader opens both. When they disagreed about why the
-    pipeline was rebuilt, whichever page a reader believed, the other one
-    looked written-to-impress. Consistency is asserted, not assumed.
-  * **Skill chips that outrun the record.** A bare tag in a skills table reads
-    as "I ship this." LangChain was a hackathon prototype and the Kubernetes
-    is OpenShift from 2017–2019, so neither may stand unqualified.
+  * A retired wording returning. Some phrasings are withdrawn on purpose and
+    are pinned here rather than left to memory.
+  * Two pages telling different stories. index.html and resume.html are one
+    click apart and a reader opens both, so agreement between them is
+    asserted rather than assumed.
+  * Skill chips that outrun the record. A bare tag in a skills table reads as
+    a production claim, so some entries have to carry a qualifier.
 
-The resume PDF is checked too, and that is new. It is the highest-distribution
-artifact here — it goes into ATS parsers and gets forwarded beyond his control
-— and until now it was the least governed: no workflow watched `images/` at
-all. It is a Google Docs export with subsetted fonts, so see `pdftext.py` for
-why reading it takes more than a substring search.
+The resume PDF is held to the same terms. It is a Google Docs export with
+subsetted fonts, so see `pdftext.py` for why reading it takes more than a
+substring search.
 
 Stdlib only and fully offline. Run from the repo root:
 
@@ -43,8 +35,8 @@ PDF = ROOT / "images" / "Jonathan Reyes Resume.pdf"
 
 LIVE_PAGES = ["index.html", "resume.html", "contact.html", "docs/index.html"]
 
-# Dealership networks the platform dispatches to. None has ever appeared on the
-# site; this is a regression guard, not a cleanup.
+# Third-party names that must not appear on the site. None ever has; this is
+# a regression guard rather than a cleanup.
 PARTNER_NAMES = ["RouteOne", "DealerTrack", "Dealertrack", "CarMax",
                  "Carvana", "Cox Automotive"]
 
@@ -54,6 +46,41 @@ RETIRED_CLAIMS = {
     "wrong-cause": re.compile(r"data\s+classification\s+surfaced", re.I),
     "langchain-skill": re.compile(r"\bLangChain\s*\(RAG\)", re.I),
 }
+
+# Phrasings withdrawn from the pages: throughput rates, organisational scope,
+# and process detail. These are pinned so an edit cannot reintroduce them.
+#
+# The throughput rules require an explicit *rate* context rather than banning
+# a bare number, because the open-source figures on these pages are meant to
+# be here — the eval harness's "10,000-resample paired bootstrap" and boost's
+# index of "10,000+ publicly available skills" both read as numbers and both
+# must pass. `test_open_source_numbers_are_not_flagged` pins that line.
+RESTRICTED_DETAIL = [
+    (re.compile(r"\d[\d,.]*\s*\+?\s*(?:requests?|apps?|applications?|events?"
+                r"|transactions?|calls?|messages?)\s*(?:/|\s+per\s+)"
+                r"\s*(?:hour|hr|min|minute|second|sec|day)", re.I),
+     "a throughput rate"),
+    (re.compile(r"(?:requests?|apps?|applications?|events?|transactions?|calls?"
+                r"|messages?)\s*(?:/|\s+per\s+)\s*(?:hour|hr|min|minute"
+                r"|second|sec)", re.I),
+     "a throughput rate"),
+    # The noun can also precede the number, which the two rules above both
+    # miss: they anchor the unit to the noun. Found by the mutation test
+    # below rather than by reading.
+    (re.compile(r"\d[\d,.]*\s*\+?\s*(?:per|/)\s*"
+                r"(?:hour|hr|min|minute|second|sec)", re.I),
+     "a throughput rate"),
+    (re.compile(r"\b10K\b(?=.{0,40}(?:hour|loan|app))", re.I | re.S),
+     "the 10K/hour hero figure"),
+    (re.compile(r"loan apps?\s*/", re.I),
+     "a throughput figure with the product unit attached"),
+    (re.compile(r"every technology organization at", re.I),
+     "internal infrastructure scope"),
+    (re.compile(r"all communications between", re.I),
+     "internal architecture scope — say 'with external dealership partners'"),
+    (re.compile(r"dealership marketing targets", re.I),
+     "an internal business process"),
+]
 
 # The PDF used to lag the pages, and a KNOWN_PDF_LAG set pinned exactly how
 # far. It was regenerated from the Google Doc on 2026-08-10 and now carries
@@ -78,9 +105,8 @@ def skill_chips(page):
 class RetiredClaimsStayRetired(unittest.TestCase):
 
     def test_no_live_page_attributes_the_rebuild_to_data_classification(self):
-        # The real driver was input format. Beyond being inaccurate, this
-        # phrasing has a named bank employee publicly describing what a data
-        # classification review found inside a production system he owns.
+        # The two are separate matters with different consequences, and the
+        # withdrawn phrasing welded them together.
         pattern = RETIRED_CLAIMS["wrong-cause"]
         for page in LIVE_PAGES:
             with self.subTest(page=page):
@@ -93,9 +119,8 @@ class RetiredClaimsStayRetired(unittest.TestCase):
                          "own sentence.")
 
     def test_skills_tables_do_not_claim_langchain_or_bare_kubernetes(self):
-        # A bare chip in a skills table reads as "I ship this". LangChain was
-        # an internal hackathon prototype, and the Kubernetes is OpenShift at
-        # IBM in 2017–2019, which the IBM role entry already dates.
+        # A bare chip in a skills table reads as a production claim. Neither
+        # of these is one, so neither may stand unqualified.
         chips = skill_chips("resume.html")
         self.assertTrue(chips, "resume.html skills chips not found — regex broke")
 
@@ -107,9 +132,8 @@ class RetiredClaimsStayRetired(unittest.TestCase):
         langchain = [c for c in chips if "langchain" in c.lower()]
         self.assertEqual(
             langchain, [],
-            f"resume.html claims LangChain as a skill ({langchain}); it was an "
-            "internal hackathon prototype and was never shipped. The honest "
-            "version of this claim lives in the contact.html FAQ.")
+            f"resume.html lists LangChain as a skill ({langchain}); it needs "
+            "the qualifier the contact.html FAQ already gives it.")
 
         # "OpenShift (Kubernetes)" is fine — it is qualified, and the IBM role
         # entry dates it. A chip that *leads* with Kubernetes is the claim of
@@ -136,11 +160,8 @@ class PagesAgreeWithEachOther(unittest.TestCase):
                     "Both pages must give the same cause for the rebuild.")
 
     def test_no_page_advertises_availability_in_an_indexed_banner(self):
-        # A public "I am looking" line, attached to a named employer and a
-        # component-level description of its production platform, is the one
-        # artifact on this site with a cost measured in something other than
-        # interviews. The contact page's role spec says the same thing to
-        # someone who has already chosen to land there.
+        # An indexed availability line is not wanted. The contact page's role
+        # spec says the same thing to someone who chose to land there.
         for page in LIVE_PAGES:
             with self.subTest(page=page):
                 self.assertNotRegex(
@@ -148,8 +169,8 @@ class PagesAgreeWithEachOther(unittest.TestCase):
                     f"{page}: carries a public availability banner.")
 
 
-class ProprietaryDetailStaysOut(unittest.TestCase):
-    """Severance-risk scrubbing, asserted rather than remembered."""
+class RestrictedDetailStaysOut(unittest.TestCase):
+    """Withdrawn detail, asserted rather than remembered."""
 
     def test_no_partner_is_named(self):
         for page in LIVE_PAGES:
@@ -159,9 +180,8 @@ class ProprietaryDetailStaysOut(unittest.TestCase):
                                      f"{page}: names dispatch partner {name}")
 
     def test_no_page_states_an_input_mix_ratio(self):
-        # "A fifth of submissions arrived as phone-camera photos" is an
-        # unpublished operational statistic about an employer's pipeline. The
-        # qualitative form makes the same point and discloses nothing.
+        # A stated input mix is an operational statistic. The qualitative
+        # form makes the same point.
         ratio = re.compile(
             r"\b(a (fifth|third|quarter|half)|\d{1,3}\s*(%|percent))\s+of\s+"
             r"(the\s+)?(submissions|documents|requests|applications)", re.I)
@@ -174,8 +194,61 @@ class ProprietaryDetailStaysOut(unittest.TestCase):
                          if hit else "")
 
 
+    def test_no_page_carries_restricted_detail(self):
+        """None of these had ever been asserted by a test, which is why an
+        older copy of the pages kept them long after they were withdrawn."""
+        for page in LIVE_PAGES:
+            for pattern, why in RESTRICTED_DETAIL:
+                with self.subTest(page=page, why=why):
+                    hit = pattern.search(read(page))
+                    self.assertIsNone(
+                        hit, f"{page} states {why}: "
+                             f"{hit.group(0)!r}" if hit else "")
+
+    def test_open_source_numbers_are_not_flagged(self):
+        """The open-source figures on these pages must pass.
+
+        Not decoration: the first draft of this guard banned a bare "10,000"
+        and flagged four of them, which would have made the suite stricter
+        than the pages it protects.
+        """
+        for allowed in [
+            "a seeded <b>10,000-resample paired bootstrap</b>, so a regression",
+            "paired bootstrap · 10,000 resamples · no significant regression",
+            "indexes more than 10,000 publicly available skills",
+            "a 70+ command Python CLI with its own MCP server",
+        ]:
+            for pattern, why in RESTRICTED_DETAIL:
+                with self.subTest(allowed=allowed[:40], why=why):
+                    self.assertIsNone(
+                        pattern.search(allowed),
+                        f"guard fires on an open-source figure "
+                        f"({why}): {allowed!r}")
+
+    def test_guard_catches_the_withdrawn_wordings(self):
+        """Break it on purpose, against the wordings verbatim."""
+        for sample in [
+            "processing requests at 10,000+ per hour on AWS microservices",
+            "processing thousands of loan applications per hour",
+            "<b>10K</b><span>Loan apps / hour orchestrated</span>",
+            "orchestrating all communications between Capital One, its "
+            "dealership partners, and internal messaging systems",
+            "the binary repository consumed by every technology organization "
+            "at Capital One",
+            "findings that analysts use to set dealership marketing targets",
+        ]:
+            with self.subTest(sample=sample[:50]):
+                self.assertTrue(
+                    any(p.search(sample) for p, _ in RESTRICTED_DETAIL),
+                    f"guard would not catch: {sample!r}")
+
+
 class ResumePdfIsGoverned(unittest.TestCase):
-    """The PDF had no test at all before this, and no workflow watched it."""
+    """The PDF had no test at all before this, and no workflow watched it.
+
+    It is checked on the same terms as the pages: it is a published artifact
+    and cannot be corrected after it has been downloaded.
+    """
 
     @classmethod
     def setUpClass(cls):
@@ -198,8 +271,7 @@ class ResumePdfIsGoverned(unittest.TestCase):
                       self.text, re.I),
             "the resume PDF's experience entry now claims Capital One "
             "conferred the title 'AI Lead Software Engineer'. It did not — "
-            "that is the headline, and this is the one page recruiters "
-            "verify. Fix the Google Doc and re-export.")
+            "that is the headline. Fix the Google Doc and re-export.")
 
     def test_no_partner_is_named(self):
         for name in PARTNER_NAMES:
@@ -215,17 +287,15 @@ class ResumePdfIsGoverned(unittest.TestCase):
         emptied that set, and tolerating nothing is simply the ratchet at its
         stop — the assertion the whole mechanism existed to arrive at.
 
-        Worth stating plainly: the PDF is the artifact that leaves Jonathan's
-        control. A page can be corrected after the fact; a PDF someone
-        forwarded to a recruiter three weeks ago cannot.
+        A page can be corrected after the fact; a PDF that has already been
+        downloaded cannot.
         """
         stale = sorted(name for name, pattern in RETIRED_CLAIMS.items()
                        if pattern.search(self.text))
         self.assertEqual(
             stale, [],
             f"the resume PDF has regained retired claim(s): {stale}. Fix the "
-            "Google Doc and re-export — the PDF cannot be patched from this "
-            "repo, and it is what gets forwarded.")
+            "Google Doc and re-export — it cannot be patched from this repo.")
 
     def test_pdf_agrees_with_the_pages_on_why_the_pipeline_was_rebuilt(self):
         # index.html and resume.html both have to say image submissions
@@ -236,11 +306,20 @@ class ResumePdfIsGoverned(unittest.TestCase):
             "the resume PDF no longer gives image submissions as the cause of "
             "the re-architecture, so it now contradicts both live pages.")
 
+    def test_pdf_carries_no_restricted_detail(self):
+        """An older copy of the PDF carried these long after the pages had
+        dropped them: being binary, no text-level guard ever looked at it."""
+        for pattern, why in RESTRICTED_DETAIL:
+            with self.subTest(why=why):
+                hit = pattern.search(self.text)
+                self.assertIsNone(
+                    hit, f"the resume PDF states {why}: {hit.group(0)!r}. Fix "
+                         "the Google Doc and re-export." if hit else "")
+
     def test_pdf_does_not_name_a_serving_stack(self):
         # "VLM" is a vision-language model; "vLLM" is a serving engine. An
-        # earlier draft of the source document said "self-hosted vLLM with
-        # Llama", which claims infrastructure that was never run and invites
-        # an interview question about a different subject entirely.
+        # earlier draft of the source document confused the two, which claims
+        # infrastructure that was never run.
         for stack in ("vLLM", "TGI", "Ollama", "SageMaker", "Triton"):
             with self.subTest(stack=stack):
                 self.assertNotIn(
